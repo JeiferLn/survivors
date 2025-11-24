@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[CreateAssetMenu(fileName = "Enemy Database", menuName = "Enemy System/Enemy Database")]
-public class EnemyDatabase : ScriptableObject
+[CreateAssetMenu(fileName = "Enemy Wave", menuName = "Enemy System/Enemy Wave")]
+public class EnemyWave : ScriptableObject
 {
     [System.Serializable]
     public class EnemySpawnInfo

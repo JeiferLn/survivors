@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Enemy TopDown", menuName = "Enemy System TopDown/Enemy Type")]
+[CreateAssetMenu(fileName = "New Enemy", menuName = "Enemy System/Enemy Type")]
 public class EnemyType: ScriptableObject
 {
     [Header("Basic Stats")]

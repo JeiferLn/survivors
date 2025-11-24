@@ -2,15 +2,9 @@ using UnityEngine;
 
 public class GunShooter : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float maxDistance = 100f;
+    [SerializeField] private BulletLinePool linePool;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField] private float lineDuration = 0.05f;
 }

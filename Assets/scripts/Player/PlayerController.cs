@@ -1,56 +1,83 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody rb;
+    private CharacterController controller;
 
-    [SerializeField] private float speed = 5f;
+    [Header("Movimiento")]
+    [SerializeField] private float moveSpeed = 6f;
+    [SerializeField] private float gravity = -9.81f;
+    private float verticalVelocity;
+
+    [Header("Rotación")]
     [SerializeField] private float rotationSpeed = 10f;
     [SerializeField] private Transform cameraTransform;
 
-    private Vector3 inputMovement;
-    private Vector3 lookDirection;
+    private Vector2 moveInput;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
+
+        controller = GetComponent<CharacterController>();
+    }
+
+    public void OnMove(InputValue value)
+    {
+        moveInput = value.Get<Vector2>();
     }
 
     void Update()
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        if (Mathf.Abs(horizontal) < 0.1f && Mathf.Abs(vertical) < 0.1f)
-        {
-            inputMovement = Vector3.zero;
-        }
-        else
-        {
-            Vector3 camForward = cameraTransform.forward;
-            Vector3 camRight = cameraTransform.right;
-
-            camForward.y = 0f;
-            camRight.y = 0f;
-
-            camForward.Normalize();
-            camRight.Normalize();
-
-            inputMovement = (camForward * vertical + camRight * horizontal).normalized;
-        }
-
-        Vector3 lookDir = cameraTransform.forward;
-        lookDir.y = 0f;
-        lookDirection = lookDir;
+        Movement();
     }
 
     void FixedUpdate()
     {
-        rb.MovePosition(rb.position + inputMovement * speed * Time.fixedDeltaTime);
+        Rotation();
+    }
 
-        if (lookDirection.sqrMagnitude > 0.001f)
+    void Movement()
+    {
+        Vector3 input = new Vector3(moveInput.x, 0, moveInput.y).normalized;
+
+        Vector3 moveDir = Vector3.zero;
+
+        if (input.magnitude >= 0.1f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+            moveDir = cameraTransform.forward * input.z + cameraTransform.right * input.x;
+            moveDir.y = 0f;
+            moveDir.Normalize();
+        }
+
+        Vector3 horizontalMovement = moveDir * moveSpeed;
+
+        if (controller.isGrounded)
+        {
+            if (verticalVelocity < 0f)
+                verticalVelocity = -2f;
+        }
+        else
+        {
+            verticalVelocity += gravity * Time.deltaTime;
+        }
+
+        Vector3 finalMovement = horizontalMovement + new Vector3(0, verticalVelocity, 0);
+
+        controller.Move(finalMovement * Time.deltaTime);
+    }
+
+    void Rotation()
+    {
+        Vector3 lookDir = cameraTransform.forward;
+        lookDir.y = 0f;
+
+        if (lookDir.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(lookDir);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
         }
     }

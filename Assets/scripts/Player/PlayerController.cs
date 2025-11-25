@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,9 +17,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform cameraTransform;
 
+    private Vector2 moveInput;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
+    }
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
     }
 
     void Update()
@@ -29,10 +37,7 @@ public class PlayerController : MonoBehaviour
 
     void Movement()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-
-        Vector3 input = new Vector3(horizontal, 0, vertical).normalized;
+        Vector3 input = new Vector3(moveInput.x, 0, moveInput.y).normalized;
 
         Vector3 moveDir = Vector3.zero;
 

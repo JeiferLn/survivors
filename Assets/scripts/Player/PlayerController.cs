@@ -1,48 +1,38 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private Rigidbody rb;
     private CharacterController controller;
 
     [Header("Movimiento")]
-    [SerializeField] private float moveSpeed = 6f;
-    [SerializeField] private float gravity = -9.81f;
+    [SerializeField]
+    private float moveSpeed = 6f;
+
+    [SerializeField]
+    private float gravity = -9.81f;
     private float verticalVelocity;
 
     [Header("Rotación")]
-    [SerializeField] private float rotationSpeed = 10f;
-    [SerializeField] private Transform cameraTransform;
-
-    private Vector2 moveInput;
+    [SerializeField]
+    private Transform cameraTransform;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
-
         controller = GetComponent<CharacterController>();
-    }
-
-    public void OnMove(InputValue value)
-    {
-        moveInput = value.Get<Vector2>();
     }
 
     void Update()
     {
         Movement();
-    }
-
-    void FixedUpdate()
-    {
         Rotation();
     }
 
     void Movement()
     {
-        Vector3 input = new Vector3(moveInput.x, 0, moveInput.y).normalized;
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
+
+        Vector3 input = new Vector3(horizontal, 0, vertical).normalized;
 
         Vector3 moveDir = Vector3.zero;
 
@@ -77,8 +67,7 @@ public class PlayerController : MonoBehaviour
 
         if (lookDir.sqrMagnitude > 0.001f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(lookDir);
-            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
+            transform.rotation = Quaternion.LookRotation(lookDir);
         }
     }
 }

@@ -3,27 +3,27 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    // ------------- MOVEMENT VARIABLES -------------
     [Header("Movimiento")]
     [SerializeField]
     private float moveSpeed = 6f;
 
+    // ------------- GRAVITY VARIABLES -------------
     [SerializeField]
     private float gravity = -9.81f;
 
+    // ------------- CHARACTER CONTROLLER -------------
     private float verticalVelocity;
     private CharacterController controller;
 
+    // ------------- CAMERA VARIABLES -------------
     [Header("Camara")]
-    [SerializeField]
-    private float lookSensitivity = 2f;
-
     [SerializeField]
     private Transform cameraTransform;
 
+    // ------------- INPUT VARIABLES -------------
     private Vector2 moveInput;
     private Vector2 lookInput;
-
-    private float cameraPitch = 0f;
 
     // ------------- START -------------
     private void Start()
@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
 
-    // ------------- INPUT SYSTEM -------------
+    // ------------- INPUT ACTIONS -------------
     public void OnMove(InputAction.CallbackContext ctx)
     {
         moveInput = ctx.ReadValue<Vector2>();
@@ -48,16 +48,18 @@ public class PlayerController : MonoBehaviour
         MovePlayer();
         ApplyGravity();
         RotateTowardsMouse();
-        RotateCamera();
     }
 
     // ------------- MOVEMENT -------------
     private void MovePlayer()
     {
-        Vector3 direction = new Vector3(moveInput.x, 0, moveInput.y);
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
 
-        direction = cameraTransform.TransformDirection(direction);
-        direction.y = 0f;
+        forward.y = 0;
+        right.y = 0;
+
+        Vector3 direction = forward * moveInput.y + right * moveInput.x;
         direction.Normalize();
 
         controller.Move(direction * moveSpeed * Time.deltaTime);
@@ -76,8 +78,7 @@ public class PlayerController : MonoBehaviour
             verticalVelocity += gravity * Time.deltaTime;
         }
 
-        Vector3 verticalMove = new Vector3(0, verticalVelocity, 0);
-        controller.Move(verticalMove * Time.deltaTime);
+        controller.Move(new Vector3(0, verticalVelocity, 0) * Time.deltaTime);
     }
 
     // ------------- ROTATION -------------
@@ -87,26 +88,16 @@ public class PlayerController : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, 200f))
         {
-            Vector3 point = hit.point;
-            point.y = transform.position.y;
+            Vector3 lookPoint = hit.point;
+            lookPoint.y = transform.position.y;
 
-            Vector3 dir = (point - transform.position).normalized;
+            Vector3 dir = (lookPoint - transform.position);
+            dir.y = 0;
 
             if (dir.sqrMagnitude > 0.01f)
             {
                 transform.rotation = Quaternion.LookRotation(dir);
             }
         }
-    }
-
-    // ------------- CAMERA ROTATION -------------
-    private void RotateCamera()
-    {
-        float mouseY = lookInput.y * lookSensitivity;
-
-        cameraPitch -= mouseY;
-        cameraPitch = Mathf.Clamp(cameraPitch, -70f, 70f);
-
-        cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0, 0);
     }
 }

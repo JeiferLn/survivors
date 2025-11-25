@@ -12,7 +12,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float gravity = -9.81f;
 
-    // ------------- CHARACTER CONTROLLER -------------
     private float verticalVelocity;
     private CharacterController controller;
 
@@ -47,7 +46,7 @@ public class PlayerController : MonoBehaviour
     {
         MovePlayer();
         ApplyGravity();
-        RotateTowardsMouse();
+        HandleRotation();
     }
 
     // ------------- MOVEMENT -------------
@@ -81,7 +80,33 @@ public class PlayerController : MonoBehaviour
         controller.Move(new Vector3(0, verticalVelocity, 0) * Time.deltaTime);
     }
 
-    // ------------- ROTATION -------------
+    // ------------- ROTATION HANDLER -------------
+    private void HandleRotation()
+    {
+        bool usingGamepad = Gamepad.current != null && lookInput.sqrMagnitude > 0.1f;
+
+        if (usingGamepad)
+        {
+            RotateWithGamepad();
+        }
+        else
+        {
+            RotateTowardsMouse();
+        }
+    }
+
+    // ------------- ROTATION WITH GAMEPAD -------------
+    private void RotateWithGamepad()
+    {
+        Vector3 dir = new Vector3(lookInput.x, 0, lookInput.y);
+
+        if (dir.sqrMagnitude > 0.01f)
+        {
+            transform.rotation = Quaternion.LookRotation(dir);
+        }
+    }
+
+    // ------------- ROTATION WITH MOUSE -------------
     private void RotateTowardsMouse()
     {
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());

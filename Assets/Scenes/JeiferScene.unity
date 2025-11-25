@@ -238,8 +238,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.32556814, y: -2.1079811e-16, z: 7.25836e-17, w: 0.9455186}
-  m_LocalPosition: {x: 17.11, y: 18.813229, z: 0.70978355}
+  m_LocalRotation: {x: 0.3826835, y: 1.6411399e-15, z: -6.797825e-16, w: 0.9238795}
+  m_LocalPosition: {x: 17.11, y: 20.642136, z: 2.3278646}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -721,8 +721,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 6
   gravity: -9.81
-  cameraTransform: {fileID: 330585546}
   lookSensitivity: 1
+  cameraTransform: {fileID: 330585546}
 --- !u!114 &763626195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -779,7 +779,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: 5344e8f0-72e6-41d1-a571-8e5be85e05ce
-    m_ActionName: Player/Look
+    m_ActionName: 'Player/Look[/Mouse/delta]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -1152,8 +1152,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1786311959}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.32556814, y: -1.0606346e-16, z: -2.3158791e-16, w: 0.9455186}
-  m_LocalPosition: {x: -48.12673, y: 18.185062, z: 43.681877}
+  m_LocalRotation: {x: 0.3826835, y: 1.6411398e-15, z: -6.7978243e-16, w: 0.92387956}
+  m_LocalPosition: {x: -48.12673, y: 20.01397, z: 45.299957}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1195,7 +1195,7 @@ MonoBehaviour:
   HorizontalAxis:
     Value: 0
     Center: 0
-    Range: {x: -180, y: 180}
+    Range: {x: 0, y: 0}
     Wrap: 1
     Recentering:
       Enabled: 0
@@ -1203,9 +1203,9 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: 38
-    Center: 38
-    Range: {x: 30, y: 45}
+    Value: 45
+    Center: 45
+    Range: {x: 45, y: 45}
     Wrap: 0
     Recentering:
       Enabled: 0

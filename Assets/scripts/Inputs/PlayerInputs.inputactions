@@ -83,7 +83,7 @@
                 },
                 {
                     "name": "2D Vector",
-                    "id": "34d8530e-abbb-4be5-ac2b-b1506b39b0bc",
+                    "id": "55890645-bb39-4829-a275-906f577b83f5",
                     "path": "2DVector",
                     "interactions": "",
                     "processors": "",
@@ -94,8 +94,8 @@
                 },
                 {
                     "name": "up",
-                    "id": "6cc4817a-a488-473b-a449-1dbe2304b81b",
-                    "path": "<Gamepad>/leftStick/up",
+                    "id": "f711429b-6be7-44cc-bde9-3ee6a860a365",
+                    "path": "<Gamepad>/dpad/up",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -105,7 +105,7 @@
                 },
                 {
                     "name": "down",
-                    "id": "f6cfa126-3418-4567-a056-324cce767ff5",
+                    "id": "8a51ee83-dd29-40df-b09c-d9b1a56c3df4",
                     "path": "<Gamepad>/dpad/down",
                     "interactions": "",
                     "processors": "",
@@ -116,7 +116,7 @@
                 },
                 {
                     "name": "left",
-                    "id": "ffb47456-abb4-4296-9b8a-13ca9948a097",
+                    "id": "8b2e89bc-c9dd-4e61-9f3f-cd56f855a356",
                     "path": "<Gamepad>/dpad/left",
                     "interactions": "",
                     "processors": "",
@@ -127,7 +127,7 @@
                 },
                 {
                     "name": "right",
-                    "id": "d357f835-f323-4d00-aef3-760ad2ba50db",
+                    "id": "3d66b41a-295d-4f31-9ab0-737649e6f5ba",
                     "path": "<Gamepad>/dpad/right",
                     "interactions": "",
                     "processors": "",
@@ -142,17 +142,6 @@
                     "path": "<Mouse>/delta",
                     "interactions": "",
                     "processors": "ScaleVector2(x=0.1,y=0.1)",
-                    "groups": "",
-                    "action": "Look",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ade93181-0db3-46b6-8933-673e1df1bf5f",
-                    "path": "<Gamepad>/rightStick",
-                    "interactions": "",
-                    "processors": "",
                     "groups": "",
                     "action": "Look",
                     "isComposite": false,

@@ -3,66 +3,69 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private CharacterController controller;
-
     [Header("Movimiento")]
     [SerializeField]
     private float moveSpeed = 6f;
 
     [SerializeField]
     private float gravity = -9.81f;
-    private float verticalVelocity;
 
-    [Header("Rotación")]
+    private float verticalVelocity;
+    private CharacterController controller;
+
+    [Header("Camara")]
+    [SerializeField]
+    private float lookSensitivity = 2f;
+
     [SerializeField]
     private Transform cameraTransform;
 
-    [SerializeField]
-    private float lookSensitivity = 1f;
-
     private Vector2 moveInput;
     private Vector2 lookInput;
+
     private float cameraPitch = 0f;
 
-    void Start()
+    // ------------- START -------------
+    private void Start()
     {
         controller = GetComponent<CharacterController>();
     }
 
-    // --- INPUT EVENTS ---
-    public void OnMove(InputAction.CallbackContext context)
+    // ------------- INPUT SYSTEM -------------
+    public void OnMove(InputAction.CallbackContext ctx)
     {
-        moveInput = context.ReadValue<Vector2>();
+        moveInput = ctx.ReadValue<Vector2>();
     }
 
-    public void OnLook(InputAction.CallbackContext context)
+    public void OnLook(InputAction.CallbackContext ctx)
     {
-        lookInput = context.ReadValue<Vector2>();
+        lookInput = ctx.ReadValue<Vector2>();
     }
 
-    // --------------------
-
-    void Update()
+    // ------------- UPDATE -------------
+    private void Update()
     {
-        Movement();
-        Rotation();
+        MovePlayer();
+        ApplyGravity();
+        RotateTowardsMouse();
+        RotateCamera();
     }
 
-    void Movement()
+    // ------------- MOVEMENT -------------
+    private void MovePlayer()
     {
-        Vector3 input = new Vector3(moveInput.x, 0, moveInput.y).normalized;
+        Vector3 direction = new Vector3(moveInput.x, 0, moveInput.y);
 
-        Vector3 moveDir = Vector3.zero;
+        direction = cameraTransform.TransformDirection(direction);
+        direction.y = 0f;
+        direction.Normalize();
 
-        if (input.magnitude >= 0.1f)
-        {
-            moveDir = cameraTransform.forward * input.z + cameraTransform.right * input.x;
-            moveDir.y = 0f;
-            moveDir.Normalize();
-        }
+        controller.Move(direction * moveSpeed * Time.deltaTime);
+    }
 
-        Vector3 horizontalMovement = moveDir * moveSpeed;
-
+    // ------------- GRAVITY -------------
+    private void ApplyGravity()
+    {
         if (controller.isGrounded)
         {
             if (verticalVelocity < 0f)
@@ -73,18 +76,37 @@ public class PlayerController : MonoBehaviour
             verticalVelocity += gravity * Time.deltaTime;
         }
 
-        Vector3 finalMovement = horizontalMovement + new Vector3(0, verticalVelocity, 0);
-
-        controller.Move(finalMovement * Time.deltaTime);
+        Vector3 verticalMove = new Vector3(0, verticalVelocity, 0);
+        controller.Move(verticalMove * Time.deltaTime);
     }
 
-    void Rotation()
+    // ------------- ROTATION -------------
+    private void RotateTowardsMouse()
     {
-        transform.Rotate(Vector3.up, lookInput.x * lookSensitivity);
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
-        cameraPitch -= lookInput.y * lookSensitivity;
-        cameraPitch = Mathf.Clamp(cameraPitch, -80f, 80f);
+        if (Physics.Raycast(ray, out RaycastHit hit, 200f))
+        {
+            Vector3 point = hit.point;
+            point.y = transform.position.y;
 
-        cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
+            Vector3 dir = (point - transform.position).normalized;
+
+            if (dir.sqrMagnitude > 0.01f)
+            {
+                transform.rotation = Quaternion.LookRotation(dir);
+            }
+        }
+    }
+
+    // ------------- CAMERA ROTATION -------------
+    private void RotateCamera()
+    {
+        float mouseY = lookInput.y * lookSensitivity;
+
+        cameraPitch -= mouseY;
+        cameraPitch = Mathf.Clamp(cameraPitch, -70f, 70f);
+
+        cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0, 0);
     }
 }

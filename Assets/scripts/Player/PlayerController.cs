@@ -17,17 +17,30 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform cameraTransform;
 
+    [SerializeField]
+    private float lookSensitivity = 1f;
+
     private Vector2 moveInput;
+    private Vector2 lookInput;
+    private float cameraPitch = 0f;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
     }
 
+    // --- INPUT EVENTS ---
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
     }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        lookInput = context.ReadValue<Vector2>();
+    }
+
+    // --------------------
 
     void Update()
     {
@@ -67,12 +80,11 @@ public class PlayerController : MonoBehaviour
 
     void Rotation()
     {
-        Vector3 lookDir = cameraTransform.forward;
-        lookDir.y = 0f;
+        transform.Rotate(Vector3.up, lookInput.x * lookSensitivity);
 
-        if (lookDir.sqrMagnitude > 0.001f)
-        {
-            transform.rotation = Quaternion.LookRotation(lookDir);
-        }
+        cameraPitch -= lookInput.y * lookSensitivity;
+        cameraPitch = Mathf.Clamp(cameraPitch, -80f, 80f);
+
+        cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
     }
 }

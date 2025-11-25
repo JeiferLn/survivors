@@ -722,6 +722,7 @@ MonoBehaviour:
   moveSpeed: 6
   gravity: -9.81
   cameraTransform: {fileID: 330585546}
+  lookSensitivity: 1
 --- !u!114 &763626195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -763,6 +764,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 2f3965b3-7202-43df-9bca-0dba44a77032
     m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 763626194}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnLook
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 5344e8f0-72e6-41d1-a571-8e5be85e05ce
+    m_ActionName: Player/Look
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

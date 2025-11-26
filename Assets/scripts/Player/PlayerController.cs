@@ -6,7 +6,9 @@ public class PlayerController : MonoBehaviour
     // ------------- MOVEMENT VARIABLES -------------
     [Header("Movimiento")]
     [SerializeField]
-    private float moveSpeed = 6f;
+    private float moveSpeed = 10f;
+    [SerializeField]
+    private float aimingMoveSpeed = 4f;
 
     // ------------- GRAVITY VARIABLES -------------
     [SerializeField]
@@ -23,11 +25,25 @@ public class PlayerController : MonoBehaviour
     // ------------- INPUT VARIABLES -------------
     private Vector2 moveInput;
     private Vector2 lookInput;
+    private bool isAiming = false;
+
+    // ------------- LINE RENDERER -------------
+    [Header("Laser")]
+    private LineRenderer lineRenderer;
+    [SerializeField]
+    private float laserDistance = 10f;
+
+    [SerializeField]
+    private Transform laserOrigin;
 
     // ------------- START -------------
     private void Start()
     {
         controller = GetComponent<CharacterController>();
+        lineRenderer = GetComponent<LineRenderer>();
+
+        if (lineRenderer != null)
+            lineRenderer.enabled = false;
     }
 
     // ------------- INPUT ACTIONS -------------
@@ -41,17 +57,25 @@ public class PlayerController : MonoBehaviour
         lookInput = ctx.ReadValue<Vector2>();
     }
 
+    public void OnAim(InputAction.CallbackContext ctx)
+    {
+        isAiming = ctx.ReadValueAsButton();
+    }
+
     // ------------- UPDATE -------------
     private void Update()
     {
         MovePlayer();
         ApplyGravity();
         HandleRotation();
+        HandleLaser();
     }
 
     // ------------- MOVEMENT -------------
     private void MovePlayer()
     {
+        float currentSpeed = isAiming ? aimingMoveSpeed : moveSpeed;
+
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
 
@@ -61,7 +85,7 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = forward * moveInput.y + right * moveInput.x;
         direction.Normalize();
 
-        controller.Move(direction * moveSpeed * Time.deltaTime);
+        controller.Move(direction * currentSpeed * Time.deltaTime);
     }
 
     // ------------- GRAVITY -------------
@@ -79,6 +103,7 @@ public class PlayerController : MonoBehaviour
 
         controller.Move(new Vector3(0, verticalVelocity, 0) * Time.deltaTime);
     }
+
 
     // ------------- ROTATION HANDLER -------------
     private void HandleRotation()
@@ -124,5 +149,35 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.LookRotation(dir);
             }
         }
+    }
+
+    // ------------- LASER SYSTEM -------------
+    private void HandleLaser()
+    {
+        if (lineRenderer == null)
+            return;
+
+        if (!isAiming)
+        {
+            lineRenderer.enabled = false;
+            return;
+        }
+
+        lineRenderer.enabled = true;
+
+        Vector3 start = laserOrigin != null
+            ? laserOrigin.position
+            : transform.position + transform.forward * 0.5f + Vector3.up * 1.0f;
+
+        Vector3 dir = transform.forward;
+        Vector3 end = start + dir * laserDistance;
+
+        if (Physics.Raycast(start, dir, out RaycastHit hit, laserDistance))
+        {
+            end = hit.point;
+        }
+
+        lineRenderer.SetPosition(0, start);
+        lineRenderer.SetPosition(1, end);
     }
 }

@@ -16,9 +16,9 @@ MonoBehaviour:
   maxHealth: 100
   moveSpeed: 5
   expAmount: 10
-  detectionRange: 5
-  attackMeleeRange: 2
-  attackDistanceRange: 3
+  detectionRange: 50
+  attackMeleeRange: 5
+  attackDistanceRange: 10
   primaryAttack: {fileID: 0}
   secondaryAttack: {fileID: 0}
   secondaryAttackChance: 0.3

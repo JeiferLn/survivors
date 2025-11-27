@@ -4,9 +4,9 @@ using UnityEngine;
 public class EnemyAttackData : ScriptableObject
 {
     public string attackName;
-    public float damage;
+    public float damageMelee;
+    public float damageRange;
     public float cooldown;
-    public float range;
    
     [Header("Visual")]
     public GameObject effectPrefab;

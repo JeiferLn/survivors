@@ -27,7 +27,7 @@
                 {
                     "name": "Aim",
                     "type": "Button",
-                    "id": "28c1cc66-298f-457a-937d-a33eca501c97",
+                    "id": "59713407-e302-45a6-bab3-a4d6cbc3a490",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -169,7 +169,7 @@
                 },
                 {
                     "name": "",
-                    "id": "61edd711-20aa-4c70-a6e5-2ae7960d556b",
+                    "id": "e9628582-8731-47af-8d42-9a22a361637d",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
@@ -180,7 +180,7 @@
                 },
                 {
                     "name": "",
-                    "id": "6acab414-ada1-4a1e-a5ab-3bc22825f849",
+                    "id": "bca0845c-5927-404c-b1a3-569191640cc0",
                     "path": "<Gamepad>/leftTrigger",
                     "interactions": "",
                     "processors": "",

@@ -1,7 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class LaserController : MonoBehaviour
+public class WeaponController : MonoBehaviour
 {
     // ------------- LINE RENDERER -------------
     [Header("Laser")]
@@ -9,6 +10,16 @@ public class LaserController : MonoBehaviour
 
     [SerializeField]
     private float laserDistance = 10f;
+
+    // ------------- MUZZLE FIRE -------------
+    [Header("Muzzle Flash")]
+    [SerializeField]
+    private GameObject muzzleFlash;
+
+    [SerializeField]
+    private float flashDuration = 0.05f;
+
+    private float flashTimer = 0f;
 
     // ------------- INPUT VARIABLES -------------
     private bool isAiming = false;
@@ -19,6 +30,14 @@ public class LaserController : MonoBehaviour
         isAiming = ctx.ReadValueAsButton();
     }
 
+    public void OnShoot(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed)
+        {
+            ShowMuzzleFlash();
+        }
+    }
+
     // ------------- START -------------
     void Start()
     {
@@ -26,18 +45,23 @@ public class LaserController : MonoBehaviour
 
         if (lineRenderer != null)
             lineRenderer.enabled = false;
+
+        if (muzzleFlash != null)
+            muzzleFlash.SetActive(false);
     }
 
     // ------------- UPDATE -------------
     void Update()
     {
         HandleLaser();
+        HandleMuzzleFlash();
     }
 
-    // ------------- LASER SYSTEM -------------
+    // ------------- LASER SYSTEM ----------------
     private void HandleLaser()
     {
-        if (lineRenderer == null) return;
+        if (lineRenderer == null)
+            return;
 
         if (!isAiming)
         {
@@ -59,5 +83,26 @@ public class LaserController : MonoBehaviour
 
         lineRenderer.SetPosition(0, start);
         lineRenderer.SetPosition(1, end);
+    }
+
+    // ------------- MUZZLE FLASH SYSTEM -------------
+    private void HandleMuzzleFlash()
+    {
+        if (flashTimer > 0f)
+        {
+            flashTimer -= Time.deltaTime;
+
+            if (flashTimer <= 0f)
+                muzzleFlash.SetActive(false);
+        }
+    }
+
+    private void ShowMuzzleFlash()
+    {
+        if (muzzleFlash == null)
+            return;
+
+        muzzleFlash.SetActive(true);
+        flashTimer = flashDuration;
     }
 }

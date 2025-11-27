@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [Header("Movimiento")]
     [SerializeField]
     private float moveSpeed = 10f;
+
     [SerializeField]
     private float aimingMoveSpeed = 4f;
 
@@ -31,7 +32,6 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         controller = GetComponent<CharacterController>();
-
     }
 
     // ------------- INPUT ACTIONS -------------
@@ -85,7 +85,6 @@ public class PlayerController : MonoBehaviour
 
         controller.Move(new Vector3(0, verticalVelocity, 0) * Time.deltaTime);
     }
-
 
     // ------------- ROTATION HANDLER -------------
     private void HandleRotation()

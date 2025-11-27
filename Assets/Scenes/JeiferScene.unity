@@ -1725,6 +1725,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laserDistance: 6
+  laserOffset: {x: 0, y: -0.05, z: 0}
+  recoilAmount: 1
+  recoilReturnSpeed: 10
   muzzleFlash: {fileID: 2119146352}
   flashDuration: 0.05
 --- !u!120 &1882959747
@@ -1850,7 +1853,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2119146353
 Transform:
   m_ObjectHideFlags: 0

@@ -12,9 +12,18 @@ public class WeaponController : MonoBehaviour
     private float laserDistance = 10f;
 
     [SerializeField]
-    private Vector3 laserOffset = new Vector3(0f, -0.5f, 0f);
+    private Vector3 laserOffset = new Vector3(0f, -0.1f, 0f);
 
-    // ------------- MUZZLE FLASH -------------
+    [Header("Recoil Settings")]
+    [SerializeField]
+    private float recoilAmount = 1f;
+
+    [SerializeField]
+    private float recoilReturnSpeed = 10f;
+
+    private Vector3 recoilOffset = Vector3.zero;
+
+    // ------------- MUZZLE FIRE -------------
     [Header("Muzzle Flash")]
     [SerializeField]
     private GameObject muzzleFlash;
@@ -37,7 +46,11 @@ public class WeaponController : MonoBehaviour
     {
         if (ctx.performed)
         {
-            ShowMuzzleFlash();
+            if (isAiming)
+            {
+                ShowMuzzleFlash();
+                ApplyRecoilKick();
+            }
         }
     }
 
@@ -58,6 +71,8 @@ public class WeaponController : MonoBehaviour
     {
         HandleLaser();
         HandleMuzzleFlash();
+
+        recoilOffset = Vector3.Lerp(recoilOffset, Vector3.zero, Time.deltaTime * recoilReturnSpeed);
     }
 
     // ------------- LASER SYSTEM ----------------
@@ -74,7 +89,6 @@ public class WeaponController : MonoBehaviour
 
         lineRenderer.enabled = true;
 
-        // ← START desplazado según laserOffset
         Vector3 start = transform.position + transform.TransformDirection(laserOffset);
 
         Vector3 dir = transform.forward;
@@ -85,8 +99,21 @@ public class WeaponController : MonoBehaviour
             end = hit.point;
         }
 
+        // Aplicar retroceso visual
+        end += recoilOffset;
+
         lineRenderer.SetPosition(0, start);
         lineRenderer.SetPosition(1, end);
+    }
+
+    // ------------- RECOIL SYSTEM -------------
+    private void ApplyRecoilKick()
+    {
+        recoilOffset = new Vector3(
+            Random.Range(-recoilAmount, recoilAmount),
+            Random.Range(0f, recoilAmount),
+            0f
+        );
     }
 
     // ------------- MUZZLE FLASH SYSTEM -------------

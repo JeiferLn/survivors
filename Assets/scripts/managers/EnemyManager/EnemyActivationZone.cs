@@ -5,9 +5,9 @@ public class EnemyActivationZone : MonoBehaviour
 {
     
     public Action OnEnemyActivated = delegate { };
-    
-    
-    private void OnTriggerEnter2D(Collider2D other)
+
+
+    private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy") && other.TryGetComponent(out EnemyActivation enemy))
         {
@@ -15,9 +15,8 @@ public class EnemyActivationZone : MonoBehaviour
             enemy.SetVisible(true);
         }
     }
-
     
-    private void OnTriggerExit2D(Collider2D other)
+    private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Enemy") && other.TryGetComponent(out EnemyActivation enemy))
         {

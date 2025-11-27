@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: z-hitBasic
   m_EditorClassIdentifier: 
   attackName: hit
-  damage: 10
+  damageMelee: 5
+  damageRange: 0
   cooldown: 2
-  range: 0.5
   effectPrefab: {fileID: 0}
   soundEffect: {fileID: 0}
   isRanged: 0

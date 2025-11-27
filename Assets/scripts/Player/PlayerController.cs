@@ -3,66 +3,76 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private CharacterController controller;
-
+    // ------------- MOVEMENT VARIABLES -------------
     [Header("Movimiento")]
     [SerializeField]
-    private float moveSpeed = 6f;
+    private float moveSpeed = 10f;
+    [SerializeField]
+    private float aimingMoveSpeed = 4f;
 
+    // ------------- GRAVITY VARIABLES -------------
     [SerializeField]
     private float gravity = -9.81f;
-    private float verticalVelocity;
 
-    [Header("Rotación")]
+    private float verticalVelocity;
+    private CharacterController controller;
+
+    // ------------- CAMERA VARIABLES -------------
+    [Header("Camara")]
     [SerializeField]
     private Transform cameraTransform;
 
-    [SerializeField]
-    private float lookSensitivity = 1f;
-
+    // ------------- INPUT VARIABLES -------------
     private Vector2 moveInput;
     private Vector2 lookInput;
-    private float cameraPitch = 0f;
+    private bool isAiming = false;
 
-    void Start()
+    // ------------- START -------------
+    private void Start()
     {
         controller = GetComponent<CharacterController>();
+
     }
 
-    // --- INPUT EVENTS ---
-    public void OnMove(InputAction.CallbackContext context)
+    // ------------- INPUT ACTIONS -------------
+    public void OnMove(InputAction.CallbackContext ctx)
     {
-        moveInput = context.ReadValue<Vector2>();
+        moveInput = ctx.ReadValue<Vector2>();
     }
 
-    public void OnLook(InputAction.CallbackContext context)
+    public void OnLook(InputAction.CallbackContext ctx)
     {
-        lookInput = context.ReadValue<Vector2>();
+        lookInput = ctx.ReadValue<Vector2>();
     }
 
-    // --------------------
-
-    void Update()
+    // ------------- UPDATE -------------
+    private void Update()
     {
-        Movement();
-        Rotation();
+        MovePlayer();
+        ApplyGravity();
+        HandleRotation();
     }
 
-    void Movement()
+    // ------------- MOVEMENT -------------
+    private void MovePlayer()
     {
-        Vector3 input = new Vector3(moveInput.x, 0, moveInput.y).normalized;
+        float currentSpeed = isAiming ? aimingMoveSpeed : moveSpeed;
 
-        Vector3 moveDir = Vector3.zero;
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
 
-        if (input.magnitude >= 0.1f)
-        {
-            moveDir = cameraTransform.forward * input.z + cameraTransform.right * input.x;
-            moveDir.y = 0f;
-            moveDir.Normalize();
-        }
+        forward.y = 0;
+        right.y = 0;
 
-        Vector3 horizontalMovement = moveDir * moveSpeed;
+        Vector3 direction = forward * moveInput.y + right * moveInput.x;
+        direction.Normalize();
 
+        controller.Move(direction * currentSpeed * Time.deltaTime);
+    }
+
+    // ------------- GRAVITY -------------
+    private void ApplyGravity()
+    {
         if (controller.isGrounded)
         {
             if (verticalVelocity < 0f)
@@ -73,18 +83,53 @@ public class PlayerController : MonoBehaviour
             verticalVelocity += gravity * Time.deltaTime;
         }
 
-        Vector3 finalMovement = horizontalMovement + new Vector3(0, verticalVelocity, 0);
-
-        controller.Move(finalMovement * Time.deltaTime);
+        controller.Move(new Vector3(0, verticalVelocity, 0) * Time.deltaTime);
     }
 
-    void Rotation()
+
+    // ------------- ROTATION HANDLER -------------
+    private void HandleRotation()
     {
-        transform.Rotate(Vector3.up, lookInput.x * lookSensitivity);
+        bool usingGamepad = Gamepad.current != null && lookInput.sqrMagnitude > 0.1f;
 
-        cameraPitch -= lookInput.y * lookSensitivity;
-        cameraPitch = Mathf.Clamp(cameraPitch, -80f, 80f);
+        if (usingGamepad)
+        {
+            RotateWithGamepad();
+        }
+        else
+        {
+            RotateTowardsMouse();
+        }
+    }
 
-        cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
+    // ------------- ROTATION WITH GAMEPAD -------------
+    private void RotateWithGamepad()
+    {
+        Vector3 dir = new Vector3(lookInput.x, 0, lookInput.y);
+
+        if (dir.sqrMagnitude > 0.01f)
+        {
+            transform.rotation = Quaternion.LookRotation(dir);
+        }
+    }
+
+    // ------------- ROTATION WITH MOUSE -------------
+    private void RotateTowardsMouse()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 200f))
+        {
+            Vector3 lookPoint = hit.point;
+            lookPoint.y = transform.position.y;
+
+            Vector3 dir = (lookPoint - transform.position);
+            dir.y = 0;
+
+            if (dir.sqrMagnitude > 0.01f)
+            {
+                transform.rotation = Quaternion.LookRotation(dir);
+            }
+        }
     }
 }

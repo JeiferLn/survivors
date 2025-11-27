@@ -11,7 +11,10 @@ public class WeaponController : MonoBehaviour
     [SerializeField]
     private float laserDistance = 10f;
 
-    // ------------- MUZZLE FIRE -------------
+    [SerializeField]
+    private Vector3 laserOffset = new Vector3(0f, -0.5f, 0f);
+
+    // ------------- MUZZLE FLASH -------------
     [Header("Muzzle Flash")]
     [SerializeField]
     private GameObject muzzleFlash;
@@ -71,7 +74,8 @@ public class WeaponController : MonoBehaviour
 
         lineRenderer.enabled = true;
 
-        Vector3 start = transform.position;
+        // ← START desplazado según laserOffset
+        Vector3 start = transform.position + transform.TransformDirection(laserOffset);
 
         Vector3 dir = transform.forward;
         Vector3 end = start + dir * laserDistance;

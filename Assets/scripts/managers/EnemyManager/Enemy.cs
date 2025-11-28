@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-
 public class Enemy : MonoBehaviour
 {
     [Header("Configuration")]
@@ -23,7 +22,7 @@ public class Enemy : MonoBehaviour
     
     // Control de Ataque
     private float lastAttackTime;
-    private float attackCooldown = 1.5f; // Tiempo entre ataques (puedes ponerlo en el ScriptableObject)
+    private float attackCooldown;
     private float attackMeleeDamage;
     private float attackDistanceDamage;
     
@@ -44,6 +43,7 @@ public class Enemy : MonoBehaviour
     private void SetEnemyStats()
     {
         health = enemyType.maxHealth;
+        isRangeEnemy = enemyAttackData.isRanged;
         attackCooldown = enemyAttackData.cooldown;
         attackMeleeDamage = enemyAttackData.damageMelee;
         attackDistanceDamage = enemyAttackData.damageRange; 
@@ -55,7 +55,6 @@ public class Enemy : MonoBehaviour
         AttackMeleeRange = enemyType.attackMeleeRange;
         AttackDistanceRange = enemyType.attackDistanceRange;
         
-        // Ajustar el Stopping Distance del agente para que no empuje al jugador
         agent.stoppingDistance = isRangeEnemy ? AttackDistanceRange * 0.8f : AttackMeleeRange * 0.8f;
     }
 
@@ -64,7 +63,7 @@ public class Enemy : MonoBehaviour
         if (agent == null) return;
         
         agent.isStopped = false;
-        // Pequeña optimización: Solo setear destino si está lejos del actual para no saturar el NavMesh
+        // Solo setear destino si está lejos del actual para no saturar el NavMesh
         if (Vector3.Distance(agent.destination, targetPosition) > 0.5f)
         {
             agent.SetDestination(targetPosition);

@@ -14,10 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: hit
   damageMelee: 5
-  damageRange: 0
-  cooldown: 2
-  effectPrefab: {fileID: 0}
-  soundEffect: {fileID: 0}
+  damageRange: 5
+  cooldown: 0
+  attackEffectPrefab: {fileID: 0}
   isRanged: 0
   projectilePrefab: {fileID: 0}
   projectileSpeed: 10

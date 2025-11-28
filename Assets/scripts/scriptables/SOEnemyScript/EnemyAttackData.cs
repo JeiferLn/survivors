@@ -1,4 +1,5 @@
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 [CreateAssetMenu(fileName = "New Enemy Attack", menuName = "Enemy System/Attack")]
 public class EnemyAttackData : ScriptableObject
@@ -9,11 +10,12 @@ public class EnemyAttackData : ScriptableObject
     public float cooldown;
    
     [Header("Visual")]
-    public GameObject effectPrefab;
-    public AudioClip soundEffect;
+    public GameObject attackEffectPrefab;
     
     [Header("Range Settings")]
     public bool isRanged;
+    [ShowIf("isRanged")]
     public GameObject projectilePrefab;
+    [ShowIf("isRanged")]
     public float projectileSpeed = 10f;
 }

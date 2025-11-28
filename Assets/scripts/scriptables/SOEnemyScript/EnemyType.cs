@@ -15,16 +15,13 @@ public class EnemyType: ScriptableObject
     public float attackDistanceRange = 3f;
     
     [Header("Attacks")]
-    public EnemyAttackData primaryAttack;
-    public EnemyAttackData secondaryAttack;
+    public EnemyAttackData meleeAttack;
+    public EnemyAttackData rangeAttack;
     [Range(0f, 1f)]
-    public float secondaryAttackChance = 0.3f;
+    public float attackDelay = 0.3f;
     
     [Header("Visual")]
-    public Sprite sprite;
-    public Color tintColor = Color.white;
-    public float scale = 1f;
-    public RuntimeAnimatorController animator; // Opcional
+    public GameObject enemy3DModel;
     
     [Header("Death")]
     public GameObject deathEffectPrefab;

@@ -45,6 +45,12 @@ public class PlayerController : MonoBehaviour
         lookInput = ctx.ReadValue<Vector2>();
     }
 
+    // ------------- SET AIMING -------------
+    public void SetAiming(bool aiming)
+    {
+        isAiming = aiming;
+    }
+
     // ------------- UPDATE -------------
     private void Update()
     {
@@ -69,6 +75,7 @@ public class PlayerController : MonoBehaviour
 
         controller.Move(direction * currentSpeed * Time.deltaTime);
     }
+
 
     // ------------- GRAVITY -------------
     private void ApplyGravity()

@@ -779,7 +779,7 @@ GameObject:
   m_Layer: 0
   m_Name: z-walker
   m_TagString: Enemy
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: 89970fd5c24cb7c4abc5e85238c7deeb, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

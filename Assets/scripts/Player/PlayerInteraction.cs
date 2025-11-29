@@ -3,16 +3,24 @@ using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    private IEquipable currentEquipable = null;
+    private IEquipable currentEquipable;
+    private PlayerController playerController;
 
-    public void OnEquip(InputAction.CallbackContext ctx)
+    private void Start()
     {
-        if (ctx.performed && currentEquipable != null)
-        {
-            currentEquipable.Equip(GetComponent<PlayerController>());
-        }
+        playerController = GetComponent<PlayerController>();
     }
 
+    // ---------------- EQUIP INPUT ----------------
+    public void OnEquip(InputAction.CallbackContext ctx)
+    {
+        if (!ctx.performed || currentEquipable == null)
+            return;
+
+        currentEquipable.Equip(playerController);
+    }
+
+    // ---------------- TRIGGER ENTER ----------------
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out IEquipable equipable))
@@ -21,12 +29,12 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+    // ---------------- TRIGGER EXIT ----------------
     private void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent(out IEquipable equipable))
+        if (other.TryGetComponent(out IEquipable equipable) && currentEquipable == equipable)
         {
-            if (currentEquipable == equipable)
-                currentEquipable = null;
+            currentEquipable = null;
         }
     }
 }

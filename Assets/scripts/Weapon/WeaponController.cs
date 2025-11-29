@@ -1,49 +1,40 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class WeaponController : MonoBehaviour
 {
-    // ------------- WEAPON DATA -------------
+    // ---------------- WEAPON DATA ----------------
     [Header("Weapon Data")]
     public WeaponData weaponData;
 
-    // ------------- LINE RENDERER -------------
+    // ---------------- COMPONENTS ----------------
     private LineRenderer lineRenderer;
     private Transform t;
+    private PlayerController player;
 
-    // ------------- SHOOTING -------------
+    // ---------------- STATE ----------------
     private bool shootingHeld = false;
-    private float fireCooldown = 0f;
-
-    // ------------- AIMING -------------
     private bool isAiming = false;
 
-    // ------------- RECOIL -------------
-    private Vector3 recoilOffset = Vector3.zero;
+    private float fireCooldown = 0f;
     private float flashTimer = 0f;
 
-    // ------------- EFFECTS -------------
+    private Vector3 recoilOffset = Vector3.zero;
+    private Vector3 laserDirection;
+    private Vector3 lastLaserEnd;
+
+    // ---------------- EFFECTS ----------------
     [Header("Effects")]
     [SerializeField]
     private GameObject muzzleFlash;
 
-    // ------------- PLAYER -------------
-    [Header("Player")]
-    [SerializeField]
-    private PlayerController player;
-
-    // ------------- LASER -------------
-    private Vector3 lastLaserEnd;
-    private Vector3 laserDirection;
-
-    // ------------- START -------------
+    // ---------------- START ----------------
     void Start()
     {
         t = transform;
 
-        if (player == null)
-            player = GetComponentInParent<PlayerController>();
+        if (!TryGetComponentInParent(out player))
+            Debug.LogWarning("WeaponController: No PlayerController found in parent.");
 
         lineRenderer = GetComponent<LineRenderer>();
         if (lineRenderer != null)
@@ -53,7 +44,7 @@ public class WeaponController : MonoBehaviour
             muzzleFlash.SetActive(false);
     }
 
-    // ------------- INPUT ACTIONS -------------
+    // ---------------- INPUT: AIM ----------------
     public void OnAim(InputAction.CallbackContext ctx)
     {
         isAiming = ctx.ReadValueAsButton();
@@ -62,73 +53,57 @@ public class WeaponController : MonoBehaviour
             player.SetAiming(isAiming);
     }
 
-    // ------------- SHOOT -------------
+    // ---------------- INPUT: SHOOT ----------------
     public void OnShoot(InputAction.CallbackContext ctx)
     {
         if (ctx.started)
             shootingHeld = true;
-
         if (ctx.canceled)
             shootingHeld = false;
     }
 
-    // ------------- UPDATE -------------
+    // ---------------- UPDATE ----------------
     void Update()
     {
         HandleLaser();
-        HandleMuzzleFlash();
+        UpdateRecoil();
+        UpdateMuzzleFlash();
+        HandleShooting();
+    }
 
+    // ---------------- SHOOT LOGIC ----------------
+    private void HandleShooting()
+    {
+        if (!shootingHeld || !isAiming)
+            return;
+
+        if (fireCooldown > 0f)
+        {
+            fireCooldown -= Time.deltaTime;
+            return;
+        }
+
+        ShootOnce();
+        fireCooldown = weaponData.fireCooldown;
+    }
+
+    private void ShootOnce()
+    {
+        ShowMuzzle();
+        ApplyRecoilKick();
+        ShootBullet();
+    }
+
+    // ---------------- RECOIL ----------------
+    private void UpdateRecoil()
+    {
         recoilOffset = Vector3.Lerp(
             recoilOffset,
             Vector3.zero,
             Time.deltaTime * weaponData.recoilReturnSpeed
         );
-
-        if (shootingHeld && isAiming)
-        {
-            if (fireCooldown <= 0f)
-            {
-                ShootBullet();
-                ShowMuzzleFlash();
-                ApplyRecoilKick();
-                fireCooldown = weaponData.fireCooldown;
-            }
-        }
-
-        if (fireCooldown > 0f)
-            fireCooldown -= Time.deltaTime;
     }
 
-    // ------------- HANDLE LASER -------------
-    private void HandleLaser()
-    {
-        if (lineRenderer == null || !isAiming)
-        {
-            if (lineRenderer != null)
-                lineRenderer.enabled = false;
-            return;
-        }
-
-        lineRenderer.enabled = true;
-
-        Vector3 muzzlePos = t.position + t.TransformDirection(weaponData.laserOffset);
-
-        Vector3 dir = (t.forward + recoilOffset).normalized;
-
-        laserDirection = dir;
-
-        Vector3 end = muzzlePos + dir * weaponData.laserDistance;
-
-        if (Physics.Raycast(muzzlePos, dir, out RaycastHit hit, weaponData.laserDistance))
-            end = hit.point;
-
-        lastLaserEnd = end;
-
-        lineRenderer.SetPosition(0, muzzlePos);
-        lineRenderer.SetPosition(1, end);
-    }
-
-    // ------------- APPLY RECOIL KICK -------------
     private void ApplyRecoilKick()
     {
         recoilOffset = new Vector3(
@@ -138,20 +113,38 @@ public class WeaponController : MonoBehaviour
         );
     }
 
-    // ------------- HANDLE MUZZLE FLASH -------------
-    private void HandleMuzzleFlash()
+    // ---------------- LASER ----------------
+    private void HandleLaser()
     {
-        if (flashTimer > 0f)
-        {
-            flashTimer -= Time.deltaTime;
+        if (lineRenderer == null)
+            return;
 
-            if (flashTimer <= 0f && muzzleFlash != null)
-                muzzleFlash.SetActive(false);
+        if (!isAiming)
+        {
+            lineRenderer.enabled = false;
+            return;
         }
+
+        lineRenderer.enabled = true;
+
+        Vector3 muzzlePos = t.position + t.TransformDirection(weaponData.laserOffset);
+        laserDirection = (t.forward + recoilOffset).normalized;
+
+        Vector3 end = muzzlePos + laserDirection * weaponData.laserDistance;
+
+        if (
+            Physics.Raycast(muzzlePos, laserDirection, out RaycastHit hit, weaponData.laserDistance)
+        )
+            end = hit.point;
+
+        lastLaserEnd = end;
+
+        lineRenderer.SetPosition(0, muzzlePos);
+        lineRenderer.SetPosition(1, end);
     }
 
-    // ------------- SHOW MUZZLE FLASH -------------
-    private void ShowMuzzleFlash()
+    // ---------------- MUZZLE FLASH ----------------
+    private void ShowMuzzle()
     {
         if (muzzleFlash == null)
             return;
@@ -160,7 +153,18 @@ public class WeaponController : MonoBehaviour
         flashTimer = 0.05f;
     }
 
-    // ------------- SHOOT BULLET -------------
+    private void UpdateMuzzleFlash()
+    {
+        if (flashTimer <= 0f)
+            return;
+
+        flashTimer -= Time.deltaTime;
+
+        if (flashTimer <= 0f && muzzleFlash != null)
+            muzzleFlash.SetActive(false);
+    }
+
+    // ---------------- BULLET ----------------
     private void ShootBullet()
     {
         if (weaponData.bulletPrefab == null)
@@ -168,16 +172,13 @@ public class WeaponController : MonoBehaviour
 
         Vector3 muzzlePos = t.position + t.TransformDirection(weaponData.laserOffset);
 
-        Vector3 dir = laserDirection;
-
-        GameObject bulletObj = Instantiate(
+        GameObject obj = Instantiate(
             weaponData.bulletPrefab,
             muzzlePos,
-            Quaternion.LookRotation(dir)
+            Quaternion.LookRotation(laserDirection)
         );
 
-        BulletTracer tracer = bulletObj.GetComponent<BulletTracer>();
-        if (tracer != null)
+        if (obj.TryGetComponent(out BulletTracer tracer))
         {
             tracer.speed = weaponData.bulletSpeed;
             tracer.tracerLength = weaponData.bulletLength;
@@ -186,9 +187,16 @@ public class WeaponController : MonoBehaviour
         }
     }
 
-    // ------------- SET WEAPON -------------
+    // ---------------- SET WEAPON ----------------
     public void SetWeapon(WeaponData newWeapon)
     {
         weaponData = newWeapon;
+    }
+
+    // Helper to avoid repeating GetComponentInParent everywhere
+    private bool TryGetComponentInParent<T>(out T comp)
+    {
+        comp = GetComponentInParent<T>();
+        return comp != null;
     }
 }

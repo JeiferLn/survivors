@@ -20,22 +20,18 @@ public class EnemyType : ScriptableObject
     // MELEE ATTACK
     // -----------------------------
     [ShowIf("ShowMelee")]
-    [FoldoutGroup("Melee Attack")]
     public float attackMeleeRange = 2f;
 
     [ShowIf("ShowMelee")]
-    [FoldoutGroup("Melee Attack")]
     public EnemyAttackData meleeAttack;
 
     // -----------------------------
     // RANGED ATTACK
     // -----------------------------
     [ShowIf("ShowRanged")]
-    [FoldoutGroup("Ranged Attack")]
     public float attackDistanceRange = 3f;
 
     [ShowIf("ShowRanged")]
-    [FoldoutGroup("Ranged Attack")]
     public EnemyAttackData rangeAttack;
 
     [Header("Visual")]

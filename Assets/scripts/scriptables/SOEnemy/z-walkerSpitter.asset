@@ -17,11 +17,11 @@ MonoBehaviour:
   moveSpeed: 5
   expAmount: 10
   detectionRange: 10
+  attackMode: 1
   attackMeleeRange: 0
-  attackDistanceRange: 20
   meleeAttack: {fileID: 0}
-  rangeAttack: {fileID: 0}
-  attackDelay: 0.3
+  attackDistanceRange: 20
+  rangeAttack: {fileID: 11400000, guid: 07b499c2fff0f4d4ba82e333306afbde, type: 2}
   enemy3DModel: {fileID: 0}
   deathEffectPrefab: {fileID: 0}
   lootPrefabs: []

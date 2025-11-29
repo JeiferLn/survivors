@@ -19,7 +19,7 @@ MonoBehaviour:
   detectionRange: 50
   attackMode: 0
   attackMeleeRange: 5
-  meleeAttack: {fileID: 0}
+  meleeAttack: {fileID: 11400000, guid: 4ae3cb66a3a4e234186d47b4b1ad08b5, type: 2}
   attackDistanceRange: 10
   rangeAttack: {fileID: 0}
   enemy3DModel: {fileID: 0}

@@ -57,7 +57,6 @@ public class BulletTracer : MonoBehaviour
     // ---------------- TRIGGER ENTER ----------------
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("BulletTracer: OnTriggerEnter: " + other.name);
         if (!other.TryGetComponent<IDamageable>(out var damageable))
             return;
 

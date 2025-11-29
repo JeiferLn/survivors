@@ -11,7 +11,6 @@ public class EnemyManager : MonoBehaviour
 
     [Header("Targets")] 
     [SerializeField] private Transform mainTarget;
-    // [SerializeField] private Transform secondaryTarget; 
 
     private List<Enemy> activeEnemies = new List<Enemy>();
 
@@ -38,7 +37,7 @@ public class EnemyManager : MonoBehaviour
 
     private void Update()
     {
-        if (activeEnemies.Count == 0 || mainTarget == null) return;
+        if (activeEnemies.Count == 0 || mainTarget is null) return;
 
         foreach (Enemy enemy in activeEnemies)
         {
@@ -99,6 +98,6 @@ public class EnemyManager : MonoBehaviour
     private void EnemyMove(Enemy enemy)
     {
         // Pasamos el destino. El script del enemigo decidirá si necesita actualizar el NavMesh
-        enemy.MoveTo(mainTarget.position);
+        enemy.MoveTo(mainTarget);
     }
 }

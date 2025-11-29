@@ -16,7 +16,7 @@ MonoBehaviour:
   maxHealth: 100
   moveSpeed: 5
   expAmount: 10
-  detectionRange: 5
+  detectionRange: 10
   attackMeleeRange: 0
   attackDistanceRange: 20
   meleeAttack: {fileID: 0}

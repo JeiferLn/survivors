@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,11 +9,13 @@ public class Enemy : MonoBehaviour
     public EnemyAttackData enemyAttackData = null;
     public bool isRangeEnemy = false;
 
+    [ShowIf("isRangeEnemy")]
+
     // Enemy Stats
     private float health;
 
     // Target range
-    private Vector3 rangeTarget;
+    private Transform mainTarget;
 
     // Detection & Combat
     public float DetectionRange { get; private set; }
@@ -31,14 +34,13 @@ public class Enemy : MonoBehaviour
     private void Start()
     {
         enemyCurrentState = EnemyState.Idle;
-
         agent = GetComponent<NavMeshAgent>();
-        if (agent != null && enemyType != null)
-        {
-            agent.speed = enemyType.moveSpeed;
-            SetEnemyStats();
-            SetEnemyDetection();
-        }
+
+        if (agent == null || enemyType == null) return;
+
+        agent.speed = enemyType.moveSpeed;
+        SetEnemyStats();
+        SetEnemyDetection();
     }
 
     private void SetEnemyStats()
@@ -59,23 +61,23 @@ public class Enemy : MonoBehaviour
         agent.stoppingDistance = isRangeEnemy ? AttackDistanceRange * 0.8f : AttackMeleeRange * 0.8f;
     }
 
-    public void MoveTo(Vector3 targetPosition)
+    public void MoveTo(Transform target)
     {
-        if (agent == null) return;
+        if (agent is null || target is null) return;
 
-        rangeTarget = targetPosition;
+        mainTarget = target;
 
         agent.isStopped = false;
         // Solo setear destino si está lejos del actual para no saturar el NavMesh
-        if (Vector3.Distance(agent.destination, targetPosition) > 0.5f)
+        if (Vector3.Distance(agent.destination, mainTarget.position) > 0.5f)
         {
-            agent.SetDestination(targetPosition);
+            agent.SetDestination(mainTarget.position);
         }
     }
 
     public void StopMoving()
     {
-        if (agent == null) return;
+        if (agent is null) return;
         agent.isStopped = true;
         // Resetear el path para asegurar que se detenga
         agent.ResetPath();
@@ -95,14 +97,14 @@ public class Enemy : MonoBehaviour
         }
 
         // ---- RANGED ----
-        if (rangeTarget == null) return;
+        if (mainTarget is null) return;
 
-        float distanceToTarget = Vector3.Distance(transform.position, rangeTarget);
+        float distanceToTarget = Vector3.Distance(transform.position, mainTarget.position);
 
         // 2) Si NO está en rango → NO raycast
         if (distanceToTarget > AttackDistanceRange)
         {
-            MoveTo(rangeTarget);
+            MoveTo(mainTarget);
             return;
         }
 
@@ -110,7 +112,7 @@ public class Enemy : MonoBehaviour
         if (!HasLineOfSightOptimized())
         {
             // En rango pero bloqueado → mover para encontrar ángulo
-            MoveTo(rangeTarget);
+            MoveTo(mainTarget);
             return;
         }
 
@@ -119,15 +121,15 @@ public class Enemy : MonoBehaviour
         lastAttackTime = Time.time;
     }
 
-    
+
     private bool HasLineOfSightOptimized()
     {
         Vector3 origin = transform.position + Vector3.up;
-        Vector3 toTarget = (rangeTarget - transform.position);
+        Vector3 toTarget = (mainTarget.position - transform.position);
 
         // Opción: evitar raycast si el ángulo es muy malo
         float angle = Vector3.Angle(transform.forward, toTarget);
-        if (angle > 70f) 
+        if (angle > 70f)
             return false;
 
         Vector3 direction = toTarget.normalized;
@@ -135,19 +137,21 @@ public class Enemy : MonoBehaviour
         // Raycast ÚNICO
         if (Physics.Raycast(origin, direction, out RaycastHit hit, AttackDistanceRange))
         {
-            return hit.transform.CompareTag("Player");
+            if (hit.transform == mainTarget || hit.transform.IsChildOf(mainTarget))
+            {
+                return true;
+            }
         }
 
         return false;
     }
 
-    
 
     private void TryRangeAttack()
     {
-        if (rangeTarget == null) return;
+        if (mainTarget is null) return;
 
-        Vector3 direction = (rangeTarget - transform.position).normalized;
+        Vector3 direction = (mainTarget.position - transform.position).normalized;
         float distance = AttackDistanceRange;
 
         // DEBUG ray (solo en editor)
@@ -217,12 +221,12 @@ public class Enemy : MonoBehaviour
             Gizmos.DrawSphere(transform.position, AttackDistanceRange);
 
             // Dibujar rayo hacia rangeTarget
-            if (rangeTarget != null)
+            if (mainTarget != null)
             {
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawLine(
                     transform.position + Vector3.up,
-                    rangeTarget + Vector3.up
+                    mainTarget.position + Vector3.up
                 );
             }
         }

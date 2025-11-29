@@ -11,11 +11,11 @@ public class EnemyType: ScriptableObject
     
     [Header("Detection")]
     public float detectionRange = 5f;
-    public float attackMeleeRange = 2f; 
-    public float attackDistanceRange = 3f;
     
-    [Header("Attacks")]
+    [Header("Attacks")] 
+    public float attackMeleeRange = 2f;
     public EnemyAttackData meleeAttack;
+    public float attackDistanceRange = 3f;
     public EnemyAttackData rangeAttack;
     [Range(0f, 1f)]
     public float attackDelay = 0.3f;
@@ -28,5 +28,4 @@ public class EnemyType: ScriptableObject
     public GameObject[] lootPrefabs;
     [Range(0f, 1f)]
     public float lootDropChance = 0.1f;
-    
 }

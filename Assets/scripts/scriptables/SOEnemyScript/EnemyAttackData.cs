@@ -5,15 +5,16 @@ using Sirenix.OdinInspector;
 public class EnemyAttackData : ScriptableObject
 {
     public string attackName;
-    public float damageMelee;
-    public float damageRange;
+    public bool isRanged;
     public float cooldown;
+    public float damageMelee;
+    [ShowIf("isRanged")]
+    public float damageRange;
    
     [Header("Visual")]
     public GameObject attackEffectPrefab;
     
     [Header("Range Settings")]
-    public bool isRanged;
     [ShowIf("isRanged")]
     public GameObject projectilePrefab;
     [ShowIf("isRanged")]

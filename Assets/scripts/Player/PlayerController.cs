@@ -76,7 +76,6 @@ public class PlayerController : MonoBehaviour
         controller.Move(direction * currentSpeed * Time.deltaTime);
     }
 
-
     // ------------- GRAVITY -------------
     private void ApplyGravity()
     {

@@ -6,6 +6,7 @@ public class BulletTracer : MonoBehaviour
     public float speed = 50f;
     public float tracerLength = 0.5f;
     public float maxDistance = 20f;
+    public float damage = 20f;
 
     private Vector3 direction;
     private LineRenderer lr;
@@ -21,23 +22,23 @@ public class BulletTracer : MonoBehaviour
         if (lr != null)
         {
             lr.positionCount = 2;
-            Vector3 tail = t.position - direction * tracerLength;
-            lr.SetPosition(0, tail);
-            lr.SetPosition(1, t.position);
         }
     }
 
     void Update()
     {
         float move = speed * Time.deltaTime;
+
         t.position += direction * move;
         traveled += move;
 
         if (lr != null)
         {
-            Vector3 tail = t.position - direction * tracerLength;
+            Vector3 head = t.position;
+            Vector3 tail = head - direction * tracerLength;
+
             lr.SetPosition(0, tail);
-            lr.SetPosition(1, t.position);
+            lr.SetPosition(1, head);
         }
 
         if (traveled >= maxDistance)
@@ -46,6 +47,14 @@ public class BulletTracer : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Destroy(gameObject);
+        if (other.CompareTag("Enemy"))
+        {
+            IDamageable damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeDamage(damage);
+                Destroy(gameObject);
+            }
+        }
     }
 }

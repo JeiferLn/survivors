@@ -2,50 +2,66 @@ using UnityEngine;
 
 public class BulletTracer : MonoBehaviour
 {
+    // ---------------- SETTINGS ----------------
     [Header("Tracer Settings")]
     public float speed = 50f;
     public float tracerLength = 0.5f;
     public float maxDistance = 20f;
+    public float damage = 20f;
 
+    // ---------------- COMPONENTS ----------------
     private Vector3 direction;
     private LineRenderer lr;
-    private float traveled = 0f;
     private Transform t;
 
+    // ---------------- STATE ----------------
+    private float traveled = 0f;
+
+    // ---------------- START ----------------
     void Start()
     {
         t = transform;
-        lr = GetComponent<LineRenderer>();
-        direction = t.forward;
 
+        direction = t.forward.normalized;
+
+        lr = GetComponent<LineRenderer>();
         if (lr != null)
         {
             lr.positionCount = 2;
-            Vector3 tail = t.position - direction * tracerLength;
-            lr.SetPosition(0, tail);
-            lr.SetPosition(1, t.position);
         }
     }
 
+    // ---------------- UPDATE ----------------
     void Update()
     {
         float move = speed * Time.deltaTime;
+
         t.position += direction * move;
         traveled += move;
 
         if (lr != null)
         {
-            Vector3 tail = t.position - direction * tracerLength;
+            Vector3 head = t.position;
+            Vector3 tail = head - direction * tracerLength;
+
             lr.SetPosition(0, tail);
-            lr.SetPosition(1, t.position);
+            lr.SetPosition(1, head);
         }
 
         if (traveled >= maxDistance)
+        {
             Destroy(gameObject);
+        }
     }
 
+    // ---------------- TRIGGER ENTER ----------------
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("BulletTracer: OnTriggerEnter: " + other.name);
+        if (!other.TryGetComponent<IDamageable>(out var damageable))
+            return;
+
+        damageable.TakeDamage(damage);
         Destroy(gameObject);
     }
 }

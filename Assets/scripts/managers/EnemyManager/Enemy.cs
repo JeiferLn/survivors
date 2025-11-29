@@ -74,6 +74,19 @@ public class Enemy : MonoBehaviour
             agent.SetDestination(mainTarget.position);
         }
     }
+    
+    private void RotateTowardsTarget()
+    {
+        if (mainTarget is null) return;
+
+        Vector3 direction = (mainTarget.position - transform.position).normalized;
+        direction.y = 0; // evitar inclinaciones
+
+        if (direction == Vector3.zero) return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
+    }
 
     public void StopMoving()
     {
@@ -91,6 +104,7 @@ public class Enemy : MonoBehaviour
         // ---- MELEE ----
         if (!isRangeEnemy)
         {
+            RotateTowardsTarget();
             MakeDamage();
             lastAttackTime = Time.time;
             return;
@@ -107,6 +121,9 @@ public class Enemy : MonoBehaviour
             MoveTo(mainTarget);
             return;
         }
+        
+        // Rotamos hacia el objetivo
+        RotateTowardsTarget();
 
         // 3) Está en rango → ahora sí hacemos el ÚNICO raycast
         if (!HasLineOfSightOptimized())

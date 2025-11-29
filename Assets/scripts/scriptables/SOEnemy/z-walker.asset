@@ -17,15 +17,12 @@ MonoBehaviour:
   moveSpeed: 5
   expAmount: 10
   detectionRange: 50
+  attackMode: 0
   attackMeleeRange: 5
+  meleeAttack: {fileID: 0}
   attackDistanceRange: 10
-  primaryAttack: {fileID: 0}
-  secondaryAttack: {fileID: 0}
-  secondaryAttackChance: 0.3
-  sprite: {fileID: 0}
-  tintColor: {r: 1, g: 1, b: 1, a: 1}
-  scale: 1
-  animator: {fileID: 0}
+  rangeAttack: {fileID: 0}
+  enemy3DModel: {fileID: 0}
   deathEffectPrefab: {fileID: 0}
   lootPrefabs: []
   lootDropChance: 0.1

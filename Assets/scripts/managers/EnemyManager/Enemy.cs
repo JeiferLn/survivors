@@ -46,11 +46,38 @@ public class Enemy : MonoBehaviour
     private void SetEnemyStats()
     {
         health = enemyType.maxHealth;
-        isRangeEnemy = enemyAttackData.isRanged;
-        attackCooldown = enemyAttackData.cooldown;
-        attackMeleeDamage = enemyAttackData.damageMelee;
-        attackDistanceDamage = enemyAttackData.damageRange;
+
+        // --- ATAQUES ---
+        switch (enemyType.attackMode)
+        {
+            case EnemyAttackMode.Melee:
+                isRangeEnemy = false;
+                attackCooldown = enemyType.meleeAttack.cooldown;
+                attackMeleeDamage = enemyType.meleeAttack.damage;
+                break;
+
+            case EnemyAttackMode.Ranged:
+                isRangeEnemy = true;
+                attackCooldown = enemyType.rangeAttack.cooldown;
+                attackDistanceDamage = enemyType.rangeAttack.damage;
+                break;
+
+            case EnemyAttackMode.Hybrid:
+                // HÍBRIDO: puede usar ambos ataques
+                isRangeEnemy = true; // El enemigo tiene ranged, importantísimo
+
+                attackMeleeDamage = enemyType.meleeAttack.damage;
+                attackDistanceDamage = enemyType.rangeAttack.damage;
+
+                // Puedes elegir el cooldown que prefieras
+                attackCooldown = Mathf.Min(
+                    enemyType.meleeAttack.cooldown, 
+                    enemyType.rangeAttack.cooldown
+                );
+                break;
+        }
     }
+
 
     private void SetEnemyDetection()
     {

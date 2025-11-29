@@ -5,18 +5,22 @@ using Sirenix.OdinInspector;
 public class EnemyAttackData : ScriptableObject
 {
     public string attackName;
-    public bool isRanged;
-    public float cooldown;
-    public float damageMelee;
-    [ShowIf("isRanged")]
-    public float damageRange;
-   
+
+    [Header("Damage")]
+    public float damage;
+
+    [Header("Cooldown")]
+    public float cooldown = 1f;
+
+    [Header("Melee or Ranged")]
+    public bool usesProjectile;
+
+    [ShowIf("usesProjectile")]
+    public GameObject projectilePrefab;
+
+    [ShowIf("usesProjectile")]
+    public float projectileSpeed = 10f;
+
     [Header("Visual")]
     public GameObject attackEffectPrefab;
-    
-    [Header("Range Settings")]
-    [ShowIf("isRanged")]
-    public GameObject projectilePrefab;
-    [ShowIf("isRanged")]
-    public float projectileSpeed = 10f;
 }

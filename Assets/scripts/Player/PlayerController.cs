@@ -23,6 +23,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform cameraTransform;
 
+    [SerializeField]
+    private LayerMask walkAreaLayer;
+
     // ------------- INPUT VARIABLES -------------
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -123,18 +126,20 @@ public class PlayerController : MonoBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 200f))
+        if (Physics.Raycast(ray, out RaycastHit hit, 300f, walkAreaLayer))
         {
-            Vector3 lookPoint = hit.point;
-            lookPoint.y = transform.position.y;
-
-            Vector3 dir = (lookPoint - transform.position);
-            dir.y = 0;
-
-            if (dir.sqrMagnitude > 0.01f)
-            {
-                transform.rotation = Quaternion.LookRotation(dir);
-            }
+            RotateTowards(hit.point);
         }
+    }
+
+    // ------------- ROTATE TOWARDS -------------
+    private void RotateTowards(Vector3 worldPoint)
+    {
+        Vector3 lookPoint = worldPoint;
+        lookPoint.y = transform.position.y;
+        Vector3 dir = (lookPoint - transform.position);
+        dir.y = 0;
+        if (dir.sqrMagnitude > 0.01f)
+            transform.rotation = Quaternion.LookRotation(dir);
     }
 }

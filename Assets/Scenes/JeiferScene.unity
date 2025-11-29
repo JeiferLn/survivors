@@ -795,6 +795,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: LevelTest
       objectReference: {fileID: 0}
+    - target: {fileID: 1293085168573400493, guid: 54f6cf25a49bdfb43867cc3b2b1d5e6f, type: 3}
+      propertyPath: m_TagString
+      value: Obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 2240717591668356256, guid: 54f6cf25a49bdfb43867cc3b2b1d5e6f, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3182755171718126032, guid: 54f6cf25a49bdfb43867cc3b2b1d5e6f, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547071024287354626, guid: 54f6cf25a49bdfb43867cc3b2b1d5e6f, type: 3}
+      propertyPath: m_TagString
+      value: Obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130382809378376629, guid: 54f6cf25a49bdfb43867cc3b2b1d5e6f, type: 3}
+      propertyPath: m_TagString
+      value: Obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7697916728822565768, guid: 54f6cf25a49bdfb43867cc3b2b1d5e6f, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     - target: {fileID: 8374248200923267205, guid: 54f6cf25a49bdfb43867cc3b2b1d5e6f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.0016860962
@@ -1123,6 +1147,9 @@ MonoBehaviour:
   aimingMoveSpeed: 5
   gravity: -25
   cameraTransform: {fileID: 330585546}
+  walkAreaLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &763626195
 MonoBehaviour:
   m_ObjectHideFlags: 0

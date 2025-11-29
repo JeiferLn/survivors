@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   damage: 10
-  recoilAmount: 0.1
-  recoilReturnSpeed: 2
+  recoilAmount: 0
+  recoilReturnSpeed: 0
   laserDistance: 5
   laserOffset: {x: 0, y: 0, z: 0}
   bulletPrefab: {fileID: 6245600608809890115, guid: d573e295d2a614705a5aee3eeb26ccf1, type: 3}

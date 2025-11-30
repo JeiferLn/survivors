@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float aimingMoveSpeed = 4f;
 
+    public bool canMove = true;
+
     // ------------- GRAVITY VARIABLES -------------
     [SerializeField]
     private float gravity = -9.81f;
@@ -53,6 +55,9 @@ public class PlayerController : MonoBehaviour
     // ---------------- UPDATE LOOP --------------------
     private void Update()
     {
+        if (!canMove)
+            return;
+
         MovePlayer();
         ApplyGravity();
         HandleRotation();

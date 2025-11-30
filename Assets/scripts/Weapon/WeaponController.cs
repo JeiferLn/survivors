@@ -34,7 +34,7 @@ public class WeaponController : MonoBehaviour
         t = transform;
 
         if (!TryGetComponentInParent(out player))
-            Debug.LogWarning("WeaponController: No PlayerController found in parent.");
+            Debug.LogWarning("No PlayerController found in parent.");
 
         lineRenderer = GetComponent<LineRenderer>();
         if (lineRenderer != null)
@@ -57,7 +57,16 @@ public class WeaponController : MonoBehaviour
     public void OnShoot(InputAction.CallbackContext ctx)
     {
         if (ctx.started)
+        {
             shootingHeld = true;
+
+            if (isAiming && fireCooldown <= 0f)
+            {
+                ShootOnce();
+                fireCooldown = weaponData.fireCooldown;
+            }
+        }
+
         if (ctx.canceled)
             shootingHeld = false;
     }
@@ -191,9 +200,9 @@ public class WeaponController : MonoBehaviour
     public void SetWeapon(WeaponData newWeapon)
     {
         weaponData = newWeapon;
+        fireCooldown = 0f;
     }
 
-    // Helper to avoid repeating GetComponentInParent everywhere
     private bool TryGetComponentInParent<T>(out T comp)
     {
         comp = GetComponentInParent<T>();

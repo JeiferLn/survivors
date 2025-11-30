@@ -14,16 +14,23 @@ public class PlayerInteraction : MonoBehaviour
     // ---------------- EQUIP INPUT ----------------
     public void OnEquip(InputAction.CallbackContext ctx)
     {
-        if (!ctx.performed || currentEquipable == null)
+        if (!ctx.performed)
             return;
 
-        currentEquipable.Equip(playerController);
+        if (currentEquipable == null)
+            return;
+
+        if (currentEquipable is IEquipable equipable)
+        {
+            equipable.Equip(playerController);
+            currentEquipable = null;
+        }
     }
 
     // ---------------- TRIGGER ENTER ----------------
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out IEquipable equipable))
+        if (other.TryGetComponent<IEquipable>(out var equipable))
         {
             currentEquipable = equipable;
         }
@@ -32,7 +39,7 @@ public class PlayerInteraction : MonoBehaviour
     // ---------------- TRIGGER EXIT ----------------
     private void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent(out IEquipable equipable) && currentEquipable == equipable)
+        if (other.TryGetComponent<IEquipable>(out var equipable) && currentEquipable == equipable)
         {
             currentEquipable = null;
         }

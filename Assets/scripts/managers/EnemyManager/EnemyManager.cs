@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
-    [Header("Pool Enemy Reference")]
-    [SerializeField] private Transform poolEnemyContainer;
+    [Header("Pool Enemy Reference")] 
+    [SerializeField]
+    private Transform poolEnemyContainer;
 
     [Header("ActivationZone Reference")] 
-    [SerializeField] private EnemyActivationZone activationZone;
+    [SerializeField]
+    private EnemyActivationZone activationZone;
 
     [Header("Targets")] 
     [SerializeField] private Transform mainTarget;
@@ -30,7 +32,7 @@ public class EnemyManager : MonoBehaviour
             if (child.TryGetComponent(out Enemy enemy))
             {
                 // Solo agregamos si está activo, o reiniciamos su lógica
-                if(child.gameObject.activeSelf) activeEnemies.Add(enemy);
+                if (child.gameObject.activeSelf) activeEnemies.Add(enemy);
             }
         }
     }
@@ -51,36 +53,43 @@ public class EnemyManager : MonoBehaviour
             {
                 case EnemyState.Idle:
                     // Si el jugador entra en rango de detección -> Moverse
+                    enemy.enemyAnimator.SetTrigger("z_idle");
+                    
                     if (distanceToTarget < enemy.DetectionRange)
                     {
                         enemy.enemyCurrentState = EnemyState.Moving;
                     }
+
                     break;
 
                 case EnemyState.Moving:
                     // Chequear rangos de ataque
                     float attackRange = enemy.isRangeEnemy ? enemy.AttackDistanceRange : enemy.AttackMeleeRange;
-                    
+
                     if (distanceToTarget <= attackRange)
                     {
                         // Cambiar a estado de ataque
-                        enemy.enemyCurrentState = enemy.isRangeEnemy ? EnemyState.AttackingDistance : EnemyState.AttackingMelee;
+                        enemy.enemyCurrentState = 
+                            enemy.isRangeEnemy ? EnemyState.AttackingDistance : EnemyState.AttackingMelee;
+                        enemy.enemyAnimator.SetTrigger("z_meleeAttack"); // por el momento dejamos esta animacion
                         enemy.StopMoving(); // Detener el NavMesh
                     }
                     else
                     {
                         // Seguir moviéndose
+                        enemy.enemyAnimator.SetTrigger("z_walk");
                         EnemyMove(enemy);
                     }
+
                     break;
 
                 case EnemyState.AttackingMelee:
                 case EnemyState.AttackingDistance:
                     // Lógica: Si el jugador se aleja, volver a perseguir
                     float exitAttackRange = enemy.isRangeEnemy ? enemy.AttackDistanceRange : enemy.AttackMeleeRange;
-                    
+
                     // Le damos un pequeño margen (offset) para que no parpadee entre atacar y moverse
-                    if (distanceToTarget > exitAttackRange + 0.5f) 
+                    if (distanceToTarget > exitAttackRange + 0.5f)
                     {
                         enemy.enemyCurrentState = EnemyState.Moving;
                     }
@@ -90,6 +99,7 @@ public class EnemyManager : MonoBehaviour
                         // El Manager decide QUE atacar, el Enemy decide COMO atacar
                         enemy.TryAttack();
                     }
+
                     break;
             }
         }

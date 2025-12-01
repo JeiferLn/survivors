@@ -1,15 +1,15 @@
-using Sirenix.OdinInspector;
+
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    [Header("Configuration")] public EnemyState enemyCurrentState;
+    [Header("Configuration")] 
+    public Animator enemyAnimator;
+    public EnemyState enemyCurrentState;
     public EnemyType enemyType = null;
     public bool isRangeEnemy = false;
-
-    [ShowIf("isRangeEnemy")]
-
+    
     // Enemy Stats
     private float health;
 

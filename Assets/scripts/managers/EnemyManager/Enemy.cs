@@ -6,7 +6,6 @@ public class Enemy : MonoBehaviour
 {
     [Header("Configuration")] public EnemyState enemyCurrentState;
     public EnemyType enemyType = null;
-    public EnemyAttackData enemyAttackData = null;
     public bool isRangeEnemy = false;
 
     [ShowIf("isRangeEnemy")]

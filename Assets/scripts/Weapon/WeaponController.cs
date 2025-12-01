@@ -21,7 +21,6 @@ public class WeaponController : MonoBehaviour
 
     private Vector3 recoilOffset = Vector3.zero;
     private Vector3 laserDirection;
-    private Vector3 lastLaserEnd;
 
     // ---------------- EFFECTS ----------------
     [Header("Effects")]
@@ -59,38 +58,39 @@ public class WeaponController : MonoBehaviour
         if (ctx.started)
         {
             shootingHeld = true;
-
-            if (isAiming && fireCooldown <= 0f)
-            {
-                ShootOnce();
-                fireCooldown = weaponData.fireCooldown;
-            }
         }
 
         if (ctx.canceled)
+        {
             shootingHeld = false;
+        }
     }
 
     // ---------------- UPDATE ----------------
     void Update()
     {
+        // UPDATE COOLDOWN
+        if (fireCooldown > 0f)
+            fireCooldown -= Time.deltaTime;
+
         HandleLaser();
         UpdateRecoil();
         UpdateMuzzleFlash();
-        HandleShooting();
+        HandleShooting(); // <-- Disparo real ahora SOLO aquí
     }
 
     // ---------------- SHOOT LOGIC ----------------
     private void HandleShooting()
     {
-        if (!shootingHeld || !isAiming)
+        if (!isAiming)
+            return;
+
+        if (!shootingHeld)
             return;
 
         if (fireCooldown > 0f)
-        {
-            fireCooldown -= Time.deltaTime;
             return;
-        }
+
 
         ShootOnce();
         fireCooldown = weaponData.fireCooldown;
@@ -141,12 +141,8 @@ public class WeaponController : MonoBehaviour
 
         Vector3 end = muzzlePos + laserDirection * weaponData.laserDistance;
 
-        if (
-            Physics.Raycast(muzzlePos, laserDirection, out RaycastHit hit, weaponData.laserDistance)
-        )
+        if (Physics.Raycast(muzzlePos, laserDirection, out RaycastHit hit, weaponData.laserDistance))
             end = hit.point;
-
-        lastLaserEnd = end;
 
         lineRenderer.SetPosition(0, muzzlePos);
         lineRenderer.SetPosition(1, end);

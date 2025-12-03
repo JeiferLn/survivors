@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8fd9156cd8444268851535f3a64de59, type: 3}
   m_Name: SoundLibrary
   m_EditorClassIdentifier: 
-  sounds: []
+  sounds:
+  - id: pistol-shoot
+    clip: {fileID: 8300000, guid: 0a0f6cee92c404a9fa9e4b698165240b, type: 3}

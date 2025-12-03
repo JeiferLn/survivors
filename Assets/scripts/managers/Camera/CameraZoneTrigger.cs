@@ -39,7 +39,11 @@ public class CameraZoneTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            targetGroup.m_Targets = new CinemachineTargetGroup.Target[0];
+            // Clear existing targets
+            for (int i = targetGroup.Targets.Count - 1; i >= 0; i--)
+            {
+                targetGroup.RemoveMember(targetGroup.Targets[i].Object);
+            }
 
             foreach (Transform t in targets)
             {

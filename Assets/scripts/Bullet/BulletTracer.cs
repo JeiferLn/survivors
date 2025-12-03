@@ -10,10 +10,6 @@ public class BulletTracer : MonoBehaviour
 
     [Header("Collision")]
     [SerializeField] private LayerMask hitLayers = ~0;
-    [SerializeField] private float rayRadius = 0.05f;
-
-    [Header("Debug")]
-    [SerializeField] private bool showDebugRay = false;
 
     private Vector3 direction;
     private LineRenderer lr;
@@ -58,11 +54,6 @@ public class BulletTracer : MonoBehaviour
 
     private bool CheckHit(Vector3 origin, Vector3 dir, float distance, out RaycastHit hit)
     {
-        if (showDebugRay)
-        {
-            Debug.DrawRay(origin, dir * distance, Color.red, 0.1f);
-        }
-
         return Physics.Raycast(origin, dir, out hit, distance, hitLayers);
     }
 

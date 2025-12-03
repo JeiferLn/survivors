@@ -1,113 +1,347 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Controla la lógica de todos los enemigos activos en escena.
+/// Actúa como el "cerebro" de la máquina de estados.
+/// </summary>
 public class EnemyManager : MonoBehaviour
 {
-    [Header("Pool Enemy Reference")] 
-    [SerializeField]
-    private Transform poolEnemyContainer;
+    #region ══════════ SERIALIZED FIELDS ══════════
+    
+    [Header("Pool & Containers")] 
+    [SerializeField] private Transform poolEnemyContainer;
 
-    [Header("ActivationZone Reference")] 
-    [SerializeField]
-    private EnemyActivationZone activationZone;
+    [Header("Activation Zone")] 
+    [SerializeField] private EnemyActivationZone activationZone;
 
-    [Header("Targets")] 
+    [Header("Target")] 
     [SerializeField] private Transform mainTarget;
 
-    private List<Enemy> activeEnemies = new List<Enemy>();
+    [Header("Settings")]
+    [SerializeField] private float exitAttackRangeOffset = 0.5f;
+    
+    [Header("Debug")]
+    [SerializeField] private bool showDebugLogs = false;
+    
+    #endregion
 
-    private void OnEnable() => activationZone.OnEnemyActivated += GetActiveEnemies;
-    private void OnDisable() => activationZone.OnEnemyActivated -= GetActiveEnemies;
+    #region ══════════ CAMPOS PRIVADOS ══════════
+    
+    private readonly List<Enemy> activeEnemies = new();
+    private readonly List<Enemy> enemiesToRemove = new();
+    
+    #endregion
+
+    #region ══════════ PROPIEDADES ══════════
+    
+    public int ActiveEnemyCount => activeEnemies.Count;
+    public IReadOnlyList<Enemy> ActiveEnemies => activeEnemies;
+    
+    #endregion
+
+    #region ══════════ UNITY LIFECYCLE ══════════
+
+    private void OnEnable()
+    {
+        if (activationZone != null)
+            activationZone.OnEnemyActivated += RefreshActiveEnemies;
+    }
+
+    private void OnDisable()
+    {
+        if (activationZone != null)
+            activationZone.OnEnemyActivated -= RefreshActiveEnemies;
+    }
 
     private void Start()
     {
-        GetActiveEnemies();
-    }
-
-    private void GetActiveEnemies()
-    {
-        activeEnemies.Clear(); // Limpiamos la lista existente antes de buscar
-        foreach (Transform child in poolEnemyContainer)
-        {
-            if (child.TryGetComponent(out Enemy enemy))
-            {
-                // Solo agregamos si está activo, o reiniciamos su lógica
-                if (child.gameObject.activeSelf) activeEnemies.Add(enemy);
-            }
-        }
+        RefreshActiveEnemies();
     }
 
     private void Update()
     {
-        if (activeEnemies.Count == 0 || mainTarget is null) return;
+        if (activeEnemies.Count == 0 || mainTarget == null) return;
 
+        ProcessEnemies();
+        CleanupDeadEnemies();
+    }
+
+    #endregion
+
+    #region ══════════ GESTIÓN DE ENEMIGOS ══════════
+
+    /// <summary>
+    /// Refresca la lista de enemigos activos desde el pool.
+    /// </summary>
+    public void RefreshActiveEnemies()
+    {
+        activeEnemies.Clear();
+        
+        if (poolEnemyContainer == null) return;
+
+        foreach (Transform child in poolEnemyContainer)
+        {
+            if (child.gameObject.activeInHierarchy && 
+                child.TryGetComponent(out Enemy enemy) && 
+                !enemy.IsDead)
+            {
+                activeEnemies.Add(enemy);
+            }
+        }
+
+        LogDebug($"Enemigos activos: {activeEnemies.Count}");
+    }
+
+    /// <summary>
+    /// Procesa la lógica de cada enemigo activo.
+    /// </summary>
+    private void ProcessEnemies()
+    {
         foreach (Enemy enemy in activeEnemies)
         {
-            if (!enemy.gameObject.activeInHierarchy) continue; // Si murió, saltar
+            if (!IsEnemyValid(enemy)) continue;
 
-            // 1. Calcular Distancia REAL en 3D
-            float distanceToTarget = Vector3.Distance(enemy.transform.position, mainTarget.position);
+            float distanceToTarget = Vector3.Distance(
+                enemy.transform.position, 
+                mainTarget.position
+            );
 
-            // MAQUINA DE ESTADOS
-            switch (enemy.enemyCurrentState)
+            ProcessEnemyState(enemy, distanceToTarget);
+        }
+    }
+
+    /// <summary>
+    /// Verifica si un enemigo es válido para procesar.
+    /// </summary>
+    private bool IsEnemyValid(Enemy enemy)
+    {
+        if (enemy == null) return false;
+        if (!enemy.gameObject.activeInHierarchy) return false;
+        if (enemy.IsDead) return false;
+        
+        return true;
+    }
+
+    /// <summary>
+    /// Limpia enemigos muertos o desactivados de la lista.
+    /// </summary>
+    private void CleanupDeadEnemies()
+    {
+        enemiesToRemove.Clear();
+        
+        foreach (Enemy enemy in activeEnemies)
+        {
+            if (!IsEnemyValid(enemy))
             {
-                case EnemyState.Idle:
-                    // Si el jugador entra en rango de detección -> Moverse
-                    enemy.enemyAnimator.SetTrigger("z_idle");
-                    
-                    if (distanceToTarget < enemy.DetectionRange)
-                    {
-                        enemy.enemyCurrentState = EnemyState.Moving;
-                    }
+                enemiesToRemove.Add(enemy);
+            }
+        }
 
-                    break;
+        foreach (Enemy enemy in enemiesToRemove)
+        {
+            activeEnemies.Remove(enemy);
+        }
+    }
 
-                case EnemyState.Moving:
-                    // Chequear rangos de ataque
-                    float attackRange = enemy.isRangeEnemy ? enemy.AttackDistanceRange : enemy.AttackMeleeRange;
+    #endregion
 
-                    if (distanceToTarget <= attackRange)
-                    {
-                        // Cambiar a estado de ataque
-                        enemy.enemyCurrentState = 
-                            enemy.isRangeEnemy ? EnemyState.AttackingDistance : EnemyState.AttackingMelee;
-                        enemy.enemyAnimator.SetTrigger("z_meleeAttack"); // por el momento dejamos esta animacion
-                        enemy.StopMoving(); // Detener el NavMesh
-                    }
-                    else
-                    {
-                        // Seguir moviéndose
-                        enemy.enemyAnimator.SetTrigger("z_walk");
-                        EnemyMove(enemy);
-                    }
+    #region ══════════ MÁQUINA DE ESTADOS ══════════
 
-                    break;
+    /// <summary>
+    /// Procesa el estado actual de un enemigo y decide transiciones.
+    /// </summary>
+    private void ProcessEnemyState(Enemy enemy, float distanceToTarget)
+    {
+        switch (enemy.CurrentState)
+        {
+            case EnemyState.Idle:
+                ProcessIdleState(enemy, distanceToTarget);
+                break;
 
-                case EnemyState.AttackingMelee:
-                case EnemyState.AttackingDistance:
-                    // Lógica: Si el jugador se aleja, volver a perseguir
-                    float exitAttackRange = enemy.isRangeEnemy ? enemy.AttackDistanceRange : enemy.AttackMeleeRange;
+            case EnemyState.Moving:
+                ProcessMovingState(enemy, distanceToTarget);
+                break;
 
-                    // Le damos un pequeño margen (offset) para que no parpadee entre atacar y moverse
-                    if (distanceToTarget > exitAttackRange + 0.5f)
-                    {
-                        enemy.enemyCurrentState = EnemyState.Moving;
-                    }
-                    else
-                    {
-                        // Aquí ordenamos al enemigo que ejecute su lógica de ataque
-                        // El Manager decide QUE atacar, el Enemy decide COMO atacar
-                        enemy.TryAttack();
-                    }
+            case EnemyState.AttackingMelee:
+            case EnemyState.AttackingDistance:
+                ProcessAttackingState(enemy, distanceToTarget);
+                break;
 
-                    break;
+            case EnemyState.TakingDamage:
+                ProcessDamageState(enemy);
+                break;
+
+            case EnemyState.Dead:
+                // No hacer nada, ya está muerto
+                break;
+
+            case EnemyState.None:
+                // Estado inválido, poner en Idle
+                enemy.CurrentState = EnemyState.Idle;
+                break;
+        }
+    }
+
+    private void ProcessIdleState(Enemy enemy, float distance)
+    {
+        // Si el jugador entra en rango de detección → Moverse
+        if (distance <= enemy.DetectionRange)
+        {
+            enemy.CurrentState = EnemyState.Moving;
+            LogDebug($"{enemy.name}: Jugador detectado, persiguiendo...");
+        }
+    }
+
+    private void ProcessMovingState(Enemy enemy, float distance)
+    {
+        float attackRange = enemy.GetCurrentAttackRange();
+
+        if (distance <= attackRange)
+        {
+            // En rango de ataque
+            enemy.StopMoving();
+            enemy.CurrentState = enemy.IsRangeEnemy 
+                ? EnemyState.AttackingDistance 
+                : EnemyState.AttackingMelee;
+                
+            LogDebug($"{enemy.name}: En rango, atacando...");
+        }
+        else if (distance <= enemy.DetectionRange)
+        {
+            // Perseguir al jugador
+            
+            enemy.MoveTo(mainTarget);
+        }
+        else
+        {
+            // Jugador fuera de rango de detección
+            enemy.StopMoving();
+            enemy.CurrentState = EnemyState.Idle;
+            LogDebug($"{enemy.name}: Objetivo perdido, volviendo a Idle");
+        }
+    }
+
+    private void ProcessAttackingState(Enemy enemy, float distance)
+    {
+        float attackRange = enemy.GetCurrentAttackRange();
+        float exitRange = attackRange + exitAttackRangeOffset;
+
+        if (distance > exitRange)
+        {
+            // Jugador se alejó, volver a perseguir
+            enemy.CurrentState = EnemyState.Moving;
+            LogDebug($"{enemy.name}: Objetivo fuera de rango, persiguiendo...");
+        }
+        else
+        {
+            // Ejecutar ataque
+            enemy.TryAttack();
+        }
+    }
+
+    private void ProcessDamageState(Enemy enemy)
+    {
+        // Verificar si la animación de daño terminó
+        if (enemy.Animator != null && enemy.Animator.IsCurrentAnimationFinished(0.9f))
+        {
+            // Volver a estado de combate o idle
+            float distance = Vector3.Distance(enemy.transform.position, mainTarget.position);
+            
+            if (distance <= enemy.GetCurrentAttackRange())
+            {
+                enemy.CurrentState = enemy.IsRangeEnemy 
+                    ? EnemyState.AttackingDistance 
+                    : EnemyState.AttackingMelee;
+            }
+            else if (distance <= enemy.DetectionRange)
+            {
+                enemy.CurrentState = EnemyState.Moving;
+            }
+            else
+            {
+                enemy.CurrentState = EnemyState.Idle;
             }
         }
     }
 
-    private void EnemyMove(Enemy enemy)
+    #endregion
+
+    #region ══════════ API PÚBLICA ══════════
+
+    /// <summary>
+    /// Cambia el objetivo principal de todos los enemigos.
+    /// </summary>
+    public void SetMainTarget(Transform newTarget)
     {
-        // Pasamos el destino. El script del enemigo decidirá si necesita actualizar el NavMesh
-        enemy.MoveTo(mainTarget);
+        mainTarget = newTarget;
     }
+
+    /// <summary>
+    /// Aplica daño a todos los enemigos en un área.
+    /// </summary>
+    public void DamageEnemiesInArea(Vector3 center, float radius, float damage)
+    {
+        foreach (Enemy enemy in activeEnemies)
+        {
+            if (!IsEnemyValid(enemy)) continue;
+
+            float distance = Vector3.Distance(enemy.transform.position, center);
+            if (distance <= radius)
+            {
+                enemy.TakeDamage(damage);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Obtiene el enemigo más cercano al punto especificado.
+    /// </summary>
+    public Enemy GetClosestEnemy(Vector3 position)
+    {
+        Enemy closest = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (Enemy enemy in activeEnemies)
+        {
+            if (!IsEnemyValid(enemy)) continue;
+
+            float distance = Vector3.Distance(enemy.transform.position, position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closest = enemy;
+            }
+        }
+
+        return closest;
+    }
+
+    #endregion
+
+    #region ══════════ DEBUG ══════════
+
+    private void LogDebug(string message)
+    {
+        if (showDebugLogs)
+            Debug.Log($"[EnemyManager] {message}");
+    }
+
+    [ContextMenu("Refresh Enemies")]
+    private void DebugRefreshEnemies()
+    {
+        RefreshActiveEnemies();
+    }
+
+    [ContextMenu("Log Active Enemies")]
+    private void DebugLogEnemies()
+    {
+        Debug.Log($"=== ENEMIGOS ACTIVOS ({activeEnemies.Count}) ===");
+        foreach (Enemy enemy in activeEnemies)
+        {
+            Debug.Log($"  - {enemy.name}: {enemy.CurrentState} | HP: {enemy.CurrentHealth}");
+        }
+    }
+
+    #endregion
 }

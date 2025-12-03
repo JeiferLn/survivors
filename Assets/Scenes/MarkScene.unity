@@ -987,6 +987,7 @@ GameObject:
   - component: {fileID: 1599488572}
   - component: {fileID: 1599488570}
   - component: {fileID: 1599488573}
+  - component: {fileID: 1599488574}
   m_Layer: 0
   m_Name: z-walker
   m_TagString: Enemy
@@ -1003,7 +1004,7 @@ Transform:
   m_GameObject: {fileID: 1599488565}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -51.4, y: -15.3, z: -79.5}
+  m_LocalPosition: {x: -30.3, y: -15.3, z: -50.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1022,10 +1023,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b945682471c08c14d82c7b5a174523c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyAnimator: {fileID: 1231244060}
-  enemyCurrentState: 0
   enemyType: {fileID: 11400000, guid: 3e5f8569faac1364e8a271aa138bcd9d, type: 2}
-  isRangeEnemy: 0
+  _currentState: 0
+  _previousState: 0
 --- !u!195 &1599488571
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1082,6 +1082,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyModel: {fileID: 1231244058}
+--- !u!114 &1599488574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599488565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b5867e843f541445be8ce1d80b53930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 1231244060}
+  animationLayer: 0
+  defaultTransitionDuration: 0.15
+  showDebugLogs: 1
 --- !u!1 &1853898506
 GameObject:
   m_ObjectHideFlags: 0
@@ -1163,6 +1179,8 @@ MonoBehaviour:
   poolEnemyContainer: {fileID: 2100743942}
   activationZone: {fileID: 365906623}
   mainTarget: {fileID: 1218887812}
+  exitAttackRangeOffset: 0.5
+  showDebugLogs: 0
 --- !u!1 &2014962650
 GameObject:
   m_ObjectHideFlags: 0
@@ -1225,10 +1243,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b945682471c08c14d82c7b5a174523c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyAnimator: {fileID: 0}
-  enemyCurrentState: 0
   enemyType: {fileID: 11400000, guid: cfbbb2e545e60e14294fb94afe7ba026, type: 2}
-  isRangeEnemy: 0
+  _currentState: 0
+  _previousState: 0
 --- !u!65 &2014962654
 BoxCollider:
   m_ObjectHideFlags: 0

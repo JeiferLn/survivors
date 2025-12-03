@@ -76,7 +76,7 @@ public class WeaponController : MonoBehaviour
         HandleLaser();
         UpdateRecoil();
         UpdateMuzzleFlash();
-        HandleShooting(); // <-- Disparo real ahora SOLO aquí
+        HandleShooting();
     }
 
     // ---------------- SHOOT LOGIC ----------------
@@ -175,6 +175,7 @@ public class WeaponController : MonoBehaviour
         if (weaponData.bulletPrefab == null)
             return;
 
+        SoundManager.Instance.PlaySFX("pistol-shoot");
         Vector3 muzzlePos = t.position + t.TransformDirection(weaponData.laserOffset);
 
         GameObject obj = Instantiate(

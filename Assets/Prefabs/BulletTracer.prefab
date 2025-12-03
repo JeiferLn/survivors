@@ -206,3 +206,8 @@ MonoBehaviour:
   tracerLength: 0.5
   maxDistance: 500
   damage: 20
+  hitLayers:
+    serializedVersion: 2
+    m_Bits: 255
+  rayRadius: 0.05
+  showDebugRay: 0

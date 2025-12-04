@@ -6,11 +6,15 @@ public class PlayerController : MonoBehaviour
     // ------------- REFERENCES -------------
     private CharacterController controller;
     private Camera mainCam;
+    private Animator animator;
 
     // ------------- MOVEMENT VARIABLES -------------
     [Header("Movimiento")]
     [SerializeField]
-    private float moveSpeed = 10f;
+    private float walkMovementSpeed = 6f;
+
+    [SerializeField]
+    private float runMovementSpeed = 10f;
 
     [SerializeField]
     private float aimingMoveSpeed = 4f;
@@ -36,16 +40,19 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     private Vector2 lookInput;
     private bool isAiming;
-
+    private bool isRunning;
     // --------------------------------------------------------
     private void Start()
     {
         controller = GetComponent<CharacterController>();
         mainCam = Camera.main;
+        animator = GetComponentInChildren<Animator>();
     }
 
     // ---------------- INPUTS --------------------
     public void OnMove(InputAction.CallbackContext ctx) => moveInput = ctx.ReadValue<Vector2>();
+
+    public void OnRun(InputAction.CallbackContext ctx) => isRunning = ctx.ReadValueAsButton();
 
     public void OnLook(InputAction.CallbackContext ctx) => lookInput = ctx.ReadValue<Vector2>();
 
@@ -66,7 +73,8 @@ public class PlayerController : MonoBehaviour
     // ---------------- MOVEMENT --------------------
     private void MovePlayer()
     {
-        float currentSpeed = isAiming ? aimingMoveSpeed : moveSpeed;
+        float currentSpeed = isAiming ? aimingMoveSpeed : isRunning ?
+         runMovementSpeed : walkMovementSpeed;
 
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
@@ -76,6 +84,9 @@ public class PlayerController : MonoBehaviour
 
         Vector3 direction = forward * moveInput.y + right * moveInput.x;
         direction = direction.sqrMagnitude > 1f ? direction.normalized : direction;
+
+        float speedValue = isRunning ? 1f : moveInput.magnitude <= 0.01f ? 0f : 0.5f;
+        animator.SetFloat("Speed", speedValue, 0.15f, Time.deltaTime);
 
         controller.Move(direction * currentSpeed * Time.deltaTime);
     }

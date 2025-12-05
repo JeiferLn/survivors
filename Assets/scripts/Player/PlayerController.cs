@@ -15,7 +15,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float runMovementSpeed = 10f;
     [SerializeField] private float aimingMoveSpeed = 4f;
 
-    private float movementDirection;
     public bool canMove = true;
 
     // ------------- GRAVITY VARIABLES -------------
@@ -61,18 +60,13 @@ public class PlayerController : MonoBehaviour
     // ---------------- MOVEMENT --------------------
     private void MovePlayer()
     {
-        Vector3 forward = cameraTransform.forward;
-        Vector3 right = cameraTransform.right;
+        Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
 
-        forward.y = 0;
-        right.y = 0;
-
-        Vector3 direction = forward * moveInput.y + right * moveInput.x;
-        direction = direction.sqrMagnitude > 1f ? direction.normalized : direction;
+        if (direction.sqrMagnitude > 1f)
+            direction.Normalize();
 
         float dot = Vector3.Dot(transform.forward, direction);
         bool isGoingBack = dot < 0f;
-        movementDirection = dot;
 
         float currentSpeed;
 
@@ -88,11 +82,14 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                currentSpeed = isRunning && direction.magnitude > 0.01f ? runMovementSpeed : walkMovementSpeed;
+                currentSpeed = isRunning ? runMovementSpeed : walkMovementSpeed;
             }
         }
 
-        animator.SetFloat("Speed", movementDirection, 0.15f, Time.deltaTime);
+        Vector3 localDir = transform.InverseTransformDirection(direction);
+
+        animator.SetFloat("Horizontal", localDir.x, 0.15f, Time.deltaTime);
+        animator.SetFloat("Vertical", localDir.z, 0.15f, Time.deltaTime);
 
         controller.Move(direction * currentSpeed * Time.deltaTime);
     }

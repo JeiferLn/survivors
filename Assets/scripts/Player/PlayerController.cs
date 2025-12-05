@@ -60,13 +60,15 @@ public class PlayerController : MonoBehaviour
     // ---------------- MOVEMENT --------------------
     private void MovePlayer()
     {
+        float animSpeed = isRunning ? 1f : 0f;
+
         Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
 
         if (direction.sqrMagnitude > 1f)
             direction.Normalize();
 
         float dot = Vector3.Dot(transform.forward, direction);
-        bool isGoingBack = dot < 0f;
+        bool isGoingBack = dot < -0.5f;
 
         float currentSpeed;
 
@@ -88,6 +90,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 localDir = transform.InverseTransformDirection(direction);
 
+        animator.SetFloat("Speed", animSpeed, 0.15f, Time.deltaTime);
         animator.SetFloat("Horizontal", localDir.x, 0.15f, Time.deltaTime);
         animator.SetFloat("Vertical", localDir.z, 0.15f, Time.deltaTime);
 

@@ -13,6 +13,13 @@ public interface ILockable
     bool IsLocked { get; }
 }
 
+public interface IKeyLockable : ILockable
+{
+    string RequiredKeyId { get; }  
+    bool TryUnlock(string keyId);     
+    bool HasValidKey(string keyId);
+}
+
 public interface IInteractable
 {
     void Interact();

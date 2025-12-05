@@ -1,3 +1,4 @@
+using PrimeTween;   
 using UnityEngine;
 
 public class Door : MonoBehaviour, IOpenable, IInteractable
@@ -14,11 +15,23 @@ public class Door : MonoBehaviour, IOpenable, IInteractable
     public bool IsOpen => _isOpen;
     public bool IsLocked => _isLocked;
     
-    private void Update()
+    private void AnimateDoor(float targetAngle)
     {
-        // Rotación suave en eje Y local
-        _currentAngle = Mathf.Lerp(_currentAngle, _targetAngle, Time.deltaTime * _openSpeed);
-        transform.localRotation = Quaternion.Euler(0f, _currentAngle, 0f);
+        Tween.Custom(
+            startValue: _currentAngle,
+            endValue: targetAngle,
+            duration: _openSpeed,
+            ease: Ease.OutCirc,
+            onValueChange: value => 
+            {
+                _currentAngle = value;
+                transform.localRotation = Quaternion.Euler(0f, value, 0f);
+            }
+        ).OnComplete(() => 
+        {
+            Debug.Log("Door is open!");
+            _isOpen = !_isOpen;
+        });
     }
     
     public void Open()
@@ -29,14 +42,14 @@ public class Door : MonoBehaviour, IOpenable, IInteractable
             return;
         }
         
-        _isOpen = true;
         _targetAngle = _openAngle;
+        AnimateDoor(_targetAngle);
     }
     
     public void Close()
     {
-        _isOpen = false;
         _targetAngle = 0f;
+        AnimateDoor(_targetAngle);
     }
     
     public void Interact()

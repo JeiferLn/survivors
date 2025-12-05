@@ -741,9 +741,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1455dc08499a29b43a9089e1a56c8b2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isLocked: 1
+  _isLocked: 0
   _openAngle: -90
-  _openSpeed: 3
+  _openSpeed: 1
 --- !u!65 &839997554
 BoxCollider:
   m_ObjectHideFlags: 0

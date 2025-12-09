@@ -15,9 +15,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float runMovementSpeed = 10f;
     [SerializeField] private float aimingMoveSpeed = 4f;
 
-    public bool canMove = true;
+    [SerializeField] private float startMoveDelay = 0.5f;
+
+    private bool wasMoving = false;
+    private float moveDelayTimer = 0f;
+    [HideInInspector] public bool canMove = true;
+
+    // ------------- STOP BUFFER VARIABLES -------------
+    [Header("Stop Buffer")]
+    [SerializeField] private float stopBufferDuration = 0.1f;
+    private float stopBufferTimer = 0f;
 
     // ------------- GRAVITY VARIABLES -------------
+    [Header("Gravity")]
     [SerializeField] private float gravity = -9.81f;
     private float verticalVelocity;
 
@@ -60,9 +70,43 @@ public class PlayerController : MonoBehaviour
     // ---------------- MOVEMENT --------------------
     private void MovePlayer()
     {
-        float animSpeed = isRunning ? 1f : 0f;
-
         Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
+        bool isTryingToMove = direction.sqrMagnitude > 0.01f;
+
+        if (isTryingToMove)
+        {
+            stopBufferTimer = stopBufferDuration;
+        }
+        else
+        {
+            stopBufferTimer -= Time.deltaTime;
+        }
+
+        bool trulyStopped = stopBufferTimer <= 0f;
+
+        if (trulyStopped)
+        {
+            wasMoving = false;
+        }
+
+        if (isTryingToMove && !wasMoving)
+        {
+            moveDelayTimer = startMoveDelay;
+            wasMoving = true;
+        }
+
+        if (moveDelayTimer > 0f)
+        {
+            moveDelayTimer -= Time.deltaTime;
+
+            Vector3 localDirDelay = transform.InverseTransformDirection(direction);
+
+            animator.SetFloat("Speed", 0.5f, 0.15f, Time.deltaTime);
+            animator.SetFloat("Horizontal", localDirDelay.x, 0.15f, Time.deltaTime);
+            animator.SetFloat("Vertical", localDirDelay.z, 0.15f, Time.deltaTime);
+
+            return;
+        }
 
         if (direction.sqrMagnitude > 1f)
             direction.Normalize();
@@ -73,29 +117,24 @@ public class PlayerController : MonoBehaviour
         float currentSpeed;
 
         if (isAiming)
-        {
             currentSpeed = isGoingBack ? aimingMoveSpeed / 2f : aimingMoveSpeed;
-        }
         else
-        {
-            if (isGoingBack)
-            {
-                currentSpeed = walkMovementSpeed / 2f;
-            }
-            else
-            {
-                currentSpeed = isRunning ? runMovementSpeed : walkMovementSpeed;
-            }
-        }
+            currentSpeed = isGoingBack ? walkMovementSpeed / 2f :
+                (isRunning ? runMovementSpeed : walkMovementSpeed);
 
-        Vector3 localDir = transform.InverseTransformDirection(direction);
+        Vector3 localFinalDir = transform.InverseTransformDirection(direction);
+
+        float animSpeed =
+            isRunning ? 1f :
+            direction.magnitude == 0f ? 0f : 0.5f;
 
         animator.SetFloat("Speed", animSpeed, 0.15f, Time.deltaTime);
-        animator.SetFloat("Horizontal", localDir.x, 0.15f, Time.deltaTime);
-        animator.SetFloat("Vertical", localDir.z, 0.15f, Time.deltaTime);
+        animator.SetFloat("Horizontal", localFinalDir.x, 0.15f, Time.deltaTime);
+        animator.SetFloat("Vertical", localFinalDir.z, 0.15f, Time.deltaTime);
 
         controller.Move(direction * currentSpeed * Time.deltaTime);
     }
+
 
     // ---------------- GRAVITY --------------------
     private void ApplyGravity()

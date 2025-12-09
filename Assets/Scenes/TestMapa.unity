@@ -1569,7 +1569,9 @@ MonoBehaviour:
   walkMovementSpeed: 6
   runMovementSpeed: 10
   aimingMoveSpeed: 5
+  startMoveDelay: 0.15
   canMove: 1
+  stopBufferDuration: 0.1
   gravity: -25
   cameraTransform: {fileID: 330585546}
   walkAreaLayer:

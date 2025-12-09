@@ -3,10 +3,12 @@ using Sirenix.OdinInspector;
 
 public class KeyPickup : MonoBehaviour, IInteractable
 {
-    [Title("Configuración")]
+    [Title("Configuración")] 
     [SerializeField] private string _keyId = "key_01";
     [SerializeField] private bool _destroyOnPickup = true;
 
+    [Title("Outline Shader Referencia")]
+    [SerializeField] private Outline outline;
 
     public void Interact()
     {

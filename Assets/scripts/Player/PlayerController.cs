@@ -117,7 +117,9 @@ public class PlayerController : MonoBehaviour
         float currentSpeed;
 
         if (isAiming)
+        {
             currentSpeed = isGoingBack ? aimingMoveSpeed / 2f : aimingMoveSpeed;
+        }
         else
             currentSpeed = isGoingBack ? walkMovementSpeed / 2f :
                 (isRunning ? runMovementSpeed : walkMovementSpeed);

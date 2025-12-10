@@ -9,6 +9,7 @@ TagManager:
   - Obstacle
   - Weapon
   - Limit
+  - Indicator
   layers:
   - Default
   - TransparentFX

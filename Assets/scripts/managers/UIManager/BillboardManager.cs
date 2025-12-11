@@ -4,17 +4,11 @@ using UnityEngine;
 public class BillboardManager : MonoBehaviour
 {
     public static BillboardManager Instance;
-    public Transform test;
     private List<Transform> billboards = new List<Transform>();
 
     void Awake()
     {
         Instance = this;
-    }
-
-    private void Start()
-    {
-        Register(test);
     }
     
     public void Register(Transform t)

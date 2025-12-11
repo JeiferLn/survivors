@@ -61,37 +61,38 @@ public class PlayerInteraction3D : MonoBehaviour
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, _interactionRange, _interactableLayer);
 
-        // Si no hay nada cerca → apagar outline previo y resetear target
+        // Si no hay nada → apagar outline previo
         if (hits.Length == 0)
         {
-            if (_lastOutline != null)
-            {
-                _lastOutline.enabled = false;
-                _lastOutline.transform.GetChild(0).gameObject.SetActive(false);
-                _lastOutline = null;
-            }
-
+            DisableLastTargetEffects();
             _currentTarget = null;
             _lastInteractionText = "Ninguno";
             return;
         }
 
-        // Buscar interactuable más cercano
+        // Guardamos todos los outlines dentro del rango
+        List<Outline> outlinesInRange = new List<Outline>();
+
         float bestDist = float.MaxValue;
         IInteractable bestTarget = null;
         Outline bestOutline = null;
 
         foreach (var hit in hits)
         {
+            Outline outline = hit.GetComponent<Outline>();
+            if (outline != null)
+                outlinesInRange.Add(outline);
+
             float dist = Vector3.Distance(transform.position, hit.transform.position);
             if (dist < bestDist)
             {
                 bestDist = dist;
                 bestTarget = hit.GetComponent<IInteractable>();
-                bestOutline = hit.GetComponent<Outline>();
+                bestOutline = outline;
             }
         }
 
+        // Set target actual
         _currentTarget = bestTarget;
 
         if (_currentTarget != null)
@@ -99,24 +100,36 @@ public class PlayerInteraction3D : MonoBehaviour
         else
             _lastInteractionText = "No interactuable";
 
-        // Apagar outline anterior si es diferente
-        if (_lastOutline != null && _lastOutline != bestOutline)
-            _lastOutline.enabled = false;
+        // Primero desactivamos todos los outlines excepto el mejor
+        foreach (var outline in outlinesInRange)
+        {
+            if (outline != bestOutline)
+            {
+                outline.enabled = false;
 
-        // Activar outline nuevo
+                Transform billboard = outline.transform.GetChild(0);
+                billboard.gameObject.SetActive(false);
+                BillboardManager.Instance.Unregister(billboard);
+            }
+        }
+
+        // Solo activamos al más cercano
         if (bestOutline != null)
         {
+            if (_lastOutline != null && _lastOutline != bestOutline)
+            {
+                DisableLastTargetEffects();
+            }
+
             bestOutline.enabled = true;
             _lastOutline = bestOutline;
-            _lastOutline.transform.GetChild(0).gameObject.SetActive(true);
-        }
-        else
-        {
-            _lastOutline = null;
+
+            Transform billboard = bestOutline.transform.GetChild(0);
+            billboard.gameObject.SetActive(true);
+            BillboardManager.Instance.Register(billboard);
         }
     }
-
-
+    
     // ══════════════════════════════════════════════════════════════
     // INTERACCIÓN
     // ══════════════════════════════════════════════════════════════
@@ -216,6 +229,20 @@ public class PlayerInteraction3D : MonoBehaviour
     {
         return _currentTarget != null;
     }
+
+    private void DisableLastTargetEffects()
+    {
+        if (_lastOutline == null) return;
+
+        Transform billboard = _lastOutline.transform.GetChild(0);
+        billboard.GetComponent<BillboardFadeInOut>()?.OnFadeOut();
+        BillboardManager.Instance.Unregister(billboard);
+        billboard.gameObject.SetActive(false);
+
+        _lastOutline.enabled = false;
+        _lastOutline = null;
+    }
+
 
     // ══════════════════════════════════════════════════════════════
     // BOTONES DE DEBUG (ODIN)

@@ -121,8 +121,10 @@ public class PlayerController : MonoBehaviour
             currentSpeed = isGoingBack ? aimingMoveSpeed / 2f : aimingMoveSpeed;
         }
         else
-            currentSpeed = isGoingBack ? walkMovementSpeed / 2f :
-                (isRunning ? runMovementSpeed : walkMovementSpeed);
+        {
+            float baseSpeed = isRunning ? runMovementSpeed : walkMovementSpeed;
+            currentSpeed = isGoingBack ? baseSpeed / 2f : baseSpeed;
+        }
 
         Vector3 localFinalDir = transform.InverseTransformDirection(direction);
 

@@ -1,5 +1,12 @@
 using UnityEngine;
 
+public enum WeaponType
+{
+    isEmptyWeapon,
+    isOneHandWeapon,
+    isTwoHandsWeapon
+}
+
 [CreateAssetMenu(fileName = "WeaponData", menuName = "Weapons/WeaponData")]
 public class WeaponData : ScriptableObject
 {
@@ -22,4 +29,7 @@ public class WeaponData : ScriptableObject
 
     [Header("Fire Rate")]
     public float fireCooldown;
+
+    [Header("Weapon Type")]
+    public WeaponType weaponType;
 }

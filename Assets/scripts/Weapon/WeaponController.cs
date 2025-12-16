@@ -44,7 +44,6 @@ public class WeaponController : MonoBehaviour
 
         if (muzzleFlash != null)
             muzzleFlash.SetActive(false);
-
     }
 
     // ---------------- INPUT: AIM ----------------
@@ -98,7 +97,6 @@ public class WeaponController : MonoBehaviour
         if (fireCooldown > 0f)
             return;
 
-
         ShootOnce();
         fireCooldown = weaponData.fireCooldown;
     }
@@ -150,7 +148,9 @@ public class WeaponController : MonoBehaviour
 
         Vector3 end = muzzlePos + laserDirection * weaponData.laserDistance;
 
-        if (Physics.Raycast(muzzlePos, laserDirection, out RaycastHit hit, weaponData.laserDistance))
+        if (
+            Physics.Raycast(muzzlePos, laserDirection, out RaycastHit hit, weaponData.laserDistance)
+        )
             end = hit.point;
 
         lineRenderer.SetPosition(0, muzzlePos);

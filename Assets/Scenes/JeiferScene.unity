@@ -553,7 +553,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.3826835, y: -0.000000030783678, z: 0.000000012751018, w: 0.92387956}
-  m_LocalPosition: {x: 17.34, y: 20.642136, z: 3.6078653}
+  m_LocalPosition: {x: 14.47, y: 21.002136, z: -12.652135}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1226,9 +1226,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 2
+  m_Height: 4.510491
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1.2552454, z: 0}
 --- !u!23 &763626190
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1236,7 +1236,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 763626186}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1291,7 +1291,7 @@ Transform:
   m_GameObject: {fileID: 763626186}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.76604444, z: 0, w: 0.64278764}
-  m_LocalPosition: {x: 17.34, y: 6.5, z: 17.75}
+  m_LocalPosition: {x: 14.47, y: 6.86, z: 1.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1336,9 +1336,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fa69407d0df541419a51abf5c6f677b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 8
+  walkMovementSpeed: 6
+  runMovementSpeed: 10
   aimingMoveSpeed: 5
+  startMoveDelay: 0
   canMove: 1
+  stopBufferDuration: 0.1
   gravity: -25
   cameraTransform: {fileID: 330585546}
   walkAreaLayer:
@@ -1449,6 +1452,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 17606700-37f3-4ee4-85c6-d79617261e5d
     m_ActionName: 'Player/Pickup[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b6f6dc31-d556-4055-a22c-bfcfa71b57b4
+    m_ActionName: 'Player/Run[/Keyboard/shift]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -2422,7 +2429,7 @@ Transform:
   m_GameObject: {fileID: 1786311959}
   serializedVersion: 2
   m_LocalRotation: {x: 0.3826835, y: 1.6411398e-15, z: -6.7978243e-16, w: 0.92387956}
-  m_LocalPosition: {x: -47.896732, y: 20.01397, z: 46.579956}
+  m_LocalPosition: {x: -50.76673, y: 20.37397, z: 30.319958}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2510,7 +2517,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &1882959743
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2593,6 +2600,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponData: {fileID: 11400000, guid: 284a04c0363ff714281b6b4575ef5db9, type: 2}
+  animator: {fileID: 0}
   muzzleFlash: {fileID: 2119146352}
 --- !u!120 &1882959747
 LineRenderer:

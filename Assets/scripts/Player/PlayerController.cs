@@ -202,7 +202,7 @@ public class PlayerController : MonoBehaviour
 
         // Check if the player is going back
         float dot = Vector3.Dot(transform.forward, direction);
-        bool isGoingBack = dot < -0.5f;
+        bool isGoingBack = dot < -0.3f;
 
         // Get the current speed of the player
         float currentSpeed;

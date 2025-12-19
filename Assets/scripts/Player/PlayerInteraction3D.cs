@@ -8,16 +8,20 @@ public class PlayerInteraction3D : MonoBehaviour
     // CONFIGURACIÓN DE INTERACCIÓN
     // ══════════════════════════════════════════════════════════════
 
-    [Title("Interacción")] [SerializeField]
+    [Title("Interacción")]
+    [SerializeField]
     private float _interactionRange = 3f;
 
-    [SerializeField] private LayerMask _interactableLayer;
+    [SerializeField]
+    private LayerMask _interactableLayer;
 
     // ══════════════════════════════════════════════════════════════
     // INVENTARIO DE LLAVES
     // ══════════════════════════════════════════════════════════════
 
-    [Title("Llaves")] [SerializeField] [ListDrawerSettings(ShowFoldout = true, DraggableItems = false)]
+    [Title("Llaves")]
+    [SerializeField]
+    [ListDrawerSettings(ShowFoldout = true, DraggableItems = false)]
     private List<string> _keys = new List<string>();
 
     [ShowInInspector, ReadOnly] private int KeyCount => _keys.Count;
@@ -26,10 +30,12 @@ public class PlayerInteraction3D : MonoBehaviour
     // DEBUG
     // ══════════════════════════════════════════════════════════════
 
-    [Title("Debug")] [ShowInInspector, ReadOnly]
+    [Title("Debug")]
+    [ShowInInspector, ReadOnly]
     private string _lastInteractionText = "Ninguno";
 
-    [ShowInInspector, ReadOnly] private IInteractable _currentTarget;
+    [ShowInInspector, ReadOnly]
+    private IInteractable _currentTarget;
 
     private Camera _camera;
     private Outline _lastOutline;
@@ -129,7 +135,7 @@ public class PlayerInteraction3D : MonoBehaviour
             BillboardManager.Instance.Register(billboard);
         }
     }
-    
+
     // ══════════════════════════════════════════════════════════════
     // INTERACCIÓN
     // ══════════════════════════════════════════════════════════════
@@ -268,5 +274,6 @@ public class PlayerInteraction3D : MonoBehaviour
     {
         ClearKeys();
     }
+
 #endif
 }

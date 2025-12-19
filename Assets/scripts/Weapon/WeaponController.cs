@@ -12,6 +12,9 @@ public class WeaponController : MonoBehaviour
     private Transform t;
     private PlayerController player;
 
+    [SerializeField]
+    private Animator animator;
+
     // ---------------- STATE ----------------
     private bool shootingHeld = false;
     private bool isAiming = false;
@@ -83,14 +86,16 @@ public class WeaponController : MonoBehaviour
     private void HandleShooting()
     {
         if (!isAiming)
+        {
+            animator.SetFloat("isAiming", 0f, 0.15f, Time.deltaTime);
             return;
+        }
 
         if (!shootingHeld)
             return;
 
         if (fireCooldown > 0f)
             return;
-
 
         ShootOnce();
         fireCooldown = weaponData.fireCooldown;
@@ -130,10 +135,12 @@ public class WeaponController : MonoBehaviour
 
         if (!isAiming)
         {
+            animator.SetFloat("isAiming", 0f, 0.15f, Time.deltaTime);
             lineRenderer.enabled = false;
             return;
         }
 
+        animator.SetFloat("isAiming", 1f, 0.15f, Time.deltaTime);
         lineRenderer.enabled = true;
 
         Vector3 muzzlePos = t.position + t.TransformDirection(weaponData.laserOffset);
@@ -141,7 +148,9 @@ public class WeaponController : MonoBehaviour
 
         Vector3 end = muzzlePos + laserDirection * weaponData.laserDistance;
 
-        if (Physics.Raycast(muzzlePos, laserDirection, out RaycastHit hit, weaponData.laserDistance))
+        if (
+            Physics.Raycast(muzzlePos, laserDirection, out RaycastHit hit, weaponData.laserDistance)
+        )
             end = hit.point;
 
         lineRenderer.SetPosition(0, muzzlePos);
@@ -196,6 +205,29 @@ public class WeaponController : MonoBehaviour
     // ---------------- SET WEAPON ----------------
     public void SetWeapon(WeaponData newWeapon)
     {
+        if (animator == null)
+            return;
+
+        animator.ResetTrigger("isEmptyWeapon");
+        animator.ResetTrigger("isOneHandWeapon");
+        animator.ResetTrigger("isTwoHandsWeapon");
+        animator.SetBool("hasOneHandWeapon", false);
+
+        switch (newWeapon.weaponType)
+        {
+            case WeaponType.isEmptyWeapon:
+                animator.SetTrigger("isEmptyWeapon");
+                break;
+            case WeaponType.isOneHandWeapon:
+                animator.SetTrigger("isOneHandWeapon");
+                animator.SetBool("hasOneHandWeapon", true);
+                break;
+            case WeaponType.isTwoHandsWeapon:
+                animator.SetTrigger("isTwoHandsWeapon");
+                animator.SetBool("hasOneHandWeapon", false);
+                break;
+        }
+
         weaponData = newWeapon;
         fireCooldown = 0f;
     }

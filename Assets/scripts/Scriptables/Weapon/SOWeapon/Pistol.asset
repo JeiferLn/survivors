@@ -22,3 +22,4 @@ MonoBehaviour:
   bulletLength: 0.5
   bulletMaxDistance: 30
   fireCooldown: 0.5
+  weaponType: 1

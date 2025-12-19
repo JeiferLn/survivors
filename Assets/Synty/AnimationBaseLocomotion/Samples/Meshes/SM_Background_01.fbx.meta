@@ -1,14 +1,14 @@
 fileFormatVersion: 2
-guid: ea58066025b617f4baba6b403684d826
+guid: 6dd808c5ba643d341a3b038fc05946a2
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
-    materialImportMode: 2
-    materialName: 1
-    materialSearch: 2
-    materialLocation: 0
+    materialImportMode: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -107,10 +107,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 290681
-  packageName: KayKit - Free Sample Pack (for Unity)
-  packageVersion: 1.1.1
-  assetPath: Assets/KayKit/Packs/KayKit - Free Sample (for Unity)/Models/Coin.fbx
-  uploadId: 814916

@@ -1,14 +1,14 @@
 fileFormatVersion: 2
-guid: 3722e1d0f8b92684f9025bbba25f4f70
+guid: fa2d15d63a1f3fe4187cd2e4e8bbeaea
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
-    materialImportMode: 2
-    materialName: 1
-    materialSearch: 2
-    materialLocation: 0
+    materialImportMode: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -107,10 +107,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 290681
-  packageName: KayKit - Free Sample Pack (for Unity)
-  packageVersion: 1.1.1
-  assetPath: Assets/KayKit/Packs/KayKit - Free Sample (for Unity)/Models/Barrel.fbx
-  uploadId: 814916

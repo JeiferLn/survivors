@@ -1,14 +1,14 @@
 fileFormatVersion: 2
-guid: 72941c2a30850314083109b3bba5b7ae
+guid: f6f1adec4ef4c6c40b664fb8ec97be0b
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
-    materialImportMode: 2
-    materialName: 1
-    materialSearch: 2
-    materialLocation: 0
+    materialImportMode: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -107,10 +107,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 290681
-  packageName: KayKit - Free Sample Pack (for Unity)
-  packageVersion: 1.1.1
-  assetPath: Assets/KayKit/Packs/KayKit - Free Sample (for Unity)/Models/Platform.fbx
-  uploadId: 814916

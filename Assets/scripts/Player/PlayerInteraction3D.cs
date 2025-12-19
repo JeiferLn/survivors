@@ -190,7 +190,8 @@ public class PlayerInteraction3D : MonoBehaviour
         if (!HasKey(keyId))
         {
             _keys.Add(keyId);
-            Debug.Log($"🔑 Llave obtenida: {keyId}");
+            // Debug.Log($"🔑 Llave obtenida: {keyId}");
+            DialogueSystem.Instance.SendText($"Has obtenido llaves {keyId}");
         }
     }
 

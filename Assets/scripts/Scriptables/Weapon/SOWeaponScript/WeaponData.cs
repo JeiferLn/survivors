@@ -4,12 +4,18 @@ public enum WeaponType
 {
     isEmptyWeapon,
     isOneHandWeapon,
-    isTwoHandsWeapon
+    isTwoHandsWeapon,
 }
 
 [CreateAssetMenu(fileName = "WeaponData", menuName = "Weapons/WeaponData")]
 public class WeaponData : ScriptableObject
 {
+    [Header("Weapon Name")]
+    public string weaponName;
+
+    [Header("Weapon Model")]
+    public GameObject weaponModel;
+
     [Header("Damage")]
     public float damage;
 

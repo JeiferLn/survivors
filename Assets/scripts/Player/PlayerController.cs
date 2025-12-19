@@ -223,7 +223,10 @@ public class PlayerController : MonoBehaviour
         Vector3 localFinalDir = transform.InverseTransformDirection(direction);
 
         // Get the animation speed
-        float animSpeed = isRunning ? 1f : 0f;
+        float animSpeed =
+            isRunning ? 1f
+            : direction.sqrMagnitude > 0.01f ? 0.5f
+            : 0f;
 
         // Set the animation speed
         animator.SetFloat("Speed", animSpeed, 0.15f, Time.deltaTime);

@@ -211,7 +211,7 @@ public class WeaponController : MonoBehaviour
         animator.ResetTrigger("isEmptyWeapon");
         animator.ResetTrigger("isOneHandWeapon");
         animator.ResetTrigger("isTwoHandsWeapon");
-        animator.SetBool("hasOneHandWeapon", false);
+        animator.SetBool("hasWeaponEquipped", false);
 
         switch (newWeapon.weaponType)
         {
@@ -220,11 +220,11 @@ public class WeaponController : MonoBehaviour
                 break;
             case WeaponType.isOneHandWeapon:
                 animator.SetTrigger("isOneHandWeapon");
-                animator.SetBool("hasOneHandWeapon", true);
+                animator.SetBool("hasWeaponEquipped", true);
                 break;
             case WeaponType.isTwoHandsWeapon:
                 animator.SetTrigger("isTwoHandsWeapon");
-                animator.SetBool("hasOneHandWeapon", false);
+                animator.SetBool("hasWeaponEquipped", true);
                 break;
         }
 

@@ -628,7 +628,7 @@ BlendTree:
   m_Name: Movement Aiming
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: 245d42ed191a7de4f80039ca54757367, type: 2}
+    m_Motion: {fileID: 7400000, guid: ef76fb22e8ad646d489f07d0b29e7e4c, type: 2}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1

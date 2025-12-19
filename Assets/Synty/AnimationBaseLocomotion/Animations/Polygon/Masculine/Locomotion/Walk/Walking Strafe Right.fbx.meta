@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d294a4226e928db4fbbd933c19ccf5a1
+guid: 988a42e4126ba2648a7bcd91b42bd467
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -31,11 +31,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: A_Run_FwdStrafeL_Masc
+      name: A_Walk_FwdStrafeR_Masc
       takeName: Take 001
       internalID: 1827226128182048838
       firstFrame: 1
-      lastFrame: 22
+      lastFrame: 32
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

@@ -19,7 +19,7 @@ public class PlayerCombatController : MonoBehaviour
     public void OnAim(InputAction.CallbackContext ctx)
     {
         isAiming = ctx.ReadValueAsButton();
-        playerState.SetCombat(isAiming ? PlayerCombatState.Aiming : PlayerCombatState.None);
+        playerState.SetAiming(isAiming);
     }
 
     public void OnShoot(InputAction.CallbackContext ctx)

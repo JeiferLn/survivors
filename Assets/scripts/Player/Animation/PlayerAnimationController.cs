@@ -60,6 +60,7 @@ public class PlayerAnimationController : MonoBehaviour
         bool hasWeapon = playerState.Combat != PlayerCombatState.None;
 
         animator.SetBool("hasWeaponEquipped", hasWeapon);
+
         animator.SetFloat("isAiming", playerState.IsAiming ? 1f : 0f, damping, Time.deltaTime);
     }
 
@@ -68,7 +69,17 @@ public class PlayerAnimationController : MonoBehaviour
     {
         bool hasWeapon = playerState.Combat != PlayerCombatState.None;
 
-        animator.SetLayerWeight(upperBodyLayerIndex, hasWeapon ? 1f : 0f);
+        float currentWeight = animator.GetLayerWeight(upperBodyLayerIndex);
+
+        if (hasWeapon)
+        {
+            animator.SetLayerWeight(upperBodyLayerIndex, 1f);
+        }
+        else
+        {
+            float newWeight = Mathf.Lerp(currentWeight, 0f, Time.deltaTime * 8f);
+            animator.SetLayerWeight(upperBodyLayerIndex, newWeight);
+        }
 
         if (rigBuilder != null)
             rigBuilder.enabled = hasWeapon;
@@ -86,7 +97,6 @@ public class PlayerAnimationController : MonoBehaviour
             return;
 
         animator.ResetTrigger(lastWeaponType.ToString());
-
         animator.SetTrigger(currentType.ToString());
 
         lastWeaponType = currentType;

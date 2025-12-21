@@ -79,12 +79,6 @@ public class PlayerController : MonoBehaviour
         DetectInputDevice(ctx);
     }
 
-    public void SetAiming(bool aiming)
-    {
-        isAiming = aiming;
-        playerState.SetCombat(isAiming ? PlayerCombatState.Aiming : PlayerCombatState.None);
-    }
-
     // ---------------- START --------------------
     private void Start()
     {

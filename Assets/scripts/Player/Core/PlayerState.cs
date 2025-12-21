@@ -8,6 +8,9 @@ public class PlayerState : MonoBehaviour
     // -------- COMBAT --------
     public PlayerCombatState Combat { get; private set; } = PlayerCombatState.None;
 
+    // -------- AIMING --------
+    public bool IsAiming { get; private set; }
+
     // -------- MOVEMENT API --------
     public void SetMovementState(PlayerLocomotionState newState)
     {
@@ -31,14 +34,17 @@ public class PlayerState : MonoBehaviour
         Combat = newState;
     }
 
-    public void SetCombat(PlayerCombatState newState)
+    // -------- AIM API --------
+    public void SetAiming(bool value)
     {
-        SetCombatState(newState);
+        IsAiming = value;
     }
 
-    // -------- CONVENIENCE PROPERTIES --------
+    // -------- CONVENIENCE --------
     public bool IsIdle => Movement == PlayerLocomotionState.Idle;
     public bool IsMoving => Movement != PlayerLocomotionState.Idle;
     public bool IsRunning => Movement == PlayerLocomotionState.Running;
-    public bool IsAiming => Combat == PlayerCombatState.Aiming;
+
+    public bool IsUnarmed => Combat == PlayerCombatState.None;
+    public bool IsArmed => Combat == PlayerCombatState.Armed;
 }

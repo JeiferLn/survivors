@@ -1397,8 +1397,8 @@ MonoBehaviour:
     m_ActionName: 'Player/Look[/Mouse/delta]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 763626197}
-        m_TargetAssemblyTypeName: WeaponController, Assembly-CSharp
+      - m_Target: {fileID: 763626199}
+        m_TargetAssemblyTypeName: PlayerCombatController, Assembly-CSharp
         m_MethodName: OnAim
         m_Mode: 0
         m_Arguments:
@@ -1413,8 +1413,8 @@ MonoBehaviour:
     m_ActionName: 'Player/Aim[/Mouse/rightButton]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 763626197}
-        m_TargetAssemblyTypeName: WeaponController, Assembly-CSharp
+      - m_Target: {fileID: 763626199}
+        m_TargetAssemblyTypeName: PlayerCombatController, Assembly-CSharp
         m_MethodName: OnShoot
         m_Mode: 0
         m_Arguments:

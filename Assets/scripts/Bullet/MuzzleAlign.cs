@@ -2,11 +2,14 @@ using UnityEngine;
 
 public class MuzzleFlipZ : MonoBehaviour
 {
-    [SerializeField]
     private Transform weapon;
-
-    [SerializeField]
     private Camera cam;
+
+    public void Init(Transform weaponTransform, Camera camera)
+    {
+        weapon = weaponTransform;
+        cam = camera;
+    }
 
     void LateUpdate()
     {
@@ -14,16 +17,10 @@ public class MuzzleFlipZ : MonoBehaviour
             return;
 
         Vector3 toCam = cam.transform.position - transform.position;
-
         float dot = Vector3.Dot(transform.forward, toCam);
 
         Vector3 localScale = transform.localScale;
-
-        if (dot < 0f)
-            localScale.z = Mathf.Abs(localScale.z);
-        else
-            localScale.z = -Mathf.Abs(localScale.z);
-
+        localScale.z = dot < 0f ? Mathf.Abs(localScale.z) : -Mathf.Abs(localScale.z);
         transform.localScale = localScale;
     }
 }

@@ -13,8 +13,8 @@ public class WeaponData : ScriptableObject
     [Header("Weapon Name")]
     public string weaponName;
 
-    [Header("Weapon Model")]
-    public GameObject weaponModel;
+    [Header("Player Weapon Model")]
+    public GameObject playerWeaponModel;
 
     [Header("Damage")]
     public float damage;

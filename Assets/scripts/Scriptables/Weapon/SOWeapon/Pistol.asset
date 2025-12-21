@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2fac3ddf31f5b43bd7fa52950328ac, type: 3}
   m_Name: Pistol
   m_EditorClassIdentifier: 
+  weaponName: Pistol
+  playerWeaponModel: {fileID: 0}
   damage: 10
   recoilAmount: 0
   recoilReturnSpeed: 0

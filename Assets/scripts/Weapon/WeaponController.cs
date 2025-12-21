@@ -1,95 +1,66 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class WeaponController : MonoBehaviour
 {
-    // ---------------- WEAPON DATA ----------------
     [Header("Weapon Data")]
     public WeaponData weaponData;
 
-    // ---------------- COMPONENTS ----------------
-    private LineRenderer lineRenderer;
-    private Transform t;
-    private PlayerController player;
+    [Header("Weapon Models")]
+    [SerializeField]
+    private List<GameObject> weaponModels;
 
     [SerializeField]
     private Animator animator;
 
+    private PlayerController player;
+
     // ---------------- STATE ----------------
-    private bool shootingHeld = false;
-    private bool isAiming = false;
+    private bool shootingHeld;
+    private bool isAiming;
+    private float fireCooldown;
 
-    private float fireCooldown = 0f;
-    private float flashTimer = 0f;
-
-    private Vector3 recoilOffset = Vector3.zero;
-    private Vector3 laserDirection;
-
-    // ---------------- EFFECTS ----------------
-    [Header("Effects")]
-    [SerializeField]
-    private GameObject muzzleFlash;
-
-    // ---------------- START ----------------
     void Start()
     {
-        t = transform;
-
-        if (!TryGetComponentInParent(out player))
-            Debug.LogWarning("No PlayerController found in parent.");
-
-        lineRenderer = GetComponent<LineRenderer>();
-        if (lineRenderer != null)
-            lineRenderer.enabled = false;
-
-        if (muzzleFlash != null)
-            muzzleFlash.SetActive(false);
+        player = GetComponentInParent<PlayerController>();
+        DisableAllWeapons();
     }
 
-    // ---------------- INPUT: AIM ----------------
+    // ---------------- INPUT ----------------
     public void OnAim(InputAction.CallbackContext ctx)
     {
         isAiming = ctx.ReadValueAsButton();
-
-        if (player != null)
-            player.SetAiming(isAiming);
+        player?.SetAiming(isAiming);
     }
 
-    // ---------------- INPUT: SHOOT ----------------
     public void OnShoot(InputAction.CallbackContext ctx)
     {
         if (ctx.started)
-        {
             shootingHeld = true;
-        }
 
         if (ctx.canceled)
-        {
             shootingHeld = false;
-        }
     }
 
-    // ---------------- UPDATE ----------------
     void Update()
     {
-        // UPDATE COOLDOWN
+        if (weaponData == null)
+            return;
+
         if (fireCooldown > 0f)
             fireCooldown -= Time.deltaTime;
 
-        HandleLaser();
-        UpdateRecoil();
-        UpdateMuzzleFlash();
+        animator.SetFloat("isAiming", isAiming ? 1f : 0f, 0.15f, Time.deltaTime);
+
         HandleShooting();
     }
 
-    // ---------------- SHOOT LOGIC ----------------
+    // ---------------- SHOOT ----------------
     private void HandleShooting()
     {
         if (!isAiming)
-        {
-            animator.SetFloat("isAiming", 0f, 0.15f, Time.deltaTime);
             return;
-        }
 
         if (!shootingHeld)
             return;
@@ -103,138 +74,30 @@ public class WeaponController : MonoBehaviour
 
     private void ShootOnce()
     {
-        ShowMuzzle();
-        ApplyRecoilKick();
-        ShootBullet();
+        Debug.Log("Disparo");
     }
 
-    // ---------------- RECOIL ----------------
-    private void UpdateRecoil()
-    {
-        recoilOffset = Vector3.Lerp(
-            recoilOffset,
-            Vector3.zero,
-            Time.deltaTime * weaponData.recoilReturnSpeed
-        );
-    }
-
-    private void ApplyRecoilKick()
-    {
-        recoilOffset = new Vector3(
-            Random.Range(-weaponData.recoilAmount, weaponData.recoilAmount),
-            Random.Range(0f, weaponData.recoilAmount),
-            0f
-        );
-    }
-
-    // ---------------- LASER ----------------
-    private void HandleLaser()
-    {
-        if (lineRenderer == null)
-            return;
-
-        if (!isAiming)
-        {
-            animator.SetFloat("isAiming", 0f, 0.15f, Time.deltaTime);
-            lineRenderer.enabled = false;
-            return;
-        }
-
-        animator.SetFloat("isAiming", 1f, 0.15f, Time.deltaTime);
-        lineRenderer.enabled = true;
-
-        Vector3 muzzlePos = t.position + t.TransformDirection(weaponData.laserOffset);
-        laserDirection = (t.forward + recoilOffset).normalized;
-
-        Vector3 end = muzzlePos + laserDirection * weaponData.laserDistance;
-
-        if (
-            Physics.Raycast(muzzlePos, laserDirection, out RaycastHit hit, weaponData.laserDistance)
-        )
-            end = hit.point;
-
-        lineRenderer.SetPosition(0, muzzlePos);
-        lineRenderer.SetPosition(1, end);
-    }
-
-    // ---------------- MUZZLE FLASH ----------------
-    private void ShowMuzzle()
-    {
-        if (muzzleFlash == null)
-            return;
-
-        muzzleFlash.SetActive(true);
-        flashTimer = 0.05f;
-    }
-
-    private void UpdateMuzzleFlash()
-    {
-        if (flashTimer <= 0f)
-            return;
-
-        flashTimer -= Time.deltaTime;
-
-        if (flashTimer <= 0f && muzzleFlash != null)
-            muzzleFlash.SetActive(false);
-    }
-
-    // ---------------- BULLET ----------------
-    private void ShootBullet()
-    {
-        if (weaponData.bulletPrefab == null)
-            return;
-
-        SoundManager.Instance.PlaySFX("pistol-shoot");
-        Vector3 muzzlePos = t.position + t.TransformDirection(weaponData.laserOffset);
-
-        GameObject obj = Instantiate(
-            weaponData.bulletPrefab,
-            muzzlePos,
-            Quaternion.LookRotation(laserDirection)
-        );
-
-        if (obj.TryGetComponent(out BulletTracer tracer))
-        {
-            tracer.speed = weaponData.bulletSpeed;
-            tracer.tracerLength = weaponData.bulletLength;
-            tracer.maxDistance = weaponData.bulletMaxDistance;
-            tracer.damage = weaponData.damage;
-        }
-    }
-
-    // ---------------- SET WEAPON ----------------
+    // ---------------- WEAPON SWITCH ----------------
     public void SetWeapon(WeaponData newWeapon)
     {
-        if (animator == null)
-            return;
-
-        animator.ResetTrigger("isEmptyWeapon");
-        animator.ResetTrigger("isOneHandWeapon");
-        animator.ResetTrigger("isTwoHandsWeapon");
-        animator.SetBool("hasWeaponEquipped", false);
-
-        switch (newWeapon.weaponType)
-        {
-            case WeaponType.isEmptyWeapon:
-                animator.SetTrigger("isEmptyWeapon");
-                break;
-            case WeaponType.isOneHandWeapon:
-                animator.SetTrigger("isOneHandWeapon");
-                animator.SetBool("hasWeaponEquipped", true);
-                break;
-            case WeaponType.isTwoHandsWeapon:
-                animator.SetTrigger("isTwoHandsWeapon");
-                animator.SetBool("hasWeaponEquipped", true);
-                break;
-        }
+        DisableAllWeapons();
 
         weaponData = newWeapon;
         fireCooldown = 0f;
+
+        if (newWeapon == null)
+            return;
+
+        GameObject model = newWeapon.playerWeaponModel;
+        model.SetActive(true);
+
+        animator.SetBool("hasWeaponEquipped", newWeapon.weaponType != WeaponType.isEmptyWeapon);
+        animator.SetTrigger(newWeapon.weaponType.ToString());
     }
 
-    private bool TryGetComponentInParent<T>(out T comp)
+    private void DisableAllWeapons()
     {
-        comp = GetComponentInParent<T>();
-        return comp != null;
+        foreach (var model in weaponModels)
+            model.SetActive(false);
     }
 }

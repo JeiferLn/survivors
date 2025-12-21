@@ -242,7 +242,7 @@ BlendTree:
   m_Name: Movement Aiming
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: e9a81df0a4cd7472d84bf30018d933c0, type: 2}
+    m_Motion: {fileID: 7400000, guid: 12f3d00af84c7cf438e680ffa0ba895e, type: 2}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -909,14 +909,22 @@ BlendTree:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Runing
-  m_Childs: []
-  m_BlendParameter: Speed
-  m_BlendParameterY: Blend
+  m_Childs:
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400000, guid: b2e2de06c8570724d9988b8589887193, type: 2}
+    m_Threshold: 0
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: Horizontal
+    m_Mirror: 0
+  m_BlendParameter: Horizontal
+  m_BlendParameterY: Vertical
   m_MinThreshold: 0
   m_MaxThreshold: 1
   m_UseAutomaticThresholds: 1
   m_NormalizedBlendValues: 0
-  m_BlendType: 0
+  m_BlendType: 2
 --- !u!91 &9100000
 AnimatorController:
   m_ObjectHideFlags: 0
@@ -1606,7 +1614,7 @@ BlendTree:
   m_Name: Walking
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: 9a104f7ce8586467e95ca3512e7ac124, type: 2}
+    m_Motion: {fileID: 7400000, guid: b2e2de06c8570724d9988b8589887193, type: 2}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -1701,8 +1709,16 @@ BlendTree:
   m_Name: Movement Withot Aiming
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 4793198583021119143}
+    m_Motion: {fileID: 7400000, guid: b2e2de06c8570724d9988b8589887193, type: 2}
     m_Threshold: 0
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: Horizontal
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 4793198583021119143}
+    m_Threshold: 0.5
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0

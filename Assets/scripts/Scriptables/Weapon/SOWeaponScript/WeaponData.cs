@@ -14,7 +14,7 @@ public class WeaponData : ScriptableObject
     public string weaponName;
 
     [Header("Player Weapon Model")]
-    public GameObject playerWeaponModel;
+    public GameObject playerWeaponPrefab;
 
     [Header("Damage")]
     public float damage;

@@ -2,18 +2,22 @@ using UnityEngine;
 
 public class WeaponPickup : MonoBehaviour, IEquipable
 {
-    // ------------- WEAPON DATA -------------
     [SerializeField]
     private WeaponData weaponData;
 
-    // ------------- EQUIP -------------
-    public void Equip(PlayerController player)
+    public void Equip(PlayerEquipmentController equipmentController)
     {
-        WeaponController wc = player.GetComponentInChildren<WeaponController>();
-        if (wc != null)
+        if (equipmentController == null)
         {
-            wc.SetWeapon(weaponData);
-            Destroy(gameObject);
+            return;
         }
+
+        if (weaponData == null)
+        {
+            return;
+        }
+
+        equipmentController.EquipWeapon(weaponData);
+        Destroy(gameObject);
     }
 }

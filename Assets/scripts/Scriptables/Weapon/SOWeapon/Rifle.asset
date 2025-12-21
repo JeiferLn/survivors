@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Rifle
   m_EditorClassIdentifier: 
   weaponName: Rifle
-  playerWeaponModel: {fileID: 0}
+  playerWeaponPrefab: {fileID: 0}
   damage: 30
   recoilAmount: 0.15
   recoilReturnSpeed: 2

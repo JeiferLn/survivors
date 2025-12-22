@@ -881,13 +881,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 512540246}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.6022289, y: 0.68035454, z: 0.30984882, w: 0.28005663}
-  m_LocalPosition: {x: 0.128, y: -0.025, z: -0.047}
+  m_LocalRotation: {x: -0.64727217, y: 0.6394191, z: 0.28465474, w: 0.30191687}
+  m_LocalPosition: {x: 0.086, y: -0.051, z: -0.0212}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1376620413}
-  m_LocalEulerAnglesHint: {x: -130.63, y: -0.69299316, z: 97.29}
+  m_LocalEulerAnglesHint: {x: -130.986, y: -1.5379944, z: 90.002}
 --- !u!1 &551350461
 GameObject:
   m_ObjectHideFlags: 0
@@ -2532,7 +2532,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e00b27b8d9c47264ab84203ddf941b2c, type: 3}
       propertyPath: m_Name
-      value: RifleModel
+      value: Rifle
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e00b27b8d9c47264ab84203ddf941b2c, type: 3}
       propertyPath: m_IsActive
@@ -3399,7 +3399,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: fdf00ae655c6f9d4abac02c38bd47b3e, type: 3}
       propertyPath: m_Name
-      value: PistolModel
+      value: Pistol
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: fdf00ae655c6f9d4abac02c38bd47b3e, type: 3}
       propertyPath: m_IsActive

@@ -115,10 +115,16 @@ public class PlayerAnimationController : MonoBehaviour
         {
             leftHandIK.weight = 0f;
             leftHandIK.data.target = null;
-            return;
+        }
+        else
+        {
+            leftHandIK.data.target = target;
+            leftHandIK.weight = 1f;
         }
 
-        leftHandIK.data.target = target;
-        leftHandIK.weight = 1f;
+        if (rigBuilder != null)
+        {
+            rigBuilder.Build();
+        }
     }
 }

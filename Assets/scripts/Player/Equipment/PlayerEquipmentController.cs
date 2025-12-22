@@ -53,5 +53,6 @@ public class PlayerEquipmentController : MonoBehaviour
 
         weaponController.SetWeapon(null);
         playerState.SetCombatState(PlayerCombatState.None);
+        animationController.SetLeftHandIKTarget(null);
     }
 }

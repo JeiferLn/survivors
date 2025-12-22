@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,7 +19,15 @@ public class PlayerController : MonoBehaviour
         Gamepad,
     }
 
-    private InputDeviceType currentInputDevice = InputDeviceType.MouseKeyboard;
+    [SerializeField]
+    private TextMeshPro keyUI;
+
+    [SerializeField]
+    private string actionName = "Pickup";
+
+    private PlayerInput playerInput;
+
+    private InputDeviceType currentInputDevice = InputDeviceType.Gamepad;
 
     // ------------- MOVEMENT VARIABLES -------------
     [Header("Movimiento")]
@@ -38,6 +47,7 @@ public class PlayerController : MonoBehaviour
     [Header("Gravity")]
     [SerializeField]
     private float gravity = -9.81f;
+
     private float verticalVelocity;
 
     // ------------- ROTATION VARIABLES -------------
@@ -47,6 +57,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private float mouseRotationSpeed = 15f;
+
     private Quaternion targetRotation;
 
     // ------------- LAYER MASK -------------
@@ -82,6 +93,7 @@ public class PlayerController : MonoBehaviour
     // ---------------- START --------------------
     private void Start()
     {
+        playerInput = GetComponent<PlayerInput>();
         controller = GetComponent<CharacterController>();
         mainCam = Camera.main;
         playerState = GetComponent<PlayerState>();
@@ -210,6 +222,7 @@ public class PlayerController : MonoBehaviour
     private void DetectInputDevice(InputAction.CallbackContext ctx)
     {
         var device = ctx.control.device;
+        playerInput = GetComponent<PlayerInput>();
 
         if (device is Gamepad)
         {
@@ -220,5 +233,66 @@ public class PlayerController : MonoBehaviour
         {
             currentInputDevice = InputDeviceType.MouseKeyboard;
         }
+
+        UpdateKeyDisplay();
+    }
+
+    private void UpdateKeyDisplay()
+    {
+        var action = playerInput.actions[actionName];
+
+        // Obtener el índice correcto según el dispositivo actual
+        int bindingIndex = GetCorrectBindingIndex(action);
+
+
+        if (bindingIndex != -1)
+        {
+            string buttonCharacter = action.GetBindingDisplayString(bindingIndex);
+
+            switch (buttonCharacter)
+            {
+                case "Triangle": buttonCharacter = "\\u25B2"; break;
+                case "Square": buttonCharacter = "\\u25A1"; break;
+                case "Circle": buttonCharacter = "\\u25CB"; break;
+                case "Cross": buttonCharacter = "X"; break;
+            }
+            
+            keyUI.text = buttonCharacter;
+        }
+        else
+        {
+            keyUI.text = "?";
+        }
+    }
+
+    private int GetCorrectBindingIndex(InputAction action)
+    {
+        // Iterar por todos los bindings
+        for (int i = 0; i < action.bindings.Count; i++)
+        {
+            var binding = action.bindings[i];
+
+            if (currentInputDevice == InputDeviceType.Gamepad)
+            {
+                // Buscar bindings de gamepad
+                if (binding.path.Contains("<Gamepad>") ||
+                    binding.path.Contains("button") ||
+                    binding.path.Contains("rightTrigger") ||
+                    binding.path.Contains("leftTrigger"))
+                {
+                    return i;
+                }
+            }
+            else if (currentInputDevice == InputDeviceType.MouseKeyboard)
+            {
+                // Buscar bindings de teclado
+                if (binding.path.Contains("<Keyboard>"))
+                {
+                    return i;
+                }
+            }
+        }
+
+        return -1; // No encontrado
     }
 }

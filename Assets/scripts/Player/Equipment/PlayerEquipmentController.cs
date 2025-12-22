@@ -37,9 +37,10 @@ public class PlayerEquipmentController : MonoBehaviour
         weaponController.SetWeapon(weaponData);
         playerState.SetCombatState(PlayerCombatState.Armed);
 
-        if (weaponData.playerWeaponPrefab.TryGetComponent(out WeaponIK weaponIK))
+        if (weaponData.playerWeaponPrefab.TryGetComponent(out WeaponModel weaponModel))
         {
-            animationController.SetLeftHandIKTarget(weaponIK.leftHandGrip);
+            animationController.SetLeftHandIKTarget(weaponModel.leftHandGrip);
+            weaponController.SetWeaponModel(weaponModel);
         }
     }
 

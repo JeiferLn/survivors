@@ -37,11 +37,10 @@ public class PlayerEquipmentController : MonoBehaviour
 
     public void UnequipCurrentWeapon()
     {
-        if (CurrentWeapon != null)
-        {
-            CurrentWeapon.playerWeaponPrefab.SetActive(false);
-        }
+        if (CurrentWeapon == null)
+            return;
 
+        CurrentWeapon.playerWeaponPrefab.SetActive(false);
         CurrentWeapon = null;
 
         weaponController.SetWeapon(null);

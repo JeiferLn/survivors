@@ -11,12 +11,15 @@ public class PlayerEquipmentController : MonoBehaviour
 
     private GameObject currentWeaponInstance;
 
+    private PlayerAnimationController animationController;
+
     public WeaponData CurrentWeapon { get; private set; }
 
     private void Awake()
     {
         weaponController = GetComponent<WeaponController>();
         playerState = GetComponent<PlayerState>();
+        animationController = GetComponentInChildren<PlayerAnimationController>();
     }
 
     // -------- PUBLIC API --------
@@ -33,6 +36,11 @@ public class PlayerEquipmentController : MonoBehaviour
 
         weaponController.SetWeapon(weaponData);
         playerState.SetCombatState(PlayerCombatState.Armed);
+
+        if (weaponData.playerWeaponPrefab.TryGetComponent(out WeaponIK weaponIK))
+        {
+            animationController.SetLeftHandIKTarget(weaponIK.leftHandGrip);
+        }
     }
 
     public void UnequipCurrentWeapon()

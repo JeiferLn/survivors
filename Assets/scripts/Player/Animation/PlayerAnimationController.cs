@@ -11,6 +11,9 @@ public class PlayerAnimationController : MonoBehaviour
     private PlayerEquipmentController equipmentController;
     private RigBuilder rigBuilder;
 
+    [SerializeField]
+    private TwoBoneIKConstraint leftHandIK;
+
     [Header("Animator Layers")]
     [SerializeField]
     private int upperBodyLayerIndex = 1;
@@ -100,5 +103,28 @@ public class PlayerAnimationController : MonoBehaviour
         animator.SetTrigger(currentType.ToString());
 
         lastWeaponType = currentType;
+    }
+
+    // ---------------- WEAPON IK ----------------
+    public void SetLeftHandIKTarget(Transform target)
+    {
+        if (leftHandIK == null)
+            return;
+
+        if (target == null)
+        {
+            leftHandIK.weight = 0f;
+            leftHandIK.data.target = null;
+        }
+        else
+        {
+            leftHandIK.data.target = target;
+            leftHandIK.weight = 1f;
+        }
+
+        if (rigBuilder != null)
+        {
+            rigBuilder.Build();
+        }
     }
 }

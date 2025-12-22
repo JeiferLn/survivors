@@ -11,12 +11,7 @@ public class PlayerInteraction : MonoBehaviour
         equipmentController = GetComponent<PlayerEquipmentController>();
 
         if (equipmentController == null)
-        {
-            Debug.LogError(
-                "PlayerInteraction: PlayerEquipmentController component not found on "
-                    + gameObject.name
-            );
-        }
+            return;
     }
 
     // ---------------- INPUT ----------------
@@ -26,10 +21,7 @@ public class PlayerInteraction : MonoBehaviour
             return;
 
         if (equipmentController == null)
-        {
-            Debug.LogWarning("PlayerInteraction: Cannot equip item, equipmentController is null.");
             return;
-        }
 
         currentEquipable?.Equip(equipmentController);
         currentEquipable = null;
@@ -39,16 +31,12 @@ public class PlayerInteraction : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent<IEquipable>(out var equipable))
-        {
             currentEquipable = equipable;
-        }
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (other.TryGetComponent<IEquipable>(out var equipable) && currentEquipable == equipable)
-        {
             currentEquipable = null;
-        }
     }
 }

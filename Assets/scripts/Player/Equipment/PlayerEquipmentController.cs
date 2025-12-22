@@ -27,9 +27,7 @@ public class PlayerEquipmentController : MonoBehaviour
         if (weaponData == null || weaponData.playerWeaponPrefab == null)
             return;
 
-        currentWeaponInstance = Instantiate(weaponData.playerWeaponPrefab, weaponOffset);
-        currentWeaponInstance.transform.localPosition = Vector3.zero;
-        currentWeaponInstance.transform.localRotation = Quaternion.identity;
+        weaponData.playerWeaponPrefab.SetActive(true);
 
         CurrentWeapon = weaponData;
 
@@ -39,10 +37,9 @@ public class PlayerEquipmentController : MonoBehaviour
 
     public void UnequipCurrentWeapon()
     {
-        if (currentWeaponInstance != null)
+        if (CurrentWeapon != null)
         {
-            Destroy(currentWeaponInstance);
-            currentWeaponInstance = null;
+            CurrentWeapon.playerWeaponPrefab.SetActive(false);
         }
 
         CurrentWeapon = null;

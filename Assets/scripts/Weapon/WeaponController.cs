@@ -5,6 +5,7 @@ public class WeaponController : MonoBehaviour
     [Header("Weapon Data")]
     public WeaponData weaponData;
 
+    private PlayerState playerState;
     private LineRenderer laserRenderer;
     private Transform firePoint;
     private WeaponModel currentWeaponModel;
@@ -13,6 +14,7 @@ public class WeaponController : MonoBehaviour
     private void Awake()
     {
         laserRenderer = GetComponent<LineRenderer>();
+        playerState = GetComponent<PlayerState>();
     }
 
     private void Update()
@@ -57,7 +59,7 @@ public class WeaponController : MonoBehaviour
 
     private void UpdateLaser()
     {
-        if (!CanShoot())
+        if (weaponData == null || firePoint == null || laserRenderer == null)
         {
             laserRenderer.enabled = false;
             return;

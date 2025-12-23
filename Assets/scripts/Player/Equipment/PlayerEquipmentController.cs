@@ -2,14 +2,12 @@ using UnityEngine;
 
 public class PlayerEquipmentController : MonoBehaviour
 {
+    private WeaponContext weaponContext;
+
     [Header("References")]
     [SerializeField]
     private Transform weaponOffset;
-
-    private WeaponController weaponController;
     private PlayerState playerState;
-
-    private GameObject currentWeaponInstance;
 
     private PlayerAnimationController animationController;
 
@@ -17,7 +15,7 @@ public class PlayerEquipmentController : MonoBehaviour
 
     private void Awake()
     {
-        weaponController = GetComponent<WeaponController>();
+        weaponContext = GetComponent<WeaponContext>();
         playerState = GetComponent<PlayerState>();
         animationController = GetComponentInChildren<PlayerAnimationController>();
     }
@@ -34,13 +32,13 @@ public class PlayerEquipmentController : MonoBehaviour
 
         CurrentWeapon = weaponData;
 
-        weaponController.SetWeapon(weaponData);
         playerState.SetCombatState(PlayerCombatState.Armed);
 
         if (weaponData.playerWeaponPrefab.TryGetComponent(out WeaponModel weaponModel))
         {
             animationController.SetLeftHandIKTarget(weaponModel.leftHandGrip);
-            weaponController.SetWeaponModel(weaponModel);
+
+            weaponContext.SetWeapon(weaponData, weaponModel);
         }
     }
 
@@ -52,7 +50,7 @@ public class PlayerEquipmentController : MonoBehaviour
         CurrentWeapon.playerWeaponPrefab.SetActive(false);
         CurrentWeapon = null;
 
-        weaponController.SetWeapon(null);
+        weaponContext.ClearWeapon();
         playerState.SetCombatState(PlayerCombatState.None);
         animationController.SetLeftHandIKTarget(null);
     }

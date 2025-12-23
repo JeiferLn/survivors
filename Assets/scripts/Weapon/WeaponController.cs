@@ -2,42 +2,39 @@ using UnityEngine;
 
 public class WeaponController : MonoBehaviour
 {
+    private WeaponData weaponData;
     private WeaponContext weaponContext;
-    private float fireCooldown;
+
+    private WeaponModel currentWeaponModel;
 
     private void Awake()
     {
         weaponContext = GetComponent<WeaponContext>();
     }
 
-    private void Update()
+    public void Shoot()
     {
-        if (fireCooldown > 0f)
-            fireCooldown -= Time.deltaTime;
-    }
+        currentWeaponModel = weaponContext.CurrentWeaponModel;
 
-    public void TryShoot()
-    {
-        if (!CanShoot())
+        if (!weaponData.bulletPrefab || !currentWeaponModel.muzzle)
+        {
+            Debug.LogError("Bullet tracer prefab or muzzle not set");
             return;
+        }
 
-        ShootOnce();
-        fireCooldown = weaponContext.CurrentWeapon.fireCooldown;
-    }
+        Debug.Log("Shooting");
 
-    private bool CanShoot()
-    {
-        return weaponContext.CurrentWeapon != null && weaponContext.CurrentWeaponModel != null;
-    }
+        GameObject bullet = Instantiate(
+            weaponData.bulletPrefab,
+            currentWeaponModel.muzzle.position,
+            Quaternion.LookRotation(currentWeaponModel.muzzle.forward)
+        );
 
-    private void ShootOnce()
-    {
-        var weapon = weaponContext.CurrentWeapon;
-        var model = weaponContext.CurrentWeaponModel;
-
-        Vector3 origin = model.GetMuzzlePosition();
-        Vector3 direction = model.GetFireDirection();
-
-        Physics.Raycast(origin, direction, out _, weapon.bulletMaxDistance);
+        BulletTracer tracer = bullet.GetComponent<BulletTracer>();
+        tracer.Init(
+            currentWeaponModel.muzzle.forward,
+            weaponData.bulletSpeed,
+            weaponData.bulletMaxDistance
+        );
     }
 }

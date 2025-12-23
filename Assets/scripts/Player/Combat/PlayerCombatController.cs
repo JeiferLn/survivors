@@ -45,6 +45,6 @@ public class PlayerCombatController : MonoBehaviour
         if (!shootHeld)
             return;
 
-        weaponController.TryShoot();
+        weaponController.Shoot();
     }
 }

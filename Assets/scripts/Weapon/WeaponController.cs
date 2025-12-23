@@ -59,7 +59,12 @@ public class WeaponController : MonoBehaviour
 
     private void UpdateLaser()
     {
-        if (weaponData == null || firePoint == null || laserRenderer == null)
+        if (
+            !playerState.IsAiming
+            || weaponData == null
+            || firePoint == null
+            || laserRenderer == null
+        )
         {
             laserRenderer.enabled = false;
             return;

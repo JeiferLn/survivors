@@ -247,20 +247,19 @@ public class PlayerController : MonoBehaviour
 
         if (bindingIndex != -1)
         {
-            // index =0 X
-            // index =1 Square
-            // index =2 Circle
-            // index =3 Triangle
-            
-            
             string buttonCharacter = action.GetBindingDisplayString(bindingIndex);
 
+            // index = 0 X
+            // index = 1 Square
+            // index = 2 Circle
+            // index = 3 Triangle
+         
             switch (buttonCharacter)
             {
-                case "Triangle": buttonCharacter = "\\u25B2"; break;
-                case "Square": buttonCharacter = "\\u25A1"; break;
-                case "Circle": buttonCharacter = "\\u25CB"; break;
-                case "Cross": buttonCharacter = "X"; break;
+                case "Triangle": buttonCharacter = "<sprite index=3>"; break;
+                case "Square": buttonCharacter = "<sprite index=1>"; break;
+                case "Circle": buttonCharacter = "<sprite index=2>"; break;
+                case "Cross": buttonCharacter = "<sprite index=0>"; break;
             }
             
             keyUI.text = buttonCharacter;

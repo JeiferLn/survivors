@@ -41,8 +41,9 @@ public class WeaponController : MonoBehaviour
 
     private void ShootOnce()
     {
+        Vector3 origin = currentWeaponModel.GetMuzzlePosition();
         Vector3 direction = currentWeaponModel.GetFireDirection();
-        Ray ray = new Ray(firePoint.position, direction);
+        Ray ray = new Ray(origin, direction);
 
         if (Physics.Raycast(ray, out RaycastHit hit, weaponData.bulletMaxDistance))
         {
@@ -64,7 +65,7 @@ public class WeaponController : MonoBehaviour
 
         laserRenderer.enabled = true;
 
-        Vector3 origin = firePoint.position + firePoint.TransformDirection(weaponData.laserOffset);
+        Vector3 origin = currentWeaponModel.GetMuzzlePosition();
         Vector3 direction = currentWeaponModel.GetFireDirection();
 
         laserRenderer.SetPosition(0, origin);

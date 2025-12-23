@@ -2,14 +2,30 @@ using UnityEngine;
 
 public class WeaponModel : MonoBehaviour
 {
+    [Header("References")]
     public Transform leftHandGrip;
     public Transform muzzle;
 
-    [Tooltip("Dirección local del disparo")]
-    public Vector3 fireDirection = Vector3.forward;
+    [Header("Configuration")]
+    [SerializeField]
+    private Vector3 fireDirection = Vector3.forward;
+
+    [SerializeField]
+    private Vector3 muzzleOffset;
+
+    public Vector3 GetMuzzlePosition()
+    {
+        if (muzzle == null)
+            return transform.position;
+
+        return muzzle.position + muzzle.TransformDirection(muzzleOffset);
+    }
 
     public Vector3 GetFireDirection()
     {
+        if (muzzle == null)
+            return transform.forward;
+
         return muzzle.TransformDirection(fireDirection).normalized;
     }
 }

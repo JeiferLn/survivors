@@ -1337,6 +1337,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponData: {fileID: 0}
+  laserSmoothSpeed: 20
+  laserDelay: 0.5
 --- !u!114 &763626198
 MonoBehaviour:
   m_ObjectHideFlags: 0

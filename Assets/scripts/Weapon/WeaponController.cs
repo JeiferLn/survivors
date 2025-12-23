@@ -1,15 +1,31 @@
+using System.IO;
 using UnityEngine;
 
 public class WeaponController : MonoBehaviour
 {
+    // ------------- REFERENCES -------------
+    private PlayerState playerState;
+    private LineRenderer laserRenderer;
+
     [Header("Weapon Data")]
     public WeaponData weaponData;
 
-    private PlayerState playerState;
-    private LineRenderer laserRenderer;
+    [Header("Laser Smoothing")]
+    [SerializeField]
+    private float laserSmoothSpeed = 20f;
+
+    [SerializeField]
+    private float laserDelay = 0.5f;
+
+    private Vector3 currentLaserEnd;
+    private Vector3 targetLaserEnd;
+
     private Transform firePoint;
     private WeaponModel currentWeaponModel;
     private float fireCooldown;
+
+    private float currentLaserDelay;
+    private bool wasAiming;
 
     private void Awake()
     {
@@ -21,6 +37,33 @@ public class WeaponController : MonoBehaviour
     {
         if (fireCooldown > 0f)
             fireCooldown -= Time.deltaTime;
+
+        if (playerState.IsAiming && !wasAiming)
+        {
+            currentLaserDelay = laserDelay;
+        }
+
+        if (!playerState.IsAiming && wasAiming)
+        {
+            laserRenderer.enabled = false;
+            if (currentLaserDelay < laserDelay)
+            {
+                currentLaserDelay += Time.deltaTime;
+            }
+            else
+            {
+                currentLaserDelay = laserDelay;
+            }
+        }
+
+        wasAiming = playerState.IsAiming;
+
+        if (currentLaserDelay > 0f && playerState.IsAiming)
+        {
+            currentLaserDelay -= Time.deltaTime;
+            laserRenderer.enabled = false;
+            return;
+        }
 
         UpdateLaser();
     }
@@ -79,12 +122,20 @@ public class WeaponController : MonoBehaviour
 
         if (Physics.Raycast(origin, direction, out RaycastHit hit, weaponData.laserDistance))
         {
-            laserRenderer.SetPosition(1, hit.point);
+            targetLaserEnd = hit.point;
         }
         else
         {
-            laserRenderer.SetPosition(1, origin + direction * weaponData.laserDistance);
+            targetLaserEnd = origin + direction * weaponData.laserDistance;
         }
+
+        currentLaserEnd = Vector3.Lerp(
+            currentLaserEnd,
+            targetLaserEnd,
+            laserSmoothSpeed * Time.deltaTime
+        );
+
+        laserRenderer.SetPosition(1, currentLaserEnd);
     }
 
     // -------- SETTERS --------
@@ -92,6 +143,12 @@ public class WeaponController : MonoBehaviour
     {
         currentWeaponModel = weaponModel;
         firePoint = weaponModel != null ? weaponModel.muzzle : null;
+
+        if (weaponData != null && firePoint != null)
+        {
+            currentLaserEnd = firePoint.position + firePoint.forward * weaponData.laserDistance;
+            targetLaserEnd = currentLaserEnd;
+        }
     }
 
     public void SetWeapon(WeaponData newWeaponData)

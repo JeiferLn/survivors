@@ -247,6 +247,12 @@ public class PlayerController : MonoBehaviour
 
         if (bindingIndex != -1)
         {
+            // index =0 X
+            // index =1 Square
+            // index =2 Circle
+            // index =3 Triangle
+            
+            
             string buttonCharacter = action.GetBindingDisplayString(bindingIndex);
 
             switch (buttonCharacter)

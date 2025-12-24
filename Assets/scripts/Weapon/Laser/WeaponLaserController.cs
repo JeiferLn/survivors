@@ -52,7 +52,7 @@ public class WeaponLaserController : MonoBehaviour
 
     private void UpdateLaser()
     {
-        if (!weaponContext.HasWeapon || currentLaserDelay > 0f)
+        if (!weaponContext.HasWeapon || !playerState.IsAiming || currentLaserDelay > 0f)
         {
             laserRenderer.enabled = false;
             laserLength01 = 0f;

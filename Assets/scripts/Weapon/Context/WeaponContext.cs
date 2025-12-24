@@ -18,6 +18,7 @@ public class WeaponContext : MonoBehaviour
     public float BulletSpeed => CurrentWeapon.bulletSpeed;
     public float BulletLength => CurrentWeapon.bulletLength;
     public float BulletMaxDistance => CurrentWeapon.bulletMaxDistance;
+    public float BulletDamage => CurrentWeapon.damage;
 
     // -------- FIRE --------
     public float FireCooldown => CurrentWeapon.fireCooldown;

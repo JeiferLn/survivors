@@ -5,17 +5,20 @@ public class BulletTracer : MonoBehaviour
 {
     private LineRenderer line;
     private Vector3 direction;
+    private IDamageable damageable;
     private float speed;
     private float maxDistance;
     private float traveledDistance;
     private float bulletLength;
+    private float bulletDamage;
 
-    public void Init(Vector3 dir, float bulletSpeed, float maxDist, float length)
+    public void Init(Vector3 dir, float bulletSpeed, float maxDist, float length, float damage)
     {
         direction = dir.normalized;
         speed = bulletSpeed;
         maxDistance = maxDist;
         bulletLength = length;
+        bulletDamage = damage;
 
         line = GetComponent<LineRenderer>();
         line.positionCount = 2;
@@ -37,9 +40,12 @@ public class BulletTracer : MonoBehaviour
             line.SetPosition(1, hit.point);
             line.SetPosition(0, hit.point - direction * bulletLength);
 
-            Debug.Log("Impactó con: " + hit.collider.name);
-            Destroy(gameObject, 0.02f);
-            return;
+            damageable = hit.collider.GetComponent<IDamageable>();
+            if (damageable == null)
+                return;
+
+            damageable.TakeDamage(bulletDamage);
+            Destroy(gameObject);
         }
 
         line.SetPosition(1, newHead);

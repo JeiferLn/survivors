@@ -29,7 +29,8 @@ public class WeaponController : MonoBehaviour
             weaponContext.FireDirection,
             weaponContext.BulletSpeed,
             weaponContext.BulletMaxDistance,
-            weaponContext.BulletLength
+            weaponContext.BulletLength,
+            weaponContext.BulletDamage
         );
     }
 }

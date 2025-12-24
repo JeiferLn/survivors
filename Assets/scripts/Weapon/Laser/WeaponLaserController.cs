@@ -52,10 +52,7 @@ public class WeaponLaserController : MonoBehaviour
 
     private void UpdateLaser()
     {
-        var weapon = weaponContext.CurrentWeapon;
-        var model = weaponContext.CurrentWeaponModel;
-
-        if (weapon == null || model == null || !playerState.IsAiming || currentLaserDelay > 0f)
+        if (!weaponContext.HasWeapon || currentLaserDelay > 0f)
         {
             laserRenderer.enabled = false;
             laserLength01 = 0f;
@@ -64,19 +61,20 @@ public class WeaponLaserController : MonoBehaviour
 
         laserRenderer.enabled = true;
 
-        Vector3 origin = model.GetMuzzlePosition();
-        Vector3 direction = model.GetFireDirection();
+        Vector3 origin = weaponContext.MuzzlePosition;
+        Vector3 direction = weaponContext.FireDirection;
 
         Vector3 targetEnd = Physics.Raycast(
             origin,
             direction,
             out RaycastHit hit,
-            weapon.laserDistance
+            weaponContext.LaserDistance
         )
             ? hit.point
-            : origin + direction * weapon.laserDistance;
+            : origin + direction * weaponContext.LaserDistance;
 
         laserLength01 = Mathf.MoveTowards(laserLength01, 1f, Time.deltaTime * laserExtendSpeed);
+
         currentWidth = Mathf.MoveTowards(
             currentWidth,
             laserWidth,

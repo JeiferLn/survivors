@@ -5,21 +5,22 @@ public class PlayerCombatController : MonoBehaviour
 {
     private PlayerState playerState;
     private WeaponController weaponController;
+    private WeaponContext weaponContext;
 
-    private bool isAiming;
     private bool shootHeld;
+    private float nextShootTime;
 
     private void Awake()
     {
         playerState = GetComponent<PlayerState>();
         weaponController = GetComponent<WeaponController>();
+        weaponContext = GetComponent<WeaponContext>();
     }
 
     // -------- INPUT --------
     public void OnAim(InputAction.CallbackContext ctx)
     {
-        isAiming = ctx.ReadValueAsButton();
-        playerState.SetAiming(isAiming);
+        playerState.SetAiming(ctx.ReadValueAsButton());
     }
 
     public void OnShoot(InputAction.CallbackContext ctx)
@@ -39,12 +40,15 @@ public class PlayerCombatController : MonoBehaviour
     // -------- LOGIC --------
     private void HandleCombat()
     {
-        if (!playerState.IsAiming)
-            return;
-
-        if (!shootHeld)
+        if (
+            !playerState.IsAiming
+            || !shootHeld
+            || !weaponContext.HasWeapon
+            || Time.time < nextShootTime
+        )
             return;
 
         weaponController.Shoot();
+        nextShootTime = Time.time + weaponContext.FireCooldown;
     }
 }

@@ -13,6 +13,10 @@ public class WeaponModel : MonoBehaviour
     [SerializeField]
     private Vector3 muzzleOffset;
 
+    [Header("Bullet")]
+    [SerializeField]
+    private Vector3 bulletOffset;
+
     public Vector3 GetMuzzlePosition()
     {
         if (muzzle == null)
@@ -27,5 +31,10 @@ public class WeaponModel : MonoBehaviour
             return transform.forward;
 
         return muzzle.TransformDirection(fireDirection).normalized;
+    }
+
+    public Vector3 GetBulletPositionCorrected()
+    {
+        return GetMuzzlePosition() + bulletOffset;
     }
 }

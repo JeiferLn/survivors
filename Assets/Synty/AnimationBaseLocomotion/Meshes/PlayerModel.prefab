@@ -2307,6 +2307,7 @@ MonoBehaviour:
   muzzle: {fileID: 6550119896196073924}
   fireDirection: {x: -50, y: 0, z: 0}
   muzzleOffset: {x: -0.35, y: 0.085, z: -0.003}
+  bulletOffset: {x: 0, y: 0.07, z: 0}
 --- !u!1001 &4879058249530325997
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2464,6 +2465,7 @@ MonoBehaviour:
   muzzle: {fileID: 3347006324489034763}
   fireDirection: {x: -50, y: 0, z: -4}
   muzzleOffset: {x: -0.75, y: 0.133, z: -0.1}
+  bulletOffset: {x: 0, y: 0.055, z: 0}
 --- !u!4 &2968264544226869395 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6559362985659250037, guid: 260ff1508afea5241b6511d8fbe92201, type: 3}

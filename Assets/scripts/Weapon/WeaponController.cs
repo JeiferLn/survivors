@@ -2,10 +2,7 @@ using UnityEngine;
 
 public class WeaponController : MonoBehaviour
 {
-    private WeaponData weaponData;
     private WeaponContext weaponContext;
-
-    private WeaponModel currentWeaponModel;
 
     private void Awake()
     {
@@ -14,27 +11,25 @@ public class WeaponController : MonoBehaviour
 
     public void Shoot()
     {
-        currentWeaponModel = weaponContext.CurrentWeaponModel;
-
-        if (!weaponData.bulletPrefab || !currentWeaponModel.muzzle)
-        {
-            Debug.LogError("Bullet tracer prefab or muzzle not set");
+        if (!weaponContext.HasWeapon || weaponContext.BulletPrefab == null)
             return;
-        }
-
-        Debug.Log("Shooting");
 
         GameObject bullet = Instantiate(
-            weaponData.bulletPrefab,
-            currentWeaponModel.muzzle.position,
-            Quaternion.LookRotation(currentWeaponModel.muzzle.forward)
+            weaponContext.BulletPrefab,
+            weaponContext.BulletPositionCorrected,
+            Quaternion.LookRotation(weaponContext.FireDirection)
         );
 
         BulletTracer tracer = bullet.GetComponent<BulletTracer>();
+
+        if (tracer == null)
+            return;
+
         tracer.Init(
-            currentWeaponModel.muzzle.forward,
-            weaponData.bulletSpeed,
-            weaponData.bulletMaxDistance
+            weaponContext.FireDirection,
+            weaponContext.BulletSpeed,
+            weaponContext.BulletMaxDistance,
+            weaponContext.BulletLength
         );
     }
 }

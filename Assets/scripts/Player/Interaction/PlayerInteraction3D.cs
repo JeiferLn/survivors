@@ -1,6 +1,6 @@
-using UnityEngine;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 public class PlayerInteraction3D : MonoBehaviour
 {
@@ -24,7 +24,8 @@ public class PlayerInteraction3D : MonoBehaviour
     [ListDrawerSettings(ShowFoldout = true, DraggableItems = false)]
     private List<string> _keys = new List<string>();
 
-    [ShowInInspector, ReadOnly] private int KeyCount => _keys.Count;
+    [ShowInInspector, ReadOnly]
+    private int KeyCount => _keys.Count;
 
     // ══════════════════════════════════════════════════════════════
     // DEBUG
@@ -65,7 +66,11 @@ public class PlayerInteraction3D : MonoBehaviour
 
     private void UpdateCurrentTarget()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, _interactionRange, _interactableLayer);
+        Collider[] hits = Physics.OverlapSphere(
+            transform.position,
+            _interactionRange,
+            _interactableLayer
+        );
 
         // Si no hay nada → apagar outline previo
         if (hits.Length == 0)
@@ -142,7 +147,8 @@ public class PlayerInteraction3D : MonoBehaviour
 
     private void TryInteract()
     {
-        if (_currentTarget == null) return;
+        if (_currentTarget == null)
+            return;
 
         // Verificar si es una puerta con llave
         if (_currentTarget is Door door)
@@ -239,7 +245,8 @@ public class PlayerInteraction3D : MonoBehaviour
 
     private void DisableLastTargetEffects()
     {
-        if (_lastOutline == null) return;
+        if (_lastOutline == null)
+            return;
 
         Transform billboard = _lastOutline.transform.GetChild(0);
         billboard.GetComponent<BillboardFadeInOut>()?.OnFadeOut();
@@ -249,7 +256,6 @@ public class PlayerInteraction3D : MonoBehaviour
         _lastOutline.enabled = false;
         _lastOutline = null;
     }
-
 
     // ══════════════════════════════════════════════════════════════
     // BOTONES DE DEBUG (ODIN)

@@ -244,7 +244,6 @@ public class PlayerController : MonoBehaviour
         // Obtener el índice correcto según el dispositivo actual
         int bindingIndex = GetCorrectBindingIndex(action);
 
-
         if (bindingIndex != -1)
         {
             string buttonCharacter = action.GetBindingDisplayString(bindingIndex);
@@ -253,15 +252,23 @@ public class PlayerController : MonoBehaviour
             // index = 1 Square
             // index = 2 Circle
             // index = 3 Triangle
-         
+
             switch (buttonCharacter)
             {
-                case "Triangle": buttonCharacter = "<sprite index=3>"; break;
-                case "Square": buttonCharacter = "<sprite index=1>"; break;
-                case "Circle": buttonCharacter = "<sprite index=2>"; break;
-                case "Cross": buttonCharacter = "<sprite index=0>"; break;
+                case "Triangle":
+                    buttonCharacter = "<sprite index=3>";
+                    break;
+                case "Square":
+                    buttonCharacter = "<sprite index=1>";
+                    break;
+                case "Circle":
+                    buttonCharacter = "<sprite index=2>";
+                    break;
+                case "Cross":
+                    buttonCharacter = "<sprite index=0>";
+                    break;
             }
-            
+
             keyUI.text = buttonCharacter;
         }
         else
@@ -280,10 +287,12 @@ public class PlayerController : MonoBehaviour
             if (currentInputDevice == InputDeviceType.Gamepad)
             {
                 // Buscar bindings de gamepad
-                if (binding.path.Contains("<Gamepad>") ||
-                    binding.path.Contains("button") ||
-                    binding.path.Contains("rightTrigger") ||
-                    binding.path.Contains("leftTrigger"))
+                if (
+                    binding.path.Contains("<Gamepad>")
+                    || binding.path.Contains("button")
+                    || binding.path.Contains("rightTrigger")
+                    || binding.path.Contains("leftTrigger")
+                )
                 {
                     return i;
                 }

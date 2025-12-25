@@ -12,6 +12,10 @@ public class Enemy : MonoBehaviour, IDamageable
     [Header("Configuration")]
     [SerializeField] private EnemyType enemyType;
     
+    [Header("NavMesh Settings")]
+    [SerializeField] private float brakingAcceleration = 100f; // Frenado brusco
+    [SerializeField] private float arrivalThreshold = 0.1f;    // Distancia para considerar "llegó"
+    
     [Header("State (Debug)")]
     [SerializeField] private EnemyState _currentState = EnemyState.None;
     [SerializeField] private EnemyState _previousState = EnemyState.None;
@@ -60,19 +64,21 @@ public class Enemy : MonoBehaviour, IDamageable
     private float attackMeleeDamage;
     private float attackDistanceDamage;
     
+    // Cache para optimización
+    private float originalAcceleration;
+    
     #endregion
 
     #region ══════════ NOMBRES DE ANIMACIONES ══════════
     
-    // Centralizamos los nombres para evitar typos
     public static class Animations
     {
-        public const string Idle = "root|Zombie_Idle";
-        public const string Walk = "root|Zombie_Walk";
-        public const string AttackMelee = "root|Zombie_Attack";
-        public const string AttackRange = "root|Zombie_RangeAttack";
-        public const string Damage = "root|Zombie_Damage";
-        public const string Die = "root|Zombie_dead";
+        public const string Idle = "Z-Idle";
+        public const string Walk = "Z-Walk";
+        public const string AttackMelee = "Z-MeleeAttack";
+        public const string AttackRange = "Z-RangeAttack";
+        public const string Damage = "Z-GetDamage";
+        public const string Die = "Z-Dead";
     }
     
     #endregion
@@ -81,7 +87,6 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void Awake()
     {
-        // Obtener componentes si no están asignados
         if (agent == null) 
             agent = GetComponent<NavMeshAgent>();
         
@@ -96,8 +101,17 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void OnEnable()
     {
-        // Reiniciar cuando se reactiva desde el pool
         ResetEnemy();
+    }
+
+    private void Update()
+    {
+        // ══════════ VERIFICACIÓN DE LLEGADA ══════════
+        // Esto previene el deslizamiento al verificar constantemente
+        if (agent != null && agent.enabled && !agent.isStopped)
+        {
+            CheckArrival();
+        }
     }
 
     #endregion
@@ -158,15 +172,21 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (agent == null) return;
         
+        // Guardar aceleración original
+        originalAcceleration = agent.acceleration;
+        
+        // ══════════ CONFIGURACIÓN ANTI-PATINAJE ══════════
         agent.speed = enemyType.moveSpeed;
+        agent.acceleration = brakingAcceleration;      // Aceleración alta = frenado rápido
+        agent.autoBraking = true;                       // Auto-frenar al llegar
         agent.stoppingDistance = IsRangeEnemy 
             ? AttackDistanceRange * 0.8f 
             : AttackMeleeRange * 0.8f;
+        
+        // Estos valores ayudan a un movimiento más preciso
+        agent.angularSpeed = 360f;                      // Rotación rápida
     }
 
-    /// <summary>
-    /// Reinicia el enemigo para reutilización en pool.
-    /// </summary>
     public void ResetEnemy()
     {
         _currentState = EnemyState.Idle;
@@ -180,6 +200,7 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             agent.isStopped = false;
             agent.ResetPath();
+            agent.velocity = Vector3.zero; // ← IMPORTANTE: Resetear velocidad
         }
         
         if (enemyAnimator != null)
@@ -193,9 +214,6 @@ public class Enemy : MonoBehaviour, IDamageable
 
     #region ══════════ ESTADO Y ANIMACIONES ══════════
 
-    /// <summary>
-    /// Callback cuando el estado cambia. Actualiza animaciones.
-    /// </summary>
     private void OnStateChanged(EnemyState from, EnemyState to)
     {
         if (enemyAnimator == null) return;
@@ -219,7 +237,6 @@ public class Enemy : MonoBehaviour, IDamageable
                 break;
 
             case EnemyState.TakingDamage:
-                // Forzamos para que se reproduzca aunque estemos en damage
                 enemyAnimator.ForceAnimation(Animations.Damage, 0.05f);
                 break;
 
@@ -233,11 +250,52 @@ public class Enemy : MonoBehaviour, IDamageable
 
     #region ══════════ MOVIMIENTO ══════════
 
+    /// <summary>
+    /// Verifica si el agente llegó a su destino y lo detiene inmediatamente.
+    /// </summary>
+    private void CheckArrival()
+    {
+        if (mainTarget == null) return;
+        
+        float distanceToTarget = Vector3.Distance(transform.position, mainTarget.position);
+        float currentAttackRange = GetCurrentAttackRange();
+        
+        // Si está dentro del rango de ataque, detener completamente
+        if (distanceToTarget <= currentAttackRange)
+        {
+            ForceStop();
+        }
+        // También verificar con el remainingDistance del agente
+        else if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + arrivalThreshold)
+        {
+            ForceStop();
+        }
+    }
+
+    /// <summary>
+    /// Fuerza la detención completa del agente sin deslizamiento.
+    /// </summary>
+    public void ForceStop()
+    {
+        if (agent == null || !agent.isOnNavMesh) return;
+        
+        // ══════════ DETENCIÓN INMEDIATA ══════════
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero;  // ← CLAVE: Elimina toda inercia
+        agent.ResetPath();
+        
+        // Opcional: Warpar a la posición actual para evitar micro-deslizamientos
+        // agent.Warp(transform.position);
+    }
+
     public void MoveTo(Transform target)
     {
         if (agent == null || target == null || IsDead) return;
+        if (!agent.isOnNavMesh) return;
         
         mainTarget = target;
+        
+        // Reactivar movimiento
         agent.isStopped = false;
 
         // Solo actualizar destino si cambió significativamente
@@ -249,10 +307,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void StopMoving()
     {
-        if (agent == null) return;
-        
-        agent.isStopped = true;
-        agent.ResetPath();
+        ForceStop(); // ← Usar ForceStop en lugar del código anterior
     }
 
     public void RotateTowardsTarget()
@@ -267,25 +322,44 @@ public class Enemy : MonoBehaviour, IDamageable
         Quaternion targetRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
     }
+    
+    /// <summary>
+    /// Verifica si el agente ha llegado a su destino.
+    /// </summary>
+    public bool HasReachedDestination()
+    {
+        if (agent == null || !agent.isOnNavMesh) return true;
+        if (agent.pathPending) return false;
+        
+        return agent.remainingDistance <= agent.stoppingDistance + arrivalThreshold;
+    }
+
+    /// <summary>
+    /// Verifica si está en rango de ataque del objetivo actual.
+    /// </summary>
+    public bool IsInAttackRange()
+    {
+        if (mainTarget == null) return false;
+        
+        float distance = Vector3.Distance(transform.position, mainTarget.position);
+        return distance <= GetCurrentAttackRange();
+    }
 
     #endregion
 
     #region ══════════ COMBATE ══════════
 
-    /// <summary>
-    /// Intenta atacar. Retorna true si el ataque se ejecutó.
-    /// </summary>
     public bool TryAttack()
     {
         if (IsDead) return false;
         
-        // Respetar cooldown
         if (Time.time < lastAttackTime + attackCooldown) 
             return false;
 
+        // ══════════ ASEGURAR DETENCIÓN ANTES DE ATACAR ══════════
+        ForceStop();
         RotateTowardsTarget();
 
-        // Ataque melee
         if (!IsRangeEnemy)
         {
             ExecuteMeleeAttack();
@@ -293,20 +367,17 @@ public class Enemy : MonoBehaviour, IDamageable
             return true;
         }
 
-        // Ataque a distancia - verificar línea de visión
         if (mainTarget == null) return false;
 
         float distanceToTarget = Vector3.Distance(transform.position, mainTarget.position);
         
         if (distanceToTarget > AttackDistanceRange)
         {
-            // Fuera de rango, el manager debería moverlo
             return false;
         }
 
         if (!HasLineOfSight())
         {
-            // Bloqueado, el manager debería moverlo
             return false;
         }
 
@@ -317,18 +388,12 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void ExecuteMeleeAttack()
     {
-        // La animación ya se setea en OnStateChanged
         Debug.Log($"[Enemy] {name}: Melee Attack! Damage: {attackMeleeDamage}");
-        
-        // TODO: Aplicar daño real al jugador
-        // mainTarget.GetComponent<PlayerHealth>()?.TakeDamage(attackMeleeDamage);
     }
 
     private void ExecuteRangedAttack()
     {
         Debug.Log($"[Enemy] {name}: Ranged Attack! Damage: {attackDistanceDamage}");
-        
-        // TODO: Instanciar proyectil o aplicar daño directo
     }
 
     private bool HasLineOfSight()
@@ -338,11 +403,9 @@ public class Enemy : MonoBehaviour, IDamageable
         Vector3 origin = transform.position + Vector3.up;
         Vector3 toTarget = mainTarget.position - transform.position;
 
-        // Verificar ángulo
         float angle = Vector3.Angle(transform.forward, toTarget);
         if (angle > 70f) return false;
 
-        // Raycast
         if (Physics.Raycast(origin, toTarget.normalized, out RaycastHit hit, AttackDistanceRange))
         {
             return hit.transform == mainTarget || hit.transform.IsChildOf(mainTarget);
@@ -369,15 +432,10 @@ public class Enemy : MonoBehaviour, IDamageable
         }
         else
         {
-            // Solo cambiar a TakingDamage si no está ya muriendo
             if (CurrentState != EnemyState.Dead)
             {
-                // Guardar estado para volver después
                 var stateBeforeDamage = CurrentState;
                 CurrentState = EnemyState.TakingDamage;
-                
-                // TODO: Opcionalmente, volver al estado anterior después de la animación
-                // StartCoroutine(ReturnToStateAfterDelay(stateBeforeDamage, 0.5f));
             }
         }
     }
@@ -385,12 +443,9 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Die()
     {
         CurrentState = EnemyState.Dead;
-        StopMoving();
+        ForceStop(); // ← Usar ForceStop
         
         Debug.Log($"[Enemy] {name}: Died!");
-        
-        // Desactivar después de un tiempo para que se vea la animación
-        // Invoke(nameof(DeactivateEnemy), 3f);
     }
 
     private void DeactivateEnemy()
@@ -402,9 +457,6 @@ public class Enemy : MonoBehaviour, IDamageable
 
     #region ══════════ UTILIDADES ══════════
 
-    /// <summary>
-    /// Obtiene el rango de ataque actual según el tipo de enemigo.
-    /// </summary>
     public float GetCurrentAttackRange()
     {
         return IsRangeEnemy ? AttackDistanceRange : AttackMeleeRange;
@@ -418,9 +470,6 @@ public class Enemy : MonoBehaviour, IDamageable
         _currentState = initialState == 0 ? EnemyState.Idle : EnemyState.Moving;
     }
 
-    /// <summary>
-    /// Verifica si puede atacar (cooldown listo).
-    /// </summary>
     public bool CanAttack()
     {
         return Time.time >= lastAttackTime + attackCooldown;
@@ -450,15 +499,12 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void OnDrawGizmosSelected()
     {
-        // Detección
         Gizmos.color = new Color(0f, 1f, 1f, 0.3f);
         Gizmos.DrawWireSphere(transform.position, DetectionRange);
 
-        // Melee
         Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
         Gizmos.DrawWireSphere(transform.position, AttackMeleeRange);
 
-        // Rango
         if (IsRangeEnemy)
         {
             Gizmos.color = new Color(1f, 0.92f, 0.016f, 0.3f);
@@ -470,6 +516,11 @@ public class Enemy : MonoBehaviour, IDamageable
                 Gizmos.DrawLine(transform.position + Vector3.up, mainTarget.position + Vector3.up);
             }
         }
+        
+        // Mostrar stopping distance
+        Gizmos.color = Color.green;
+        if (agent != null)
+            Gizmos.DrawWireSphere(transform.position, agent.stoppingDistance);
     }
 
     #endregion

@@ -18,7 +18,7 @@ MonoBehaviour:
   expAmount: 10
   detectionRange: 50
   attackMode: 0
-  attackMeleeRange: 5
+  attackMeleeRange: 1.7
   meleeAttack: {fileID: 11400000, guid: 4ae3cb66a3a4e234186d47b4b1ad08b5, type: 2}
   attackDistanceRange: 10
   rangeAttack: {fileID: 0}

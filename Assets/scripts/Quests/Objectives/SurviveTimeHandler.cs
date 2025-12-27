@@ -2,7 +2,7 @@ public class SurviveTimeHandler : IQuestObjectiveHandler
 {
     public QuestType ObjectiveType => QuestType.SurviveTime;
 
-    public void Process(QuestManager questManager, QuestDefinition quest, object data)
+    public void Process(QuestManager questManager, QuestData quest, object data)
     {
         if (data is not float deltaTime)
             return;

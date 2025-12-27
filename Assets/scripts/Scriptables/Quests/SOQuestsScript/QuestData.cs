@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Quests/Quest")]
-public class QuestDefinition : ScriptableObject
+public class QuestData : ScriptableObject
 {
     public string QuestId;
     public string QuestName;
@@ -16,7 +16,7 @@ public class QuestDefinition : ScriptableObject
     public List<QuestObjective> Objectives = new();
 
     [Header("Quest Flow")]
-    public List<QuestDefinition> RequiredQuests = new();
-    public List<QuestDefinition> UnlocksQuests = new();
-    public List<QuestDefinition> BlocksQuests = new();
+    public List<QuestData> RequiredQuests = new();
+    public List<QuestData> UnlocksQuests = new();
+    public List<QuestData> BlocksQuests = new();
 }

@@ -2,7 +2,7 @@ public class CollectItemHandler : IQuestObjectiveHandler
 {
     public QuestType ObjectiveType => QuestType.CollectItem;
 
-    public void Process(QuestManager questManager, QuestDefinition quest, object data)
+    public void Process(QuestManager questManager, QuestData quest, object data)
     {
         if (data is not ItemEventData itemData)
             return;

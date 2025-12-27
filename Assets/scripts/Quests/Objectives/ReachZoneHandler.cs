@@ -2,7 +2,7 @@ public class ReachZoneHandler : IQuestObjectiveHandler
 {
     public QuestType ObjectiveType => QuestType.ReachZone;
 
-    public void Process(QuestManager questManager, QuestDefinition quest, object data)
+    public void Process(QuestManager questManager, QuestData quest, object data)
     {
         if (data is not string zoneId)
             return;

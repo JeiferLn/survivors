@@ -2,7 +2,7 @@ public class TalkNpcHandler : IQuestObjectiveHandler
 {
     public QuestType ObjectiveType => QuestType.TalkToNPC;
 
-    public void Process(QuestManager questManager, QuestDefinition quest, object data)
+    public void Process(QuestManager questManager, QuestData quest, object data)
     {
         if (data is not string npcId)
             return;

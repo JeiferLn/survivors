@@ -55,7 +55,7 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    private bool AreRequirementsCompleted(QuestDefinition quest)
+    private bool AreRequirementsCompleted(QuestData quest)
     {
         foreach (var req in quest.RequiredQuests)
             if (questStates[req.QuestId].Status != QuestStatus.Completed)
@@ -64,12 +64,12 @@ public class QuestManager : MonoBehaviour
         return true;
     }
 
-    private void ActivateQuest(QuestDefinition quest)
+    private void ActivateQuest(QuestData quest)
     {
         questStates[quest.QuestId].SetActive();
     }
 
-    internal void CompleteQuestInternal(QuestDefinition quest)
+    internal void CompleteQuestInternal(QuestData quest)
     {
         var state = questStates[quest.QuestId];
         if (state.Status == QuestStatus.Completed)
@@ -80,7 +80,7 @@ public class QuestManager : MonoBehaviour
         TryActivateAvailableQuests();
     }
 
-    private void HandleUnlocksAndBlocks(QuestDefinition quest)
+    private void HandleUnlocksAndBlocks(QuestData quest)
     {
         foreach (var unlock in quest.UnlocksQuests)
             if (questStates[unlock.QuestId].Status == QuestStatus.Locked)

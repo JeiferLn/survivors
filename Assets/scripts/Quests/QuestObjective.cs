@@ -1,20 +1,39 @@
-using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
-[Serializable]
+[System.Serializable]
 public class QuestObjective
 {
-    public QuestType ObjectiveType;
+    [HorizontalGroup("Header")]
+    [HideLabel]
+    public QuestType Type;
 
-    [Header("Generic")]
+    [ShowIf(nameof(UsesAmount))]
+    [LabelText("Required Amount")]
     public int RequiredAmount;
 
-    [Header("Item")]
+    [ShowIf(nameof(UsesItem))]
+    [LabelText("Item Id")]
     public string ItemId;
 
-    [Header("NPC")]
+    [ShowIf(nameof(UsesNpc))]
+    [LabelText("Npc Id")]
     public string NpcId;
 
-    [Header("Zone")]
+    [ShowIf(nameof(UsesZone))]
+    [LabelText("Zone Id")]
     public string ZoneId;
+
+    // ---------- Helpers ----------
+
+    private bool UsesAmount =>
+        Type == QuestType.CollectItem
+        || Type == QuestType.CraftItem
+        || Type == QuestType.SurviveTime;
+
+    private bool UsesItem => Type == QuestType.CollectItem || Type == QuestType.CraftItem;
+
+    private bool UsesNpc => Type == QuestType.TalkToNPC;
+
+    private bool UsesZone => Type == QuestType.ReachZone;
 }

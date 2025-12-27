@@ -9,7 +9,7 @@ public class TalkNpcHandler : IQuestObjectiveHandler
 
         foreach (var obj in quest.Objectives)
         {
-            if (obj.ObjectiveType != QuestType.TalkToNPC)
+            if (obj.Type != QuestType.TalkToNPC)
                 continue;
 
             if (obj.NpcId != npcId)

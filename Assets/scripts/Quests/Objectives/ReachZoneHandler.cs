@@ -9,7 +9,7 @@ public class ReachZoneHandler : IQuestObjectiveHandler
 
         foreach (var obj in quest.Objectives)
         {
-            if (obj.ObjectiveType != QuestType.ReachZone)
+            if (obj.Type != QuestType.ReachZone)
                 continue;
 
             if (obj.ZoneId != zoneId)

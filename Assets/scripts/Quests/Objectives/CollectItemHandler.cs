@@ -9,7 +9,7 @@ public class CollectItemHandler : IQuestObjectiveHandler
 
         foreach (var obj in quest.Objectives)
         {
-            if (obj.ObjectiveType != QuestType.CollectItem)
+            if (obj.Type != QuestType.CollectItem)
                 continue;
 
             if (obj.ItemId != itemData.ItemId)

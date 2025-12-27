@@ -9,7 +9,7 @@ public class SurviveTimeHandler : IQuestObjectiveHandler
 
         foreach (var obj in quest.Objectives)
         {
-            if (obj.ObjectiveType != QuestType.SurviveTime)
+            if (obj.Type != QuestType.SurviveTime)
                 continue;
 
             var state = questManager.GetQuestState(quest.QuestId);

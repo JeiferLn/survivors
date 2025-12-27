@@ -9,7 +9,7 @@ public class CraftItemHandler : IQuestObjectiveHandler
 
         foreach (var obj in quest.Objectives)
         {
-            if (obj.ObjectiveType != QuestType.CraftItem)
+            if (obj.Type != QuestType.CraftItem)
                 continue;
 
             if (obj.ItemId != itemData.ItemId)

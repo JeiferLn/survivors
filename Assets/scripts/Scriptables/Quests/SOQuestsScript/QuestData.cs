@@ -1,50 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewQuest", menuName = "Quests/Quest Definition")]
+[CreateAssetMenu(menuName = "Quests/Quest")]
 public class QuestDefinition : ScriptableObject
 {
-    [Header("Identity")]
-    [SerializeField]
-    private string questId;
-
-    [SerializeField]
-    private string questName;
+    public string QuestId;
+    public string QuestName;
 
     [TextArea]
-    [SerializeField]
-    private string description;
+    public string Description;
 
-    [Header("Classification")]
-    [SerializeField]
-    private QuestCategory category;
+    public QuestCategory Category;
 
-    [SerializeField]
-    private QuestType questType;
+    [Header("Objectives")]
+    public List<QuestObjective> Objectives = new();
 
-    [Header("Objective")]
-    [SerializeField]
-    private int targetAmount;
-
-    [Header("Dependencies")]
-    [SerializeField]
-    private List<QuestDefinition> requiredQuests;
-
-    [SerializeField]
-    private List<QuestDefinition> unlocksQuests;
-
-    [SerializeField]
-    private List<QuestDefinition> blocksQuests;
-
-    // Getters (solo lectura)
-    public string QuestId => questId;
-    public string QuestName => questName;
-    public string Description => description;
-    public QuestCategory Category => category;
-    public QuestType QuestType => questType;
-    public int TargetAmount => targetAmount;
-
-    public IReadOnlyList<QuestDefinition> RequiredQuests => requiredQuests;
-    public IReadOnlyList<QuestDefinition> UnlocksQuests => unlocksQuests;
-    public IReadOnlyList<QuestDefinition> BlocksQuests => blocksQuests;
+    [Header("Quest Flow")]
+    public List<QuestDefinition> RequiredQuests = new();
+    public List<QuestDefinition> UnlocksQuests = new();
+    public List<QuestDefinition> BlocksQuests = new();
 }

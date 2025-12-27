@@ -1,44 +1,42 @@
-using System;
-using UnityEngine;
-
 public class QuestState
 {
-    [SerializeField]
-    private string questId;
+    public QuestStatus Status { get; private set; } = QuestStatus.Locked;
+    public float CurrentProgress { get; private set; }
 
-    [SerializeField]
-    private QuestStatus status;
-
-    [SerializeField]
-    private int currentProgress;
-
-    public QuestState(string questId)
+    public void SetActive()
     {
-        this.questId = questId;
-        status = QuestStatus.Locked;
-        currentProgress = 0;
+        Status = QuestStatus.Active;
     }
 
-    public string QuestId => questId;
-    public QuestStatus Status => status;
-    public int CurrentProgress => currentProgress;
-
-    public void SetStatus(QuestStatus newStatus)
+    public void SetCompleted()
     {
-        status = newStatus;
+        Status = QuestStatus.Completed;
     }
 
-    public void AddProgress(int amount, int target)
+    public void SetBlocked()
     {
-        if (status != QuestStatus.Active)
-            return;
-
-        currentProgress += amount;
-        currentProgress = Math.Min(currentProgress, target);
+        Status = QuestStatus.Locked;
     }
 
-    public bool IsCompleted(int target)
+    public void AddProgress(float amount, float required)
     {
-        return currentProgress >= target;
+        CurrentProgress += amount;
+        CurrentProgress = UnityEngine.Mathf.Clamp(CurrentProgress, 0, required);
+    }
+
+    public void AddTime(float deltaTime, float required)
+    {
+        AddProgress(deltaTime, required);
+    }
+
+    public bool IsCompleted(float required)
+    {
+        return CurrentProgress >= required;
+    }
+
+    public void Load(float progress, QuestStatus status)
+    {
+        CurrentProgress = progress;
+        Status = status;
     }
 }

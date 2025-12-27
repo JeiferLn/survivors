@@ -3,140 +3,152 @@ using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
-    [Header("Database")]
     [SerializeField]
     private QuestDatabase questDatabase;
 
-    private Dictionary<string, QuestState> questStates;
+    private Dictionary<string, QuestState> questStates = new();
+    private Dictionary<QuestType, IQuestObjectiveHandler> handlers = new();
 
     private void Awake()
     {
-        questDatabase.Initialize();
-        InitializeStates();
+        RegisterHandlers();
+        InitializeQuests();
     }
 
-    private void InitializeStates()
+    private void Update()
     {
-        questStates = new Dictionary<string, QuestState>();
-
-        foreach (var quest in questDatabase.Quests)
-        {
-            questStates.Add(quest.QuestId, new QuestState(quest.QuestId));
-        }
-
-        InitializeAvailableQuests();
+        DispatchEvent(QuestType.SurviveTime, Time.deltaTime);
     }
 
-    private void InitializeAvailableQuests()
+    private void RegisterHandlers()
+    {
+        Register(new CollectItemHandler());
+        Register(new CraftItemHandler());
+        Register(new ReachZoneHandler());
+        Register(new TalkNpcHandler());
+        Register(new SurviveTimeHandler());
+    }
+
+    private void Register(IQuestObjectiveHandler handler)
+    {
+        handlers.Add(handler.ObjectiveType, handler);
+    }
+
+    private void InitializeQuests()
+    {
+        foreach (var quest in questDatabase.Quests)
+            questStates[quest.QuestId] = new QuestState();
+
+        TryActivateAvailableQuests();
+    }
+
+    private void TryActivateAvailableQuests()
     {
         foreach (var quest in questDatabase.Quests)
         {
+            var state = questStates[quest.QuestId];
+            if (state.Status != QuestStatus.Locked)
+                continue;
+
             if (AreRequirementsCompleted(quest))
-            {
-                var state = questStates[quest.QuestId];
-                if (state.Status == QuestStatus.Locked)
-                {
-                    state.SetStatus(QuestStatus.Available);
-                }
-            }
+                ActivateQuest(quest);
         }
     }
 
     private bool AreRequirementsCompleted(QuestDefinition quest)
     {
-        foreach (var required in quest.RequiredQuests)
-        {
-            if (!questStates.TryGetValue(required.QuestId, out var state))
+        foreach (var req in quest.RequiredQuests)
+            if (questStates[req.QuestId].Status != QuestStatus.Completed)
                 return false;
-
-            if (state.Status != QuestStatus.Completed)
-                return false;
-        }
 
         return true;
     }
 
-    public void ActivateQuest(string questId)
+    private void ActivateQuest(QuestDefinition quest)
     {
-        if (!questStates.ContainsKey(questId))
-            return;
-
-        var state = questStates[questId];
-
-        if (state.Status == QuestStatus.Available)
-        {
-            state.SetStatus(QuestStatus.Active);
-        }
+        questStates[quest.QuestId].SetActive();
     }
 
-    public void AddProgress(string questId, int amount)
-    {
-        var quest = questDatabase.GetQuestById(questId);
-        if (quest == null)
-            return;
-
-        var state = questStates[questId];
-        state.AddProgress(amount, quest.TargetAmount);
-
-        if (state.IsCompleted(quest.TargetAmount))
-        {
-            CompleteQuest(quest);
-        }
-    }
-
-    private void CompleteQuest(QuestDefinition quest)
+    internal void CompleteQuestInternal(QuestDefinition quest)
     {
         var state = questStates[quest.QuestId];
-        state.SetStatus(QuestStatus.Completed);
+        if (state.Status == QuestStatus.Completed)
+            return;
 
-        HandleUnlocks(quest);
-        HandleBlocks(quest);
+        state.SetCompleted();
+        HandleUnlocksAndBlocks(quest);
+        TryActivateAvailableQuests();
     }
 
-    private void HandleUnlocks(QuestDefinition quest)
+    private void HandleUnlocksAndBlocks(QuestDefinition quest)
     {
         foreach (var unlock in quest.UnlocksQuests)
-        {
-            if (questStates.TryGetValue(unlock.QuestId, out var state))
-            {
-                if (state.Status == QuestStatus.Locked)
-                    state.SetStatus(QuestStatus.Available);
-            }
-        }
-    }
+            if (questStates[unlock.QuestId].Status == QuestStatus.Locked)
+                ActivateQuest(unlock);
 
-    private void HandleBlocks(QuestDefinition quest)
-    {
         foreach (var block in quest.BlocksQuests)
+            questStates[block.QuestId].SetBlocked();
+    }
+
+    private void DispatchEvent(QuestType type, object data)
+    {
+        if (!handlers.TryGetValue(type, out var handler))
+            return;
+
+        foreach (var quest in questDatabase.Quests)
         {
-            if (questStates.TryGetValue(block.QuestId, out var state))
-            {
-                if (state.Status == QuestStatus.Active || state.Status == QuestStatus.Available)
-                {
-                    state.SetStatus(QuestStatus.Failed);
-                }
-            }
+            var state = questStates[quest.QuestId];
+            if (state.Status != QuestStatus.Active)
+                continue;
+
+            handler.Process(this, quest, data);
         }
     }
 
-    // =====================
-    // SAVE / LOAD
-    // =====================
-
-    public QuestSaveData GetSaveData()
+    public QuestStateSaveData GetSaveData()
     {
-        return new QuestSaveData(new List<QuestState>(questStates.Values));
-    }
+        var saveData = new QuestStateSaveData();
 
-    public void LoadFromSaveData(QuestSaveData saveData)
-    {
-        questStates.Clear();
-
-        foreach (var state in saveData.QuestStates)
+        foreach (var pair in questStates)
         {
-            questStates.Add(state.QuestId, state);
+            saveData.QuestId = pair.Key;
+            saveData.Status = pair.Value.Status;
+            saveData.Progress = pair.Value.CurrentProgress;
         }
 
-        InitializeAvailableQuests();
+        return saveData;
+    }
+
+    public void LoadFromSaveData(QuestStateSaveData saveData)
+    {
+        if (!questStates.TryGetValue(saveData.QuestId, out var state))
+            return;
+
+        state.Load(saveData.Progress, saveData.Status);
+    }
+
+    public void OnItemCollected(string itemId, int amount)
+    {
+        DispatchEvent(QuestType.CollectItem, new ItemEventData(itemId, amount));
+    }
+
+    public void OnItemCrafted(string itemId, int amount)
+    {
+        DispatchEvent(QuestType.CraftItem, new ItemEventData(itemId, amount));
+    }
+
+    public void OnZoneReached(string zoneId)
+    {
+        DispatchEvent(QuestType.ReachZone, zoneId);
+    }
+
+    public void OnNpcTalked(string npcId)
+    {
+        DispatchEvent(QuestType.TalkToNPC, npcId);
+    }
+
+    public QuestState GetQuestState(string questId)
+    {
+        return questStates.TryGetValue(questId, out var state) ? state : null;
     }
 }

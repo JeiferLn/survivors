@@ -27,7 +27,7 @@ public class SaveManager : MonoBehaviour
             return;
 
         var json = File.ReadAllText(SavePath);
-        var saveData = JsonUtility.FromJson<QuestSaveData>(json);
+        var saveData = JsonUtility.FromJson<QuestStateSaveData>(json);
 
         questManager.LoadFromSaveData(saveData);
     }

@@ -1,7 +1,8 @@
 public enum QuestType
 {
-    Collect,
-    TalkToNPC,
-    ReachZone,
     SurviveTime,
+    ReachZone,
+    TalkToNPC,
+    CollectItem,
+    CraftItem,
 }

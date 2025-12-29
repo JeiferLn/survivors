@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: hit
   damage: 0
-  cooldown: 0.6
+  cooldown: 2
   usesProjectile: 0
   projectilePrefab: {fileID: 0}
   projectileSpeed: 10

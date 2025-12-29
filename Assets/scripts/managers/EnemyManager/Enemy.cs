@@ -1,29 +1,38 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour, IDamageable
 {
     #region ══════════ SERIALIZED FIELDS ══════════
-    
-    [Header("Components")] 
+
+    [Header("Components")]
     private EnemyAnimator enemyAnimator;
+
     private NavMeshAgent agent;
-    
+
     [Header("Configuration")]
-    [SerializeField] private EnemyType enemyType;
-    
+    [SerializeField]
+    private EnemyType enemyType;
+
     [Header("NavMesh Settings")]
-    [SerializeField] private float brakingAcceleration = 100f; // Frenado brusco
-    [SerializeField] private float arrivalThreshold = 0.1f;    // Distancia para considerar "llegó"
-    
+    [SerializeField]
+    private float brakingAcceleration = 100f; // Frenado brusco
+
+    [SerializeField]
+    private float arrivalThreshold = 0.1f; // Distancia para considerar "llegó"
+
     [Header("State (Debug)")]
-    [SerializeField] private EnemyState _currentState = EnemyState.None;
-    [SerializeField] private EnemyState _previousState = EnemyState.None;
-    
+    [SerializeField]
+    private EnemyState _currentState = EnemyState.None;
+
+    [SerializeField]
+    private EnemyState _previousState = EnemyState.None;
+
     #endregion
 
     #region ══════════ PROPIEDADES PÚBLICAS ══════════
-    
+
     // Estado
     public EnemyState CurrentState
     {
@@ -36,41 +45,46 @@ public class Enemy : MonoBehaviour, IDamageable
             OnStateChanged(_previousState, _currentState);
         }
     }
+
     public EnemyState PreviousState => _previousState;
-    
+
     // Tipo de enemigo
     public bool IsRangeEnemy { get; private set; }
     public EnemyType Type => enemyType;
-    
+
     // Detección y Combate
     public float DetectionRange { get; private set; }
     public float AttackMeleeRange { get; private set; }
     public float AttackDistanceRange { get; private set; }
-    
+
     // Stats
     public float CurrentHealth { get; private set; }
     public bool IsDead => CurrentHealth <= 0;
-    
+
     // Componentes
     public EnemyAnimator Animator => enemyAnimator;
-    
+
+    public bool isAttacking { get; private set; }
+
     #endregion
 
     #region ══════════ CAMPOS PRIVADOS ══════════
-    
+
     private Transform mainTarget;
     private float lastAttackTime;
     private float attackCooldown;
     private float attackMeleeDamage;
     private float attackDistanceDamage;
     
+    private readonly float angleThreshold = 1f; 
+
     // Cache para optimización
     private float originalAcceleration;
-    
+
     #endregion
 
     #region ══════════ NOMBRES DE ANIMACIONES ══════════
-    
+
     public static class Animations
     {
         public const string Idle = "Z-Idle";
@@ -80,17 +94,17 @@ public class Enemy : MonoBehaviour, IDamageable
         public const string Damage = "Z-GetDamage";
         public const string Die = "Z-Dead";
     }
-    
+
     #endregion
 
     #region ══════════ UNITY LIFECYCLE ══════════
 
     private void Awake()
     {
-        if (agent == null) 
+        if (agent == null)
             agent = GetComponent<NavMeshAgent>();
-        
-        if (enemyAnimator == null) 
+
+        if (enemyAnimator == null)
             enemyAnimator = GetComponent<EnemyAnimator>();
     }
 
@@ -154,7 +168,7 @@ public class Enemy : MonoBehaviour, IDamageable
                 attackMeleeDamage = enemyType.meleeAttack.damage;
                 attackDistanceDamage = enemyType.rangeAttack.damage;
                 attackCooldown = Mathf.Min(
-                    enemyType.meleeAttack.cooldown, 
+                    enemyType.meleeAttack.cooldown,
                     enemyType.rangeAttack.cooldown
                 );
                 break;
@@ -171,20 +185,20 @@ public class Enemy : MonoBehaviour, IDamageable
     private void SetupNavMesh()
     {
         if (agent == null) return;
-        
+
         // Guardar aceleración original
         originalAcceleration = agent.acceleration;
-        
+
         // ══════════ CONFIGURACIÓN ANTI-PATINAJE ══════════
         agent.speed = enemyType.moveSpeed;
-        agent.acceleration = brakingAcceleration;      // Aceleración alta = frenado rápido
-        agent.autoBraking = true;                       // Auto-frenar al llegar
-        agent.stoppingDistance = IsRangeEnemy 
-            ? AttackDistanceRange * 0.8f 
+        agent.acceleration = brakingAcceleration; // Aceleración alta = frenado rápido
+        agent.autoBraking = true; // Auto-frenar al llegar
+        agent.stoppingDistance = IsRangeEnemy
+            ? AttackDistanceRange * 0.8f
             : AttackMeleeRange * 0.8f;
-        
+
         // Estos valores ayudan a un movimiento más preciso
-        agent.angularSpeed = 360f;                      // Rotación rápida
+        agent.angularSpeed = 360f; // Rotación rápida
     }
 
     public void ResetEnemy()
@@ -192,17 +206,17 @@ public class Enemy : MonoBehaviour, IDamageable
         _currentState = EnemyState.Idle;
         _previousState = EnemyState.None;
         lastAttackTime = 0f;
-        
+
         if (enemyType != null)
             CurrentHealth = enemyType.maxHealth;
-        
+
         if (agent != null)
         {
             agent.isStopped = false;
             agent.ResetPath();
             agent.velocity = Vector3.zero; // ← IMPORTANTE: Resetear velocidad
         }
-        
+
         if (enemyAnimator != null)
         {
             enemyAnimator.ResetAnimationTracking();
@@ -256,10 +270,10 @@ public class Enemy : MonoBehaviour, IDamageable
     private void CheckArrival()
     {
         if (mainTarget == null) return;
-        
+
         float distanceToTarget = Vector3.Distance(transform.position, mainTarget.position);
         float currentAttackRange = GetCurrentAttackRange();
-        
+
         // Si está dentro del rango de ataque, detener completamente
         if (distanceToTarget <= currentAttackRange)
         {
@@ -278,12 +292,12 @@ public class Enemy : MonoBehaviour, IDamageable
     public void ForceStop()
     {
         if (agent == null || !agent.isOnNavMesh) return;
-        
+
         // ══════════ DETENCIÓN INMEDIATA ══════════
         agent.isStopped = true;
-        agent.velocity = Vector3.zero;  // ← CLAVE: Elimina toda inercia
+        agent.velocity = Vector3.zero; // ← CLAVE: Elimina toda inercia
         agent.ResetPath();
-        
+
         // Opcional: Warpar a la posición actual para evitar micro-deslizamientos
         // agent.Warp(transform.position);
     }
@@ -292,9 +306,9 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (agent == null || target == null || IsDead) return;
         if (!agent.isOnNavMesh) return;
-        
+
         mainTarget = target;
-        
+
         // Reactivar movimiento
         agent.isStopped = false;
 
@@ -309,20 +323,23 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         ForceStop(); // ← Usar ForceStop en lugar del código anterior
     }
-
-    public void RotateTowardsTarget()
+    
+    private bool RotateTowardsTarget()
     {
-        if (mainTarget == null) return;
+        if (mainTarget == null) return false;
 
         Vector3 direction = (mainTarget.position - transform.position).normalized;
         direction.y = 0;
 
-        if (direction == Vector3.zero) return;
+        if (direction == Vector3.zero) return false;
 
         Quaternion targetRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
+
+        float angle = Quaternion.Angle(transform.rotation, targetRotation);
+        return angle <= angleThreshold;
     }
-    
+
     /// <summary>
     /// Verifica si el agente ha llegado a su destino.
     /// </summary>
@@ -330,7 +347,7 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (agent == null || !agent.isOnNavMesh) return true;
         if (agent.pathPending) return false;
-        
+
         return agent.remainingDistance <= agent.stoppingDistance + arrivalThreshold;
     }
 
@@ -340,7 +357,7 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool IsInAttackRange()
     {
         if (mainTarget == null) return false;
-        
+
         float distance = Vector3.Distance(transform.position, mainTarget.position);
         return distance <= GetCurrentAttackRange();
     }
@@ -351,26 +368,27 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public bool TryAttack()
     {
-        if (IsDead) return false;
-        
-        if (Time.time < lastAttackTime + attackCooldown) 
+        if (IsDead || isAttacking || mainTarget is null) return false;
+
+        if (Time.time < lastAttackTime + attackCooldown)
             return false;
 
         // ══════════ ASEGURAR DETENCIÓN ANTES DE ATACAR ══════════
         ForceStop();
-        RotateTowardsTarget();
+        bool lookPlayer = RotateTowardsTarget();
+        if (!lookPlayer) return false;
 
         if (!IsRangeEnemy)
         {
-            ExecuteMeleeAttack();
+            isAttacking = true;
+            StartCoroutine(ExecuteMeleeAttack(attackCooldown));
             lastAttackTime = Time.time;
             return true;
         }
 
-        if (mainTarget == null) return false;
 
         float distanceToTarget = Vector3.Distance(transform.position, mainTarget.position);
-        
+
         if (distanceToTarget > AttackDistanceRange)
         {
             return false;
@@ -386,8 +404,10 @@ public class Enemy : MonoBehaviour, IDamageable
         return true;
     }
 
-    private void ExecuteMeleeAttack()
+    private IEnumerator ExecuteMeleeAttack(float delay)
     {
+        yield return new WaitForSeconds(delay);
+        isAttacking = false;
         Debug.Log($"[Enemy] {name}: Melee Attack! Damage: {attackMeleeDamage}");
     }
 
@@ -423,7 +443,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (IsDead) return;
 
         CurrentHealth -= amount;
-        
+
         Debug.Log($"[Enemy] {name}: Took {amount} damage. Health: {CurrentHealth}");
 
         if (CurrentHealth <= 0)
@@ -444,7 +464,7 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         CurrentState = EnemyState.Dead;
         ForceStop(); // ← Usar ForceStop
-        
+
         Debug.Log($"[Enemy] {name}: Died!");
     }
 
@@ -461,7 +481,7 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         return IsRangeEnemy ? AttackDistanceRange : AttackMeleeRange;
     }
-    
+
     public void SetInZoneState()
     {
         if (_currentState == EnemyState.Moving) return;
@@ -516,7 +536,7 @@ public class Enemy : MonoBehaviour, IDamageable
                 Gizmos.DrawLine(transform.position + Vector3.up, mainTarget.position + Vector3.up);
             }
         }
-        
+
         // Mostrar stopping distance
         Gizmos.color = Color.green;
         if (agent != null)

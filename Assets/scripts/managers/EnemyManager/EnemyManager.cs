@@ -8,36 +8,41 @@ using UnityEngine;
 public class EnemyManager : MonoBehaviour
 {
     #region ══════════ SERIALIZED FIELDS ══════════
-    
-    [Header("Pool & Containers")] 
-    [SerializeField] private Transform poolEnemyContainer;
 
-    [Header("Activation Zone")] 
-    [SerializeField] private EnemyActivationZone activationZone;
+    [Header("Pool & Containers")]
+    [SerializeField]
+    private Transform poolEnemyContainer;
 
-    [Header("Target")] 
-    [SerializeField] private Transform mainTarget;
+    [Header("Activation Zone")]
+    [SerializeField]
+    private EnemyActivationZone activationZone;
+
+    [Header("Target")]
+    [SerializeField]
+    private Transform mainTarget;
 
     [Header("Settings")]
-    [SerializeField] private float exitAttackRangeOffset = 0.5f;
-    
+    [SerializeField]
+    private float exitAttackRangeOffset = 0.5f;
+
     [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = false;
-    
+    [SerializeField]
+    private bool showDebugLogs = false;
+
     #endregion
 
     #region ══════════ CAMPOS PRIVADOS ══════════
-    
+
     private readonly List<Enemy> activeEnemies = new();
     private readonly List<Enemy> enemiesToRemove = new();
-    
+
     #endregion
 
     #region ══════════ PROPIEDADES ══════════
-    
+
     public int ActiveEnemyCount => activeEnemies.Count;
     public IReadOnlyList<Enemy> ActiveEnemies => activeEnemies;
-    
+
     #endregion
 
     #region ══════════ UNITY LIFECYCLE ══════════
@@ -77,13 +82,13 @@ public class EnemyManager : MonoBehaviour
     public void RefreshActiveEnemies()
     {
         activeEnemies.Clear();
-        
+
         if (poolEnemyContainer == null) return;
 
         foreach (Transform child in poolEnemyContainer)
         {
-            if (child.gameObject.activeInHierarchy && 
-                child.TryGetComponent(out Enemy enemy) && 
+            if (child.gameObject.activeInHierarchy &&
+                child.TryGetComponent(out Enemy enemy) &&
                 !enemy.IsDead)
             {
                 activeEnemies.Add(enemy);
@@ -103,7 +108,7 @@ public class EnemyManager : MonoBehaviour
             if (!IsEnemyValid(enemy)) continue;
 
             float distanceToTarget = Vector3.Distance(
-                enemy.transform.position, 
+                enemy.transform.position,
                 mainTarget.position
             );
 
@@ -119,7 +124,7 @@ public class EnemyManager : MonoBehaviour
         if (enemy == null) return false;
         if (!enemy.gameObject.activeInHierarchy) return false;
         if (enemy.IsDead) return false;
-        
+
         return true;
     }
 
@@ -129,7 +134,7 @@ public class EnemyManager : MonoBehaviour
     private void CleanupDeadEnemies()
     {
         enemiesToRemove.Clear();
-        
+
         foreach (Enemy enemy in activeEnemies)
         {
             if (!IsEnemyValid(enemy))
@@ -201,16 +206,16 @@ public class EnemyManager : MonoBehaviour
         {
             // En rango de ataque
             enemy.StopMoving();
-            enemy.CurrentState = enemy.IsRangeEnemy 
-                ? EnemyState.AttackingDistance 
+            enemy.CurrentState = enemy.IsRangeEnemy
+                ? EnemyState.AttackingDistance
                 : EnemyState.AttackingMelee;
-                
+
             LogDebug($"{enemy.name}: En rango, atacando...");
         }
         else if (distance <= enemy.DetectionRange)
         {
             // Perseguir al jugador
-            
+
             enemy.MoveTo(mainTarget);
         }
         else
@@ -224,6 +229,8 @@ public class EnemyManager : MonoBehaviour
 
     private void ProcessAttackingState(Enemy enemy, float distance)
     {
+        if (enemy.isAttacking) return;
+
         float attackRange = enemy.GetCurrentAttackRange();
         float exitRange = attackRange + exitAttackRangeOffset;
 
@@ -236,7 +243,10 @@ public class EnemyManager : MonoBehaviour
         else
         {
             // Ejecutar ataque
-            enemy.TryAttack();
+            if (!enemy.isAttacking)
+            {
+                enemy.TryAttack();
+            }
         }
     }
 
@@ -247,11 +257,11 @@ public class EnemyManager : MonoBehaviour
         {
             // Volver a estado de combate o idle
             float distance = Vector3.Distance(enemy.transform.position, mainTarget.position);
-            
+
             if (distance <= enemy.GetCurrentAttackRange())
             {
-                enemy.CurrentState = enemy.IsRangeEnemy 
-                    ? EnemyState.AttackingDistance 
+                enemy.CurrentState = enemy.IsRangeEnemy
+                    ? EnemyState.AttackingDistance
                     : EnemyState.AttackingMelee;
             }
             else if (distance <= enemy.DetectionRange)

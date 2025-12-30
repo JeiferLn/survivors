@@ -85,7 +85,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     #region ══════════ NOMBRES DE ANIMACIONES ══════════
 
-    public static class Animations
+    private static class Animations
     {
         public const string Idle = "Z-Idle";
         public const string Walk = "Z-Walk";

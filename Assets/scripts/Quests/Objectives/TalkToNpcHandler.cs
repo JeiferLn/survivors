@@ -14,7 +14,7 @@ public class TalkToNPCHandler : IQuestObjectiveHandler
         if (data is not ScriptableObject npc)
             return;
 
-        if (npc.name != objective.TargetId)
+        if (npc.name != objective.NpcId)
             return;
 
         var state = manager.GetQuestState(quest.QuestId);

@@ -22,8 +22,8 @@ public class QuestState
         return objective.Type switch
         {
             QuestType.Countdown => ObjectivesProgress[index].Progress >= objective.RequiredTime,
-            QuestType.CollectItem => ObjectivesProgress[index].Progress >= objective.RequiredAmount,
-            QuestType.CraftItem => ObjectivesProgress[index].Progress >= objective.RequiredAmount,
+            QuestType.CollectItem => ObjectivesProgress[index].Progress >= objective.CollectAmount,
+            QuestType.CraftItem => ObjectivesProgress[index].Progress >= objective.CraftAmount,
             _ => ObjectivesProgress[index].Completed,
         };
     }

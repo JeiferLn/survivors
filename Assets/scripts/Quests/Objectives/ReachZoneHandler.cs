@@ -14,7 +14,7 @@ public class ReachZoneHandler : IQuestObjectiveHandler
         if (data is not ScriptableObject zone)
             return;
 
-        if (zone.name != objective.TargetId)
+        if (zone.name != objective.ZoneId)
             return;
 
         var state = manager.GetQuestState(quest.QuestId);

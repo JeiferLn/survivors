@@ -14,7 +14,7 @@ public class CraftItemHandler : IQuestObjectiveHandler
         if (data is not ItemEventData itemData)
             return;
 
-        if (itemData.ItemId != objective.TargetId)
+        if (itemData.ItemId != objective.CraftRecipeId)
             return;
 
         var state = manager.GetQuestState(quest.QuestId);

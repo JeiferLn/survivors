@@ -14,7 +14,7 @@ public class CollectItemHandler : IQuestObjectiveHandler
         if (data is not ItemEventData itemData)
             return;
 
-        if (itemData.ItemId != objective.TargetId)
+        if (itemData.ItemId != objective.CollectItemId)
             return;
 
         var state = manager.GetQuestState(quest.QuestId);

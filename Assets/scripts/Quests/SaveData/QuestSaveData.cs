@@ -1,9 +1,15 @@
 using System;
+using System.Collections.Generic;
 
 [Serializable]
-public class QuestStateSaveData
+public class QuestSaveData
+{
+    public List<QuestStateEntry> States = new();
+}
+
+[Serializable]
+public class QuestStateEntry
 {
     public string QuestId;
-    public QuestStatus Status;
-    public float Progress;
+    public QuestState State;
 }

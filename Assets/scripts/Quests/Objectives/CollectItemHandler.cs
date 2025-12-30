@@ -1,25 +1,31 @@
+using UnityEngine;
+
 public class CollectItemHandler : IQuestObjectiveHandler
 {
     public QuestType ObjectiveType => QuestType.CollectItem;
 
-    public void Process(QuestManager questManager, QuestData quest, object data)
+    public void Process(
+        QuestManager manager,
+        QuestDefinition quest,
+        QuestObjective objective,
+        object data
+    )
     {
         if (data is not ItemEventData itemData)
             return;
 
-        foreach (var obj in quest.Objectives)
+        if (itemData.ItemId != objective.TargetId)
+            return;
+
+        var state = manager.GetQuestState(quest.QuestId);
+        int index = quest.Objectives.IndexOf(objective);
+
+        state.AddTimeProgress(index, itemData.Amount);
+
+        if (state.IsObjectiveCompleted(index, objective))
         {
-            if (obj.Type != QuestType.CollectItem)
-                continue;
-
-            if (obj.ItemId != itemData.ItemId)
-                continue;
-
-            var state = questManager.GetQuestState(quest.QuestId);
-            state.AddProgress(itemData.Amount, obj.RequiredAmount);
-
-            if (state.IsCompleted(obj.RequiredAmount))
-                questManager.CompleteQuestInternal(quest);
+            state.MarkCompleted(index);
+            manager.MarkObjectiveCompleted(quest, objective);
         }
     }
 }

@@ -1,7 +1,7 @@
 using System.IO;
 using UnityEngine;
 
-public class SaveManager : MonoBehaviour
+public class SaveQuestsManager : MonoBehaviour
 {
     [SerializeField]
     private QuestManager questManager;
@@ -15,10 +15,11 @@ public class SaveManager : MonoBehaviour
 
     public void Save()
     {
-        var saveData = questManager.GetSaveData();
-        var json = JsonUtility.ToJson(saveData, true);
-
+        var data = questManager.GetSaveData();
+        var json = JsonUtility.ToJson(data, true);
         File.WriteAllText(SavePath, json);
+
+        Debug.Log("Quests guardadas");
     }
 
     public void Load()
@@ -27,9 +28,10 @@ public class SaveManager : MonoBehaviour
             return;
 
         var json = File.ReadAllText(SavePath);
-        var saveData = JsonUtility.FromJson<QuestStateSaveData>(json);
+        var data = JsonUtility.FromJson<QuestSaveData>(json);
 
-        questManager.LoadFromSaveData(saveData);
+        questManager.LoadFromSaveData(data);
+        Debug.Log("Quests cargadas");
     }
 
     private void OnApplicationQuit()

@@ -1,8 +1,6 @@
-using UnityEngine;
-
-public class CraftItemHandler : IQuestObjectiveHandler
+public class CountdownHandler : IQuestObjectiveHandler
 {
-    public QuestType ObjectiveType => QuestType.CraftItem;
+    public QuestType ObjectiveType => QuestType.Countdown;
 
     public void Process(
         QuestManager manager,
@@ -11,16 +9,13 @@ public class CraftItemHandler : IQuestObjectiveHandler
         object data
     )
     {
-        if (data is not ItemEventData itemData)
-            return;
-
-        if (itemData.ItemId != objective.TargetId)
+        if (data is not float deltaTime)
             return;
 
         var state = manager.GetQuestState(quest.QuestId);
         int index = quest.Objectives.IndexOf(objective);
 
-        state.AddTimeProgress(index, itemData.Amount);
+        state.AddTimeProgress(index, deltaTime);
 
         if (state.IsObjectiveCompleted(index, objective))
         {

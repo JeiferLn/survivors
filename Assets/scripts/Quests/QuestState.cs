@@ -1,42 +1,51 @@
+using System;
+using System.Collections.Generic;
+
+[Serializable]
 public class QuestState
 {
-    public QuestStatus Status { get; private set; } = QuestStatus.Locked;
-    public float CurrentProgress { get; private set; }
+    public QuestStatus Status;
 
-    public void SetActive()
+    // Progreso por objetivo (tiempo, cantidad, etc)
+    public List<ObjectiveProgress> ObjectivesProgress = new();
+
+    public void AddTimeProgress(int index, float delta)
     {
-        Status = QuestStatus.Active;
+        EnsureIndex(index);
+        ObjectivesProgress[index].Progress += delta;
     }
 
-    public void SetCompleted()
+    public bool IsObjectiveCompleted(int index, QuestObjective objective)
     {
-        Status = QuestStatus.Completed;
+        EnsureIndex(index);
+
+        return objective.Type switch
+        {
+            QuestType.Countdown => ObjectivesProgress[index].Progress >= objective.RequiredTime,
+            QuestType.CollectItem => ObjectivesProgress[index].Progress >= objective.RequiredAmount,
+            QuestType.CraftItem => ObjectivesProgress[index].Progress >= objective.RequiredAmount,
+            _ => ObjectivesProgress[index].Completed,
+        };
     }
 
-    public void SetBlocked()
+    public void MarkCompleted(int index)
     {
-        Status = QuestStatus.Locked;
+        EnsureIndex(index);
+        ObjectivesProgress[index].Completed = true;
     }
 
-    public void AddProgress(float amount, float required)
+    private void EnsureIndex(int index)
     {
-        CurrentProgress += amount;
-        CurrentProgress = UnityEngine.Mathf.Clamp(CurrentProgress, 0, required);
+        while (ObjectivesProgress.Count <= index)
+        {
+            ObjectivesProgress.Add(new ObjectiveProgress());
+        }
     }
+}
 
-    public void AddTime(float deltaTime, float required)
-    {
-        AddProgress(deltaTime, required);
-    }
-
-    public bool IsCompleted(float required)
-    {
-        return CurrentProgress >= required;
-    }
-
-    public void Load(float progress, QuestStatus status)
-    {
-        CurrentProgress = progress;
-        Status = status;
-    }
+[Serializable]
+public class ObjectiveProgress
+{
+    public float Progress;
+    public bool Completed;
 }

@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class ReachZoneHandler : IQuestObjectiveHandler
+public class TalkToNPCHandler : IQuestObjectiveHandler
 {
-    public QuestType ObjectiveType => QuestType.ReachZone;
+    public QuestType ObjectiveType => QuestType.TalkToNPC;
 
     public void Process(
         QuestManager manager,
@@ -11,10 +11,10 @@ public class ReachZoneHandler : IQuestObjectiveHandler
         object data
     )
     {
-        if (data is not ScriptableObject zone)
+        if (data is not ScriptableObject npc)
             return;
 
-        if (zone.name != objective.TargetId)
+        if (npc.name != objective.TargetId)
             return;
 
         var state = manager.GetQuestState(quest.QuestId);

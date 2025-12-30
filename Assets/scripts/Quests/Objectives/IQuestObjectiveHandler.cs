@@ -1,5 +1,11 @@
 public interface IQuestObjectiveHandler
 {
     QuestType ObjectiveType { get; }
-    void Process(QuestManager questManager, QuestData quest, object data);
+
+    void Process(
+        QuestManager manager,
+        QuestDefinition quest,
+        QuestObjective objective,
+        object data
+    );
 }

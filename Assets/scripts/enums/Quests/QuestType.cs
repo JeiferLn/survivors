@@ -1,6 +1,6 @@
 public enum QuestType
 {
-    SurviveTime,
+    Countdown,
     ReachZone,
     TalkToNPC,
     CollectItem,

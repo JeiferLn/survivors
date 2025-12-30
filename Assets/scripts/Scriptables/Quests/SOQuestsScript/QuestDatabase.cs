@@ -5,15 +5,15 @@ using UnityEngine;
 public class QuestDatabase : ScriptableObject
 {
     [SerializeField]
-    private List<QuestData> quests;
+    private List<QuestDefinition> quests;
 
-    private Dictionary<string, QuestData> questLookup;
+    private Dictionary<string, QuestDefinition> questLookup;
 
-    public IReadOnlyList<QuestData> Quests => quests;
+    public IReadOnlyList<QuestDefinition> Quests => quests;
 
     public void Initialize()
     {
-        questLookup = new Dictionary<string, QuestData>();
+        questLookup = new Dictionary<string, QuestDefinition>();
 
         foreach (var quest in quests)
         {
@@ -24,7 +24,7 @@ public class QuestDatabase : ScriptableObject
         }
     }
 
-    public QuestData GetQuestById(string questId)
+    public QuestDefinition GetQuestById(string questId)
     {
         if (questLookup == null)
             Initialize();

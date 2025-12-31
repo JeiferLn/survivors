@@ -126,14 +126,8 @@ public class QuestManager : MonoBehaviour
                 return false;
         }
 
-        foreach (var blocked in quest.BlocksQuests)
-        {
-            if (questStates.TryGetValue(blocked.QuestId, out var state))
-            {
-                if (state.Status == QuestStatus.Active)
-                    return false;
-            }
-        }
+        if (IsQuestBlocked(quest))
+            return false;
 
         return true;
     }
@@ -143,18 +137,22 @@ public class QuestManager : MonoBehaviour
         var state = questStates[quest.QuestId];
         state.Status = QuestStatus.Active;
         UpdateActiveQuestCache(quest, true);
-        Debug.Log($"Misión inicializada: {quest.QuestName} - {quest.QuestId}");
+        Debug.Log($"Misión activada: {quest.QuestName}");
     }
 
     internal void MarkObjectiveCompleted(QuestDefinition quest, QuestObjective objective)
     {
-        Debug.Log($"Objetivo completado: {objective.Type}");
         CheckQuestCompletion(quest);
     }
 
     private void CheckQuestCompletion(QuestDefinition quest)
     {
         var state = questStates[quest.QuestId];
+
+        if (IsQuestBlocked(quest))
+        {
+            return;
+        }
 
         for (int i = 0; i < quest.Objectives.Count; i++)
         {
@@ -165,9 +163,10 @@ public class QuestManager : MonoBehaviour
 
         state.Status = QuestStatus.Completed;
         UpdateActiveQuestCache(quest, false);
-        Debug.Log($"MISIÓN COMPLETADA: {quest.QuestId}");
+        Debug.Log($"Misión completada: {quest.QuestName}");
 
         HandleQuestUnlocks(quest);
+        HandleQuestBlocks(quest);
     }
 
     private void HandleQuestUnlocks(QuestDefinition quest)
@@ -179,6 +178,50 @@ public class QuestManager : MonoBehaviour
                 ActivateQuest(unlock);
             }
         }
+    }
+
+    private void HandleQuestBlocks(QuestDefinition quest)
+    {
+        foreach (var blocked in quest.BlocksQuests)
+        {
+            if (questStates.TryGetValue(blocked.QuestId, out var state))
+            {
+                if (state.Status == QuestStatus.Active || state.Status == QuestStatus.Locked)
+                {
+                    state.Status = QuestStatus.Failed;
+                    UpdateActiveQuestCache(blocked, false);
+                    Debug.Log($"Misión bloqueada: {blocked.QuestName}");
+                }
+            }
+        }
+    }
+
+    private bool IsQuestBlocked(QuestDefinition quest)
+    {
+        foreach (var otherQuest in questDatabase.Quests)
+        {
+            if (string.IsNullOrEmpty(otherQuest.QuestId))
+                continue;
+
+            if (otherQuest.QuestId == quest.QuestId)
+                continue;
+
+            if (!questStates.TryGetValue(otherQuest.QuestId, out var otherState))
+                continue;
+
+            if (otherState.Status != QuestStatus.Completed)
+                continue;
+
+            foreach (var blocked in otherQuest.BlocksQuests)
+            {
+                if (blocked.QuestId == quest.QuestId)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public void DispatchEvent(QuestType type, object data)
@@ -247,12 +290,6 @@ public class QuestManager : MonoBehaviour
         return newState;
     }
 
-    /// <summary>
-    /// Resetea el progreso de todos los objetivos de tipo Countdown que corresponden a la zona especificada.
-    /// IMPORTANTE: Solo afecta a misiones de tipo Countdown. Otros tipos de misiones (ReachZone, CollectItem, etc.)
-    /// mantendrán su progreso aunque el jugador salga de la zona.
-    /// Solo resetea si el objetivo no está completado.
-    /// </summary>
     public void ResetCountdownProgressForZone(ZoneId zone)
     {
         if (zone == null)

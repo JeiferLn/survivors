@@ -247,19 +247,41 @@ public class QuestManager : MonoBehaviour
         return newState;
     }
 
-    [ContextMenu("Reset All Quests")]
-    public void ResetAllQuests()
+    /// <summary>
+    /// Resetea el progreso de todos los objetivos de tipo Countdown que corresponden a la zona especificada.
+    /// IMPORTANTE: Solo afecta a misiones de tipo Countdown. Otros tipos de misiones (ReachZone, CollectItem, etc.)
+    /// mantendrán su progreso aunque el jugador salga de la zona.
+    /// Solo resetea si el objetivo no está completado.
+    /// </summary>
+    public void ResetCountdownProgressForZone(ZoneId zone)
     {
-        questStates.Clear();
-        activeQuestsCache.Clear();
-        questsInitialized = false;
+        if (zone == null)
+            return;
 
-        Debug.Log("[QuestManager] Todas las misiones han sido reseteadas.");
+        if (questDatabase == null)
+            return;
 
-        if (questDatabase != null)
+        foreach (var quest in questDatabase.Quests)
         {
-            InitializeQuests();
-            questsInitialized = true;
+            if (string.IsNullOrEmpty(quest.QuestId))
+                continue;
+
+            var state = GetQuestState(quest.QuestId);
+            if (state.Status != QuestStatus.Active)
+                continue;
+
+            for (int i = 0; i < quest.Objectives.Count; i++)
+            {
+                var objective = quest.Objectives[i];
+                // SOLO resetea objetivos de tipo Countdown, otros tipos mantienen su progreso
+                if (objective.Type == QuestType.Countdown && objective.Zone == zone)
+                {
+                    if (!state.IsObjectiveCompleted(i, objective))
+                    {
+                        state.ResetProgress(i);
+                    }
+                }
+            }
         }
     }
 

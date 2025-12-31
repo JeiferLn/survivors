@@ -26,7 +26,8 @@ public class QuestState
         {
             QuestType.Countdown => ObjectivesProgress[index].Progress >= objective.RequiredTime,
             QuestType.CollectItem => ObjectivesProgress[index].Progress >= objective.RequiredAmount,
-            QuestType.CraftItem => ObjectivesProgress[index].Progress >= objective.CraftRequiredAmount,
+            QuestType.CraftItem => ObjectivesProgress[index].Progress
+                >= objective.CraftRequiredAmount,
             _ => ObjectivesProgress[index].Completed,
         };
     }
@@ -35,6 +36,16 @@ public class QuestState
     {
         EnsureIndex(index);
         ObjectivesProgress[index].Completed = true;
+    }
+
+    public void ResetProgress(int index)
+    {
+        EnsureIndex(index);
+        // Solo resetear si el objetivo no está completado
+        if (!ObjectivesProgress[index].Completed)
+        {
+            ObjectivesProgress[index].Progress = 0f;
+        }
     }
 
     private void EnsureIndex(int index)

@@ -59,23 +59,4 @@ public class SaveQuestsManager : MonoBehaviour
     {
         Save();
     }
-
-    [ContextMenu("Reset Quests (Delete Save File)")]
-    public void ResetQuests()
-    {
-        if (File.Exists(SavePath))
-        {
-            File.Delete(SavePath);
-            Debug.Log($"[SaveQuestsManager] Archivo de guardado eliminado: {SavePath}");
-
-            if (questManager != null)
-            {
-                questManager.ResetAllQuests();
-            }
-        }
-        else
-        {
-            Debug.Log("[SaveQuestsManager] No hay archivo de guardado para eliminar.");
-        }
-    }
 }

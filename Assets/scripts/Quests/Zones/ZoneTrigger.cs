@@ -37,7 +37,15 @@ public class ZoneTrigger : MonoBehaviour
     {
         if (!other.CompareTag("Player"))
             return;
+
         playerInside = false;
+
+        // Resetear SOLO el progreso de misiones tipo Countdown cuando el jugador sale de la zona.
+        // Otros tipos de misiones (ReachZone, CollectItem, etc.) mantienen su progreso.
+        if (zoneId != null && QuestManager.Instance != null)
+        {
+            QuestManager.Instance.ResetCountdownProgressForZone(zoneId);
+        }
     }
 
     private IEnumerator Tick()

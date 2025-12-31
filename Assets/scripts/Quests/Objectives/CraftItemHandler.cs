@@ -8,23 +8,22 @@ public class CraftItemHandler : IQuestObjectiveHandler
         QuestManager manager,
         QuestDefinition quest,
         QuestObjective objective,
+        int objectiveIndex,
         object data
     )
     {
         if (data is not ItemEventData itemData)
             return;
 
-        if (itemData.ItemId != objective.CraftRecipeId)
+        if (itemData.ItemId != objective.ItemToCraft.name)
             return;
 
         var state = manager.GetQuestState(quest.QuestId);
-        int index = quest.Objectives.IndexOf(objective);
+        state.AddProgress(objectiveIndex, itemData.Amount);
 
-        state.AddTimeProgress(index, itemData.Amount);
-
-        if (state.IsObjectiveCompleted(index, objective))
+        if (state.IsObjectiveCompleted(objectiveIndex, objective))
         {
-            state.MarkCompleted(index);
+            state.MarkCompleted(objectiveIndex);
             manager.MarkObjectiveCompleted(quest, objective);
         }
     }

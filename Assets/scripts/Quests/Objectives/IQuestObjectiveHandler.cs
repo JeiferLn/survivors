@@ -6,6 +6,7 @@ public interface IQuestObjectiveHandler
         QuestManager manager,
         QuestDefinition quest,
         QuestObjective objective,
+        int objectiveIndex,
         object data
     );
 }

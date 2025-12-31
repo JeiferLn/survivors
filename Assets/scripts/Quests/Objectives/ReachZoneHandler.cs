@@ -8,19 +8,18 @@ public class ReachZoneHandler : IQuestObjectiveHandler
         QuestManager manager,
         QuestDefinition quest,
         QuestObjective objective,
+        int objectiveIndex,
         object data
     )
     {
         if (data is not ScriptableObject zone)
             return;
 
-        if (zone.name != objective.ZoneId)
+        if (zone.name != objective.ReachZone.name)
             return;
 
         var state = manager.GetQuestState(quest.QuestId);
-        int index = quest.Objectives.IndexOf(objective);
-
-        state.MarkCompleted(index);
+        state.MarkCompleted(objectiveIndex);
         manager.MarkObjectiveCompleted(quest, objective);
     }
 }

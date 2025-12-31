@@ -5,75 +5,42 @@ using UnityEngine;
 [Serializable]
 public class QuestObjective
 {
-    [HideLabel]
     public QuestType Type;
 
-    // =========================
-    // COUNTDOWN (SURVIVE ZONE)
-    // =========================
+    [ShowIf(nameof(IsCountdown))]
+    [BoxGroup("Countdown")]
+    public ZoneId Zone;
 
     [ShowIf(nameof(IsCountdown))]
     [BoxGroup("Countdown")]
-    [LabelText("Zone ID")]
-    public string ZoneId;
-
-    [ShowIf(nameof(IsCountdown))]
-    [BoxGroup("Countdown")]
-    [LabelText("Required Time (seconds)")]
     [MinValue(1)]
     public float RequiredTime;
 
-    // =========================
-    // REACH ZONE
-    // =========================
-
     [ShowIf(nameof(IsReachZone))]
     [BoxGroup("Reach Zone")]
-    [LabelText("Zone ID")]
-    public string ReachZoneId;
-
-    // =========================
-    // TALK TO NPC
-    // =========================
+    public ZoneId ReachZone;
 
     [ShowIf(nameof(IsTalkToNpc))]
     [BoxGroup("Talk To NPC")]
-    [LabelText("NPC ID")]
-    public string NpcId;
-
-    // =========================
-    // COLLECT ITEM
-    // =========================
+    public NpcId Npc;
 
     [ShowIf(nameof(IsCollectItem))]
     [BoxGroup("Collect Item")]
-    [LabelText("Item ID")]
-    public string CollectItemId;
+    public ItemId Item;
 
     [ShowIf(nameof(IsCollectItem))]
     [BoxGroup("Collect Item")]
-    [LabelText("Required Amount")]
     [MinValue(1)]
-    public int CollectAmount;
-
-    // =========================
-    // CRAFT ITEM
-    // =========================
+    public int RequiredAmount;
 
     [ShowIf(nameof(IsCraftItem))]
     [BoxGroup("Craft Item")]
-    [LabelText("Recipe ID")]
-    public string CraftRecipeId;
+    public ItemId ItemToCraft;
 
     [ShowIf(nameof(IsCraftItem))]
     [BoxGroup("Craft Item")]
-    [LabelText("Required Amount")]
     [MinValue(1)]
-    public int CraftAmount;
-
-    // =========================
-    // ODIN HELPERS
-    // =========================
+    public int CraftRequiredAmount;
 
     private bool IsCountdown() => Type == QuestType.Countdown;
 

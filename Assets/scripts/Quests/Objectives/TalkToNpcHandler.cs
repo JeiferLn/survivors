@@ -8,19 +8,18 @@ public class TalkToNPCHandler : IQuestObjectiveHandler
         QuestManager manager,
         QuestDefinition quest,
         QuestObjective objective,
+        int objectiveIndex,
         object data
     )
     {
         if (data is not ScriptableObject npc)
             return;
 
-        if (npc.name != objective.NpcId)
+        if (npc.name != objective.Npc.name)
             return;
 
         var state = manager.GetQuestState(quest.QuestId);
-        int index = quest.Objectives.IndexOf(objective);
-
-        state.MarkCompleted(index);
+        state.MarkCompleted(objectiveIndex);
         manager.MarkObjectiveCompleted(quest, objective);
     }
 }

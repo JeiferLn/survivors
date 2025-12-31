@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class ZoneTrigger : MonoBehaviour
 {
+    [SerializeField]
+    private ZoneId zoneId;
+
     private bool playerInside;
 
     private void OnTriggerEnter(Collider other)

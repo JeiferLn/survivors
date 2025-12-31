@@ -5,14 +5,17 @@ using System.Collections.Generic;
 public class QuestState
 {
     public QuestStatus Status;
-
-    // Progreso por objetivo (tiempo, cantidad, etc)
     public List<ObjectiveProgress> ObjectivesProgress = new();
 
-    public void AddTimeProgress(int index, float delta)
+    public void AddProgress(int index, float delta)
     {
         EnsureIndex(index);
         ObjectivesProgress[index].Progress += delta;
+    }
+
+    public void AddTimeProgress(int index, float delta)
+    {
+        AddProgress(index, delta);
     }
 
     public bool IsObjectiveCompleted(int index, QuestObjective objective)
@@ -22,8 +25,8 @@ public class QuestState
         return objective.Type switch
         {
             QuestType.Countdown => ObjectivesProgress[index].Progress >= objective.RequiredTime,
-            QuestType.CollectItem => ObjectivesProgress[index].Progress >= objective.CollectAmount,
-            QuestType.CraftItem => ObjectivesProgress[index].Progress >= objective.CraftAmount,
+            QuestType.CollectItem => ObjectivesProgress[index].Progress >= objective.RequiredAmount,
+            QuestType.CraftItem => ObjectivesProgress[index].Progress >= objective.CraftRequiredAmount,
             _ => ObjectivesProgress[index].Completed,
         };
     }

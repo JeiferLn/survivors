@@ -6,6 +6,7 @@ public class CountdownHandler : IQuestObjectiveHandler
         QuestManager manager,
         QuestDefinition quest,
         QuestObjective objective,
+        int objectiveIndex,
         object data
     )
     {
@@ -13,13 +14,11 @@ public class CountdownHandler : IQuestObjectiveHandler
             return;
 
         var state = manager.GetQuestState(quest.QuestId);
-        int index = quest.Objectives.IndexOf(objective);
+        state.AddTimeProgress(objectiveIndex, deltaTime);
 
-        state.AddTimeProgress(index, deltaTime);
-
-        if (state.IsObjectiveCompleted(index, objective))
+        if (state.IsObjectiveCompleted(objectiveIndex, objective))
         {
-            state.MarkCompleted(index);
+            state.MarkCompleted(objectiveIndex);
             manager.MarkObjectiveCompleted(quest, objective);
         }
     }

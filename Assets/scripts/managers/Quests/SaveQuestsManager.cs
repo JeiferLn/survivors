@@ -10,7 +10,27 @@ public class SaveQuestsManager : MonoBehaviour
 
     private void Awake()
     {
-        Load();
+        if (questManager == null)
+        {
+            questManager = QuestManager.Instance;
+        }
+    }
+
+    private void Start()
+    {
+        if (questManager == null)
+        {
+            questManager = QuestManager.Instance;
+        }
+        
+        if (questManager != null)
+        {
+            Load();
+        }
+        else
+        {
+            Debug.LogError("[SaveQuestsManager] QuestManager no encontrado. Asegúrate de que QuestManager se inicialice antes.");
+        }
     }
 
     public void Save()
@@ -31,11 +51,29 @@ public class SaveQuestsManager : MonoBehaviour
         var data = JsonUtility.FromJson<QuestSaveData>(json);
 
         questManager.LoadFromSaveData(data);
-        Debug.Log("Quests cargadas");
     }
 
     private void OnApplicationQuit()
     {
         Save();
+    }
+
+    [ContextMenu("Reset Quests (Delete Save File)")]
+    public void ResetQuests()
+    {
+        if (File.Exists(SavePath))
+        {
+            File.Delete(SavePath);
+            Debug.Log($"[SaveQuestsManager] Archivo de guardado eliminado: {SavePath}");
+            
+            if (questManager != null)
+            {
+                questManager.ResetAllQuests();
+            }
+        }
+        else
+        {
+            Debug.Log("[SaveQuestsManager] No hay archivo de guardado para eliminar.");
+        }
     }
 }

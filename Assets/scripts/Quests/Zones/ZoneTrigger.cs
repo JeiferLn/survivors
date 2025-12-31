@@ -12,6 +12,23 @@ public class ZoneTrigger : MonoBehaviour
     {
         if (!other.CompareTag("Player"))
             return;
+
+        if (zoneId == null)
+        {
+            Debug.LogError(
+                $"[ZoneTrigger] ZoneId no está asignado en el GameObject '{gameObject.name}'. Por favor, asigna un ZoneId en el Inspector."
+            );
+            return;
+        }
+
+        if (QuestManager.Instance == null)
+        {
+            Debug.LogError(
+                "[ZoneTrigger] QuestManager.Instance es null. Asegúrate de que QuestManager esté inicializado."
+            );
+            return;
+        }
+
         playerInside = true;
         StartCoroutine(Tick());
     }
@@ -27,8 +44,13 @@ public class ZoneTrigger : MonoBehaviour
     {
         while (playerInside)
         {
-            QuestManager.Instance.DispatchEvent(QuestType.Countdown, Time.deltaTime);
+            if (zoneId == null || QuestManager.Instance == null)
+            {
+                yield break;
+            }
 
+            var eventData = new CountdownEventData(zoneId, Time.deltaTime);
+            QuestManager.Instance.DispatchEvent(QuestType.Countdown, eventData);
             yield return null;
         }
     }

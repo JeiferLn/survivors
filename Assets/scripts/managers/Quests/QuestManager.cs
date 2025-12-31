@@ -29,7 +29,15 @@ public class QuestManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         RegisterHandlers();
-        InitializeQuests();
+    }
+
+    private void Start()
+    {
+        if (!questsInitialized)
+        {
+            InitializeQuests();
+            questsInitialized = true;
+        }
     }
 
     private void RegisterHandlers()
@@ -58,6 +66,13 @@ public class QuestManager : MonoBehaviour
 
         foreach (var quest in questDatabase.Quests)
         {
+            var state = questStates[quest.QuestId];
+
+            if (state.Status == QuestStatus.Completed)
+            {
+                continue;
+            }
+
             if (CanActivateQuest(quest))
             {
                 ActivateQuest(quest);
@@ -134,10 +149,15 @@ public class QuestManager : MonoBehaviour
     public void DispatchEvent(QuestType type, object data)
     {
         if (!handlers.TryGetValue(type, out var handler))
+        {
+            Debug.LogWarning($"[QuestManager] No hay handler registrado para tipo: {type}");
             return;
+        }
 
         if (!activeQuestsCache.TryGetValue(type, out var activeObjectives))
+        {
             return;
+        }
 
         foreach (var (quest, objective, index) in activeObjectives.ToList())
         {
@@ -179,6 +199,22 @@ public class QuestManager : MonoBehaviour
     public QuestState GetQuestState(string questId)
     {
         return questStates[questId];
+    }
+
+    [ContextMenu("Reset All Quests")]
+    public void ResetAllQuests()
+    {
+        questStates.Clear();
+        activeQuestsCache.Clear();
+        questsInitialized = false;
+
+        Debug.Log("[QuestManager] Todas las misiones han sido reseteadas.");
+
+        if (questDatabase != null)
+        {
+            InitializeQuests();
+            questsInitialized = true;
+        }
     }
 
     public QuestSaveData GetSaveData()
@@ -243,7 +279,48 @@ public class QuestManager : MonoBehaviour
         }
 
         RebuildActiveQuestCache();
+        SyncCompletedObjectives();
         ReactivateUnlockedQuests();
+        
+        LogQuestStatusSummary();
+
+        questsInitialized = true;
+    }
+
+    private bool questsInitialized = false;
+
+    private void SyncCompletedObjectives()
+    {
+        foreach (var quest in questDatabase.Quests)
+        {
+            var state = questStates[quest.QuestId];
+
+            if (state.Status != QuestStatus.Active)
+            {
+                continue;
+            }
+
+            bool anyObjectiveCompleted = false;
+
+            for (int i = 0; i < quest.Objectives.Count; i++)
+            {
+                var objective = quest.Objectives[i];
+
+                if (state.IsObjectiveCompleted(i, objective))
+                {
+                    if (!state.ObjectivesProgress[i].Completed)
+                    {
+                        state.MarkCompleted(i);
+                        anyObjectiveCompleted = true;
+                    }
+                }
+            }
+
+            if (anyObjectiveCompleted)
+            {
+                CheckQuestCompletion(quest);
+            }
+        }
     }
 
     private void RebuildActiveQuestCache()
@@ -258,6 +335,81 @@ public class QuestManager : MonoBehaviour
                 UpdateActiveQuestCache(quest, true);
             }
         }
+    }
+
+    private void LogQuestStatusSummary()
+    {
+        var completed = new List<string>();
+        var inProgress = new List<string>();
+        var activated = new List<string>();
+
+        foreach (var quest in questDatabase.Quests)
+        {
+            var state = questStates[quest.QuestId];
+            if (state.Status == QuestStatus.Completed)
+            {
+                completed.Add(quest.QuestName);
+            }
+            else if (state.Status == QuestStatus.Active)
+            {
+                // Verificar si la misión tiene objetivos con progreso
+                bool hasProgress = false;
+                for (int i = 0; i < quest.Objectives.Count && i < state.ObjectivesProgress.Count; i++)
+                {
+                    if (state.ObjectivesProgress[i].Progress > 0)
+                    {
+                        hasProgress = true;
+                        break;
+                    }
+                }
+                
+                if (hasProgress)
+                {
+                    inProgress.Add(quest.QuestName);
+                }
+                else
+                {
+                    activated.Add(quest.QuestName);
+                }
+            }
+        }
+
+        Debug.Log("=== RESUMEN DE MISIONES AL CARGAR ===");
+        
+        if (completed.Count > 0)
+        {
+            Debug.Log(
+                $"[QuestManager] ✓ Misiones completadas ({completed.Count}): {string.Join(", ", completed)}"
+            );
+        }
+        else
+        {
+            Debug.Log("[QuestManager] ✓ Misiones completadas: Ninguna");
+        }
+
+        if (inProgress.Count > 0)
+        {
+            Debug.Log(
+                $"[QuestManager] ⏳ Misiones en progreso ({inProgress.Count}): {string.Join(", ", inProgress)}"
+            );
+        }
+        else
+        {
+            Debug.Log("[QuestManager] ⏳ Misiones en progreso: Ninguna");
+        }
+
+        if (activated.Count > 0)
+        {
+            Debug.Log(
+                $"[QuestManager] ▶ Misiones activadas ({activated.Count}): {string.Join(", ", activated)}"
+            );
+        }
+        else
+        {
+            Debug.Log("[QuestManager] ▶ Misiones activadas: Ninguna");
+        }
+        
+        Debug.Log("=====================================");
     }
 
     private void ReactivateUnlockedQuests()

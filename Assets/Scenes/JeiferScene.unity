@@ -2292,7 +2292,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de1dd11f09f254ece9af35c486aca318, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  zoneConfig: {fileID: 0}
 --- !u!1 &1738467044
 GameObject:
   m_ObjectHideFlags: 0
@@ -2673,7 +2672,6 @@ GameObject:
   - component: {fileID: 1848083884}
   - component: {fileID: 1848083886}
   - component: {fileID: 1848083885}
-  - component: {fileID: 1848083887}
   m_Layer: 0
   m_Name: QuestSystem
   m_TagString: Untagged
@@ -2722,19 +2720,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   questDatabase: {fileID: 11400000, guid: a9cc4e63de8ea274696a16c4c565338c, type: 2}
---- !u!114 &1848083887
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1848083883}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eaf22951fdd5d4a81b063fc6b608bc9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  questManager: {fileID: 1848083886}
 --- !u!1 &1990056922
 GameObject:
   m_ObjectHideFlags: 0

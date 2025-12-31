@@ -18,8 +18,14 @@ MonoBehaviour:
   Category: 0
   Objectives:
   - Type: 0
-    TargetId: {fileID: 0}
-    RequiredAmount: 5
+    ZoneId: 
+    RequiredTime: 1
+    ReachZoneId: 
+    NpcId: 
+    CollectItemId: 
+    CollectAmount: 0
+    CraftRecipeId: 
+    CraftAmount: 0
   RequiredQuests: []
   UnlocksQuests: []
   BlocksQuests: []

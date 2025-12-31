@@ -1,12 +1,25 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// Dispara eventos de misiones cuando el jugador entra/sale de una zona.
+/// Configurable para disparar eventos de ReachZone y/o Countdown.
+/// </summary>
 public class ZoneTrigger : MonoBehaviour
 {
+    [Header("Zone Configuration")]
     [SerializeField]
     private ZoneId zoneId;
 
+    [Header("Quest Event Types")]
+    [SerializeField]
+    private bool triggerReachZone = false;
+
+    [SerializeField]
+    private bool triggerCountdown = false;
+
     private bool playerInside;
+    private bool reachZoneTriggered = false;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -30,7 +43,17 @@ public class ZoneTrigger : MonoBehaviour
         }
 
         playerInside = true;
-        StartCoroutine(Tick());
+
+        if (triggerReachZone && !reachZoneTriggered)
+        {
+            QuestManager.Instance.DispatchEvent(QuestType.ReachZone, zoneId);
+            reachZoneTriggered = true;
+        }
+
+        if (triggerCountdown)
+        {
+            StartCoroutine(Tick());
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -40,9 +63,9 @@ public class ZoneTrigger : MonoBehaviour
 
         playerInside = false;
 
-        // Resetear SOLO el progreso de misiones tipo Countdown cuando el jugador sale de la zona.
-        // Otros tipos de misiones (ReachZone, CollectItem, etc.) mantienen su progreso.
-        if (zoneId != null && QuestManager.Instance != null)
+        reachZoneTriggered = false;
+
+        if (triggerCountdown && zoneId != null && QuestManager.Instance != null)
         {
             QuestManager.Instance.ResetCountdownProgressForZone(zoneId);
         }

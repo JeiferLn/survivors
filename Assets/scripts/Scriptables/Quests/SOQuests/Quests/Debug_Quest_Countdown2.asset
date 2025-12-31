@@ -12,11 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2014fac9987e45c397329ba077de58b, type: 3}
   m_Name: Debug_Quest_Countdown2
   m_EditorClassIdentifier: 
-  QuestId: 
-  QuestName: 
-  Description: 
-  Category: 0
-  Objectives: []
-  RequiredQuests: []
+  QuestId: Debug_Quest_Countdown2
+  QuestName: Countdown 2
+  Description: Debug_Quest_Countdown 2
+  Category: 1
+  Objectives:
+  - Type: 0
+    Zone: {fileID: 11400000, guid: f8c96e51c958ee14388fb19ddccea712, type: 2}
+    RequiredTime: 8
+    ReachZone: {fileID: 0}
+    Npc: {fileID: 0}
+    Item: {fileID: 0}
+    RequiredAmount: 0
+    ItemToCraft: {fileID: 0}
+    CraftRequiredAmount: 0
+  RequiredQuests:
+  - {fileID: 11400000, guid: c4aaa62330aaf4317aecdb7dcae64dd0, type: 2}
   UnlocksQuests: []
   BlocksQuests: []

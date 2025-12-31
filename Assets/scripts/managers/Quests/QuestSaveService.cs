@@ -2,10 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// Servicio que maneja la serialización y deserialización de datos de misiones.
-/// Extrae la lógica de guardado/carga del QuestManager para mantener la separación de responsabilidades.
-/// </summary>
 public class QuestSaveService
 {
     private QuestDatabase questDatabase;
@@ -23,9 +19,6 @@ public class QuestSaveService
         onLoadComplete = onLoadCallback;
     }
 
-    /// <summary>
-    /// Convierte el estado actual de las misiones a un formato serializable.
-    /// </summary>
     public QuestSaveData GetSaveData()
     {
         QuestSaveData data = new QuestSaveData();
@@ -38,9 +31,6 @@ public class QuestSaveService
         return data;
     }
 
-    /// <summary>
-    /// Carga datos de misiones desde un formato serializable y los aplica al estado actual.
-    /// </summary>
     public void LoadFromSaveData(
         QuestSaveData data,
         System.Action rebuildCache,
@@ -95,7 +85,6 @@ public class QuestSaveService
             questStates[entry.QuestId] = entry.State;
         }
 
-        // Asegurar que todas las misiones de la base de datos tengan un estado
         if (questDatabase != null)
         {
             foreach (var quest in questDatabase.Quests)
@@ -107,7 +96,6 @@ public class QuestSaveService
             }
         }
 
-        // Ejecutar callbacks para reconstruir el estado del sistema
         rebuildCache?.Invoke();
         syncObjectives?.Invoke();
         reactivateQuests?.Invoke();
@@ -116,4 +104,3 @@ public class QuestSaveService
         onLoadComplete?.Invoke();
     }
 }
-

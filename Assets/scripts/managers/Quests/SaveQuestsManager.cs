@@ -22,14 +22,16 @@ public class SaveQuestsManager : MonoBehaviour
         {
             questManager = QuestManager.Instance;
         }
-        
+
         if (questManager != null)
         {
             Load();
         }
         else
         {
-            Debug.LogError("[SaveQuestsManager] QuestManager no encontrado. Asegúrate de que QuestManager se inicialice antes.");
+            Debug.LogError(
+                "[SaveQuestsManager] QuestManager no encontrado. Asegúrate de que QuestManager se inicialice antes."
+            );
         }
     }
 
@@ -65,7 +67,7 @@ public class SaveQuestsManager : MonoBehaviour
         {
             File.Delete(SavePath);
             Debug.Log($"[SaveQuestsManager] Archivo de guardado eliminado: {SavePath}");
-            
+
             if (questManager != null)
             {
                 questManager.ResetAllQuests();

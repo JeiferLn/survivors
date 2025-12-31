@@ -16,6 +16,8 @@ public class QuestManager : MonoBehaviour
         List<(QuestDefinition quest, QuestObjective objective, int index)>
     > activeQuestsCache = new();
 
+    private QuestSaveService saveService;
+
     private void Awake()
     {
         if (Instance != null)
@@ -29,6 +31,7 @@ public class QuestManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         RegisterHandlers();
+        InitializeSaveService();
     }
 
     private void Start()
@@ -54,9 +57,41 @@ public class QuestManager : MonoBehaviour
         handlers[handler.ObjectiveType] = handler;
     }
 
+    private void InitializeSaveService()
+    {
+        saveService = new QuestSaveService(questDatabase, questStates);
+    }
+
     private void InitializeQuests()
     {
-        // Validar QuestIds únicos
+        if (questDatabase == null)
+        {
+            Debug.LogError("[QuestManager] QuestDatabase no está asignado en el Inspector.");
+            return;
+        }
+
+        ValidateQuestIds();
+
+        foreach (var quest in questDatabase.Quests)
+        {
+            if (string.IsNullOrEmpty(quest.QuestId))
+                continue;
+
+            if (!questStates.ContainsKey(quest.QuestId))
+            {
+                questStates[quest.QuestId] = new QuestState { Status = QuestStatus.Locked };
+            }
+
+            var state = questStates[quest.QuestId];
+            if (state.Status != QuestStatus.Completed && CanActivateQuest(quest))
+            {
+                ActivateQuest(quest);
+            }
+        }
+    }
+
+    private void ValidateQuestIds()
+    {
         var questIds = new HashSet<string>();
         foreach (var quest in questDatabase.Quests)
         {
@@ -77,35 +112,6 @@ public class QuestManager : MonoBehaviour
             }
 
             questIds.Add(quest.QuestId);
-        }
-
-        foreach (var quest in questDatabase.Quests)
-        {
-            if (string.IsNullOrEmpty(quest.QuestId))
-                continue;
-
-            if (!questStates.ContainsKey(quest.QuestId))
-            {
-                questStates[quest.QuestId] = new QuestState { Status = QuestStatus.Locked };
-            }
-        }
-
-        foreach (var quest in questDatabase.Quests)
-        {
-            if (string.IsNullOrEmpty(quest.QuestId))
-                continue;
-
-            var state = questStates[quest.QuestId];
-
-            if (state.Status == QuestStatus.Completed)
-            {
-                continue;
-            }
-
-            if (CanActivateQuest(quest))
-            {
-                ActivateQuest(quest);
-            }
         }
     }
 
@@ -188,7 +194,8 @@ public class QuestManager : MonoBehaviour
             return;
         }
 
-        foreach (var (quest, objective, index) in activeObjectives.ToList())
+        var objectivesCopy = activeObjectives.ToList();
+        foreach (var (quest, objective, index) in objectivesCopy)
         {
             handler.Process(this, quest, objective, index, data);
         }
@@ -227,7 +234,17 @@ public class QuestManager : MonoBehaviour
 
     public QuestState GetQuestState(string questId)
     {
-        return questStates[questId];
+        if (questStates.TryGetValue(questId, out var state))
+        {
+            return state;
+        }
+
+        Debug.LogWarning(
+            $"[QuestManager] QuestId '{questId}' no encontrado. Se retornará un estado nuevo."
+        );
+        var newState = new QuestState { Status = QuestStatus.Locked };
+        questStates[questId] = newState;
+        return newState;
     }
 
     [ContextMenu("Reset All Quests")]
@@ -248,78 +265,26 @@ public class QuestManager : MonoBehaviour
 
     public QuestSaveData GetSaveData()
     {
-        QuestSaveData data = new QuestSaveData();
+        if (saveService == null)
+            InitializeSaveService();
 
-        foreach (var pair in questStates)
-        {
-            data.States.Add(new QuestStateEntry { QuestId = pair.Key, State = pair.Value });
-        }
-
-        return data;
+        return saveService.GetSaveData();
     }
 
     public void LoadFromSaveData(QuestSaveData data)
     {
-        questStates.Clear();
+        if (saveService == null)
+            InitializeSaveService();
+
         activeQuestsCache.Clear();
 
-        foreach (var entry in data.States)
-        {
-            if (string.IsNullOrEmpty(entry.QuestId))
-            {
-                Debug.LogWarning(
-                    "[QuestManager] Se encontró un QuestId vacío en los datos guardados. Se omitirá."
-                );
-                continue;
-            }
-
-            var quest = questDatabase.GetQuestById(entry.QuestId);
-            if (quest == null)
-            {
-                Debug.LogWarning(
-                    $"QuestId '{entry.QuestId}' no encontrado en la base de datos. Se omitirá."
-                );
-                continue;
-            }
-
-            if (entry.State == null)
-            {
-                Debug.LogWarning(
-                    $"Estado nulo para QuestId '{entry.QuestId}'. Se creará un estado nuevo."
-                );
-                questStates[entry.QuestId] = new QuestState { Status = QuestStatus.Locked };
-                continue;
-            }
-
-            if (
-                entry.State.ObjectivesProgress != null
-                && entry.State.ObjectivesProgress.Count > quest.Objectives.Count
-            )
-            {
-                Debug.LogWarning(
-                    $"QuestId '{entry.QuestId}' tiene más progreso de objetivos que objetivos definidos. Se ajustará."
-                );
-                entry.State.ObjectivesProgress = entry
-                    .State.ObjectivesProgress.Take(quest.Objectives.Count)
-                    .ToList();
-            }
-
-            questStates[entry.QuestId] = entry.State;
-        }
-
-        foreach (var quest in questDatabase.Quests)
-        {
-            if (!questStates.ContainsKey(quest.QuestId))
-            {
-                questStates[quest.QuestId] = new QuestState { Status = QuestStatus.Locked };
-            }
-        }
-
-        RebuildActiveQuestCache();
-        SyncCompletedObjectives();
-        ReactivateUnlockedQuests();
-
-        LogQuestStatusSummary();
+        saveService.LoadFromSaveData(
+            data,
+            RebuildActiveQuestCache,
+            SyncCompletedObjectives,
+            ReactivateUnlockedQuests,
+            LogQuestStatusSummary
+        );
 
         questsInitialized = true;
     }
@@ -328,44 +293,27 @@ public class QuestManager : MonoBehaviour
 
     private void SyncCompletedObjectives()
     {
+        if (questDatabase == null)
+            return;
+
         foreach (var quest in questDatabase.Quests)
         {
-            var state = questStates[quest.QuestId];
+            if (string.IsNullOrEmpty(quest.QuestId))
+                continue;
+
+            if (!questStates.TryGetValue(quest.QuestId, out var state))
+                continue;
 
             if (state.Status != QuestStatus.Active)
-            {
                 continue;
-            }
 
             bool anyObjectiveCompleted = false;
-
             for (int i = 0; i < quest.Objectives.Count; i++)
             {
-                var objective = quest.Objectives[i];
-
-                // Obtener el progreso actual
-                float currentProgress =
-                    state.ObjectivesProgress.Count > i ? state.ObjectivesProgress[i].Progress : 0f;
-
-                // Obtener el requerimiento según el tipo
-                float required = objective.Type switch
-                {
-                    QuestType.Countdown => objective.RequiredTime,
-                    QuestType.CollectItem => objective.RequiredAmount,
-                    QuestType.CraftItem => objective.CraftRequiredAmount,
-                    _ => 0f,
-                };
-
-                if (state.IsObjectiveCompleted(i, objective))
+                if (state.IsObjectiveCompleted(i, quest.Objectives[i]))
                 {
                     if (!state.ObjectivesProgress[i].Completed)
                     {
-                        Debug.Log(
-                            $"[SyncCompletedObjectives] Marcando objetivo {i} como completado para misión '{quest.QuestName}' ({quest.QuestId})\n"
-                                + $"  - Progreso: {currentProgress:F2} / {required:F2}\n"
-                                + $"  - Zona: {objective.Zone?.name ?? "null"}\n"
-                                + $"  - Tipo: {objective.Type}"
-                        );
                         state.MarkCompleted(i);
                         anyObjectiveCompleted = true;
                     }
@@ -374,9 +322,6 @@ public class QuestManager : MonoBehaviour
 
             if (anyObjectiveCompleted)
             {
-                Debug.Log(
-                    $"[SyncCompletedObjectives] Verificando completitud de misión '{quest.QuestName}' ({quest.QuestId})"
-                );
                 CheckQuestCompletion(quest);
             }
         }
@@ -386,9 +331,17 @@ public class QuestManager : MonoBehaviour
     {
         activeQuestsCache.Clear();
 
+        if (questDatabase == null)
+            return;
+
         foreach (var quest in questDatabase.Quests)
         {
-            var state = questStates[quest.QuestId];
+            if (string.IsNullOrEmpty(quest.QuestId))
+                continue;
+
+            if (!questStates.TryGetValue(quest.QuestId, out var state))
+                continue;
+
             if (state.Status == QuestStatus.Active)
             {
                 UpdateActiveQuestCache(quest, true);
@@ -398,6 +351,9 @@ public class QuestManager : MonoBehaviour
 
     private void LogQuestStatusSummary()
     {
+        if (questDatabase == null)
+            return;
+
         var completed = new List<string>();
         var inProgress = new List<string>();
         var activated = new List<string>();
@@ -411,75 +367,45 @@ public class QuestManager : MonoBehaviour
             }
             else if (state.Status == QuestStatus.Active)
             {
-                // Verificar si la misión tiene objetivos con progreso
-                bool hasProgress = false;
-                for (
-                    int i = 0;
-                    i < quest.Objectives.Count && i < state.ObjectivesProgress.Count;
-                    i++
-                )
-                {
-                    if (state.ObjectivesProgress[i].Progress > 0)
-                    {
-                        hasProgress = true;
-                        break;
-                    }
-                }
-
+                bool hasProgress = state.ObjectivesProgress.Any(p => p.Progress > 0);
                 if (hasProgress)
-                {
                     inProgress.Add(quest.QuestName);
-                }
                 else
-                {
                     activated.Add(quest.QuestName);
-                }
             }
         }
 
         Debug.Log("=== RESUMEN DE MISIONES AL CARGAR ===");
-
-        if (completed.Count > 0)
-        {
-            Debug.Log(
-                $"[QuestManager] ✓ Misiones completadas ({completed.Count}): {string.Join(", ", completed)}"
-            );
-        }
-        else
-        {
-            Debug.Log("[QuestManager] ✓ Misiones completadas: Ninguna");
-        }
-
-        if (inProgress.Count > 0)
-        {
-            Debug.Log(
-                $"[QuestManager] ⏳ Misiones en progreso ({inProgress.Count}): {string.Join(", ", inProgress)}"
-            );
-        }
-        else
-        {
-            Debug.Log("[QuestManager] ⏳ Misiones en progreso: Ninguna");
-        }
-
-        if (activated.Count > 0)
-        {
-            Debug.Log(
-                $"[QuestManager] ▶ Misiones activadas ({activated.Count}): {string.Join(", ", activated)}"
-            );
-        }
-        else
-        {
-            Debug.Log("[QuestManager] ▶ Misiones activadas: Ninguna");
-        }
-
+        Debug.Log(
+            completed.Count > 0
+                ? $"[QuestManager] ✓ Misiones completadas ({completed.Count}): {string.Join(", ", completed)}"
+                : "[QuestManager] ✓ Misiones completadas: Ninguna"
+        );
+        Debug.Log(
+            inProgress.Count > 0
+                ? $"[QuestManager] ⏳ Misiones en progreso ({inProgress.Count}): {string.Join(", ", inProgress)}"
+                : "[QuestManager] ⏳ Misiones en progreso: Ninguna"
+        );
+        Debug.Log(
+            activated.Count > 0
+                ? $"[QuestManager] ▶ Misiones activadas ({activated.Count}): {string.Join(", ", activated)}"
+                : "[QuestManager] ▶ Misiones activadas: Ninguna"
+        );
         Debug.Log("=====================================");
     }
 
     private void ReactivateUnlockedQuests()
     {
+        if (questDatabase == null)
+            return;
+
         foreach (var quest in questDatabase.Quests)
         {
-            var state = questStates[quest.QuestId];
+            if (string.IsNullOrEmpty(quest.QuestId))
+                continue;
+
+            if (!questStates.TryGetValue(quest.QuestId, out var state))
+                continue;
 
             if (state.Status == QuestStatus.Locked && CanActivateQuest(quest))
             {

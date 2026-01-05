@@ -4909,6 +4909,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e14d1c0726b1ed42879a2a1687aa9db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interactionRange: 3
+  _interactableLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  _keys: []
 --- !u!114 &743574429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4959,7 +4964,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keyUI: {fileID: 896689262}
-  actionName: Pickup
+  interactionActionRef: {fileID: -2303620076154341897, guid: 1c22b4fd3ad7048bbbdda2cde844830b, type: 3}
   walkMovementSpeed: 6
   runMovementSpeed: 10
   aimingMoveSpeed: 3
@@ -5061,22 +5066,6 @@ MonoBehaviour:
     m_ActionName: 'Player/Shoot[/Mouse/leftButton]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 743574428}
-        m_TargetAssemblyTypeName: PlayerInteraction, Assembly-CSharp
-        m_MethodName: OnEquip
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: 17606700-37f3-4ee4-85c6-d79617261e5d
-    m_ActionName: 'Player/Pickup[/Keyboard/e]'
-  - m_PersistentCalls:
-      m_Calls:
       - m_Target: {fileID: 743574432}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
         m_MethodName: OnRun
@@ -5091,6 +5080,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: b6f6dc31-d556-4055-a22c-bfcfa71b57b4
     m_ActionName: 'Player/Run[/Keyboard/capsLock]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e8c1a984-45c0-4ea3-b4f0-a0dbae5aa702
+    m_ActionName: 'Player/Interaction[/Keyboard/f]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

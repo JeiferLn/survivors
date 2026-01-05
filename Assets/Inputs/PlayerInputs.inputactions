@@ -52,9 +52,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Pickup",
+                    "name": "Interaction",
                     "type": "Button",
-                    "id": "17606700-37f3-4ee4-85c6-d79617261e5d",
+                    "id": "e8c1a984-45c0-4ea3-b4f0-a0dbae5aa702",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -240,39 +240,6 @@
                 },
                 {
                     "name": "",
-                    "id": "ae8651e7-f9c2-467f-b0e7-fcb05eeb3647",
-                    "path": "<Keyboard>/f",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Pickup",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "e430cbe9-e5fe-4dc1-b0dd-1948b2d36a76",
-                    "path": "<DualShockGamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Pickup",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "16c66979-1157-45bb-941d-fbede7c48d99",
-                    "path": "<XInputController>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Pickup",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "3c0db718-72cd-4c25-8232-f712c6bcbbbd",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
@@ -290,6 +257,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "Run",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "96e3bac8-a255-4474-9468-172101429c71",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interaction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a37c177a-e20b-4dba-8b37-91a2ef6db93d",
+                    "path": "<DualShockGamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interaction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8b05ce82-5711-4ae7-9c6f-76ea80e7bf14",
+                    "path": "<XInputController>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interaction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

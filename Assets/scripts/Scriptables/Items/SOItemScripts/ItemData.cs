@@ -8,7 +8,7 @@ public class ItemData : ScriptableObject
     public string itemName;
     public string description;
     public Sprite itemImage;
-    public GameObject itemPrefab;
+    public GameObject item3d;
 
     [Header("Classification")]
     public ItemType itemType;

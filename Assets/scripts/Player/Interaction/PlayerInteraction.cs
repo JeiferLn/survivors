@@ -35,21 +35,9 @@ public class PlayerInteraction : MonoBehaviour
     [ShowInInspector, ReadOnly]
     private int KeyCount => _keys.Count;
 
-    // ══════════════════════════════════════════════════════════════
-    // DEBUG
-    // ══════════════════════════════════════════════════════════════
-
-    [Title("Debug")]
-    [ShowInInspector, ReadOnly]
     private string _lastInteractionText = "Ninguno";
-
-    [ShowInInspector, ReadOnly]
     private IInteractable _currentTarget;
-
-    [ShowInInspector, ReadOnly]
     private IEquipable _currentEquipableTarget;
-
-    private Camera _camera;
     private Outline _lastOutline;
 
     // ══════════════════════════════════════════════════════════════
@@ -59,11 +47,6 @@ public class PlayerInteraction : MonoBehaviour
     private void Awake()
     {
         _equipmentController = GetComponent<PlayerEquipmentController>();
-    }
-
-    private void Start()
-    {
-        _camera = Camera.main;
     }
 
     private void Update()
@@ -236,11 +219,9 @@ public class PlayerInteraction : MonoBehaviour
             if (HasKey(requiredKey))
             {
                 door.InteractWithKey(requiredKey);
-                Debug.Log($"🔑 Usaste la llave: {requiredKey}");
             }
             else
             {
-                Debug.Log($"❌ No tienes la llave: {requiredKey}");
                 // Aquí podrías mostrar UI, reproducir sonido, etc.
             }
         }
@@ -265,20 +246,13 @@ public class PlayerInteraction : MonoBehaviour
         if (!HasKey(keyId))
         {
             _keys.Add(keyId);
-            // Debug.Log($"🔑 Llave obtenida: {keyId}");
             DialogueSystem.Instance.SendText($"Has obtenido llaves {keyId}");
         }
     }
 
     public bool RemoveKey(string keyId)
     {
-        if (_keys.Remove(keyId))
-        {
-            Debug.Log($"🔑 Llave removida: {keyId}");
-            return true;
-        }
-
-        return false;
+        return _keys.Remove(keyId);
     }
 
     public void ClearKeys()
@@ -319,30 +293,4 @@ public class PlayerInteraction : MonoBehaviour
         _lastOutline.enabled = false;
         _lastOutline = null;
     }
-
-    // ══════════════════════════════════════════════════════════════
-    // BOTONES DE DEBUG (ODIN)
-    // ══════════════════════════════════════════════════════════════
-
-#if UNITY_EDITOR
-    [Title("Testing")]
-    [Button("Agregar Llave de Prueba")]
-    private void AddTestKey()
-    {
-        AddKey($"key_test_{_keys.Count + 1}");
-    }
-
-    [Button("Agregar Llave Específica")]
-    private void AddSpecificKey(string keyId = "key_01")
-    {
-        AddKey(keyId);
-    }
-
-    [Button("Limpiar Llaves")]
-    private void ClearAllKeys()
-    {
-        ClearKeys();
-    }
-
-#endif
 }

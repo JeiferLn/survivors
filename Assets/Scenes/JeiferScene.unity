@@ -3706,6 +3706,7 @@ MonoBehaviour:
   _npcName: NPC
   _dialogueBeforeQuest:
   - "Hola, \xBFpuedes ayudarme?"
+  - Ten esta mision.
   _dialogueAfterQuest:
   - "\xA1Gracias! Buena suerte con la misi\xF3n."
   _dialogueQuestActive:

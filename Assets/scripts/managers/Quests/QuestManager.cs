@@ -66,7 +66,6 @@ public class QuestManager : MonoBehaviour
     {
         if (questDatabase == null)
         {
-            Debug.LogError("[QuestManager] QuestDatabase no está asignado en el Inspector.");
             return;
         }
 
@@ -83,7 +82,19 @@ public class QuestManager : MonoBehaviour
             }
 
             var state = questStates[quest.QuestId];
-            if (state.Status != QuestStatus.Completed && CanActivateQuest(quest))
+
+            // Solo desbloquear (Available) si tiene RequiredQuests completadas
+            if (state.Status == QuestStatus.Locked && HasRequiredQuestsCompleted(quest))
+            {
+                UnlockQuest(quest);
+            }
+
+            // Activar automáticamente solo si está Available, puede activarse y tiene el flag AutoActivateOnStart
+            if (
+                state.Status == QuestStatus.Available
+                && quest.AutoActivateOnStart
+                && CanActivateQuest(quest)
+            )
             {
                 ActivateQuest(quest);
             }
@@ -97,17 +108,11 @@ public class QuestManager : MonoBehaviour
         {
             if (string.IsNullOrEmpty(quest.QuestId))
             {
-                Debug.LogError(
-                    $"[QuestManager] ERROR: La misión '{quest.QuestName}' tiene un QuestId vacío. Cada misión debe tener un QuestId único."
-                );
                 continue;
             }
 
             if (questIds.Contains(quest.QuestId))
             {
-                Debug.LogError(
-                    $"[QuestManager] ERROR: La misión '{quest.QuestName}' tiene un QuestId duplicado: '{quest.QuestId}'. Cada misión debe tener un QuestId único."
-                );
                 continue;
             }
 
@@ -115,7 +120,10 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    private bool CanActivateQuest(QuestDefinition quest)
+    /// <summary>
+    /// Verifica si una misión tiene todas sus RequiredQuests completadas (para desbloquear)
+    /// </summary>
+    private bool HasRequiredQuestsCompleted(QuestDefinition quest)
     {
         foreach (var required in quest.RequiredQuests)
         {
@@ -126,10 +134,32 @@ public class QuestManager : MonoBehaviour
                 return false;
         }
 
+        return true;
+    }
+
+    /// <summary>
+    /// Verifica si una misión puede activarse (debe estar Available y no estar bloqueada)
+    /// </summary>
+    private bool CanActivateQuest(QuestDefinition quest)
+    {
+        // Debe tener RequiredQuests completadas
+        if (!HasRequiredQuestsCompleted(quest))
+            return false;
+
+        // No debe estar bloqueada
         if (IsQuestBlocked(quest))
             return false;
 
         return true;
+    }
+
+    /// <summary>
+    /// Desbloquea una misión (cambia de Locked a Available) sin activarla
+    /// </summary>
+    private void UnlockQuest(QuestDefinition quest)
+    {
+        var state = questStates[quest.QuestId];
+        state.Status = QuestStatus.Available;
     }
 
     private void ActivateQuest(QuestDefinition quest)
@@ -163,7 +193,6 @@ public class QuestManager : MonoBehaviour
 
         state.Status = QuestStatus.Completed;
         UpdateActiveQuestCache(quest, false);
-        Debug.Log($"Misión completada: {quest.QuestName}");
 
         HandleQuestUnlocks(quest);
         HandleQuestBlocks(quest);
@@ -171,11 +200,57 @@ public class QuestManager : MonoBehaviour
 
     private void HandleQuestUnlocks(QuestDefinition quest)
     {
+        // UnlocksQuests: Desbloquear Y activar automáticamente
         foreach (var unlock in quest.UnlocksQuests)
         {
+            // Primero desbloquear si está Locked
+            if (!questStates.ContainsKey(unlock.QuestId))
+            {
+                questStates[unlock.QuestId] = new QuestState { Status = QuestStatus.Locked };
+            }
+
+            var unlockState = questStates[unlock.QuestId];
+
+            if (unlockState.Status == QuestStatus.Locked)
+            {
+                UnlockQuest(unlock);
+            }
+
+            // Luego activar si puede activarse
             if (CanActivateQuest(unlock))
             {
                 ActivateQuest(unlock);
+            }
+        }
+
+        // RequiredQuests: Solo desbloquear (Available), NO activar automáticamente
+        // Las misiones que tienen esta misión como RequiredQuest se desbloquearán
+        foreach (var otherQuest in questDatabase.Quests)
+        {
+            if (string.IsNullOrEmpty(otherQuest.QuestId))
+                continue;
+
+            // Verificar si esta misión completada es requerida por otra
+            if (otherQuest.RequiredQuests.Contains(quest))
+            {
+                if (!questStates.ContainsKey(otherQuest.QuestId))
+                {
+                    questStates[otherQuest.QuestId] = new QuestState
+                    {
+                        Status = QuestStatus.Locked,
+                    };
+                }
+
+                var otherState = questStates[otherQuest.QuestId];
+
+                // Solo desbloquear si está Locked y ahora cumple los requisitos
+                if (
+                    otherState.Status == QuestStatus.Locked
+                    && HasRequiredQuestsCompleted(otherQuest)
+                )
+                {
+                    UnlockQuest(otherQuest);
+                }
             }
         }
     }
@@ -186,11 +261,14 @@ public class QuestManager : MonoBehaviour
         {
             if (questStates.TryGetValue(blocked.QuestId, out var state))
             {
-                if (state.Status == QuestStatus.Active || state.Status == QuestStatus.Locked)
+                if (
+                    state.Status == QuestStatus.Active
+                    || state.Status == QuestStatus.Locked
+                    || state.Status == QuestStatus.Available
+                )
                 {
                     state.Status = QuestStatus.Failed;
                     UpdateActiveQuestCache(blocked, false);
-                    Debug.Log($"Misión bloqueada: {blocked.QuestName}");
                 }
             }
         }
@@ -228,7 +306,6 @@ public class QuestManager : MonoBehaviour
     {
         if (!handlers.TryGetValue(type, out var handler))
         {
-            Debug.LogWarning($"[QuestManager] No hay handler registrado para tipo: {type}");
             return;
         }
 
@@ -282,9 +359,6 @@ public class QuestManager : MonoBehaviour
             return state;
         }
 
-        Debug.LogWarning(
-            $"[QuestManager] QuestId '{questId}' no encontrado. Se retornará un estado nuevo."
-        );
         var newState = new QuestState { Status = QuestStatus.Locked };
         questStates[questId] = newState;
         return newState;
@@ -294,14 +368,12 @@ public class QuestManager : MonoBehaviour
     {
         if (questDatabase == null)
         {
-            Debug.LogError("[QuestManager] QuestDatabase no está asignado.");
             return false;
         }
 
         var quest = questDatabase.GetQuestById(questId);
         if (quest == null)
         {
-            Debug.LogWarning($"[QuestManager] No se encontró la misión con QuestId: {questId}");
             return false;
         }
 
@@ -312,7 +384,6 @@ public class QuestManager : MonoBehaviour
     {
         if (quest == null || string.IsNullOrEmpty(quest.QuestId))
         {
-            Debug.LogWarning("[QuestManager] La misión es null o no tiene QuestId.");
             return false;
         }
 
@@ -324,28 +395,31 @@ public class QuestManager : MonoBehaviour
 
         var state = questStates[quest.QuestId];
 
-        // Solo activar si está bloqueada y puede activarse
+        // Solo activar si está Available o Locked (y puede activarse)
+        if (state.Status == QuestStatus.Available && CanActivateQuest(quest))
+        {
+            ActivateQuest(quest);
+            return true;
+        }
+
+        // Si está Locked pero puede activarse, desbloquear primero y luego activar
         if (state.Status == QuestStatus.Locked && CanActivateQuest(quest))
         {
+            UnlockQuest(quest);
             ActivateQuest(quest);
             return true;
         }
 
         if (state.Status == QuestStatus.Active)
         {
-            Debug.Log($"[QuestManager] La misión '{quest.QuestName}' ya está activa.");
             return false;
         }
 
         if (state.Status == QuestStatus.Completed)
         {
-            Debug.Log($"[QuestManager] La misión '{quest.QuestName}' ya está completada.");
             return false;
         }
 
-        Debug.LogWarning(
-            $"[QuestManager] No se puede activar la misión '{quest.QuestName}'. Estado: {state.Status}"
-        );
         return false;
     }
 
@@ -468,47 +542,7 @@ public class QuestManager : MonoBehaviour
 
     private void LogQuestStatusSummary()
     {
-        if (questDatabase == null)
-            return;
-
-        var completed = new List<string>();
-        var inProgress = new List<string>();
-        var activated = new List<string>();
-
-        foreach (var quest in questDatabase.Quests)
-        {
-            var state = questStates[quest.QuestId];
-            if (state.Status == QuestStatus.Completed)
-            {
-                completed.Add(quest.QuestName);
-            }
-            else if (state.Status == QuestStatus.Active)
-            {
-                bool hasProgress = state.ObjectivesProgress.Any(p => p.Progress > 0);
-                if (hasProgress)
-                    inProgress.Add(quest.QuestName);
-                else
-                    activated.Add(quest.QuestName);
-            }
-        }
-
-        Debug.Log("=== RESUMEN DE MISIONES AL CARGAR ===");
-        Debug.Log(
-            completed.Count > 0
-                ? $"[QuestManager] ✓ Misiones completadas ({completed.Count}): {string.Join(", ", completed)}"
-                : "[QuestManager] ✓ Misiones completadas: Ninguna"
-        );
-        Debug.Log(
-            inProgress.Count > 0
-                ? $"[QuestManager] ⏳ Misiones en progreso ({inProgress.Count}): {string.Join(", ", inProgress)}"
-                : "[QuestManager] ⏳ Misiones en progreso: Ninguna"
-        );
-        Debug.Log(
-            activated.Count > 0
-                ? $"[QuestManager] ▶ Misiones activadas ({activated.Count}): {string.Join(", ", activated)}"
-                : "[QuestManager] ▶ Misiones activadas: Ninguna"
-        );
-        Debug.Log("=====================================");
+        // Método vacío - logs removidos
     }
 
     private void ReactivateUnlockedQuests()
@@ -524,7 +558,18 @@ public class QuestManager : MonoBehaviour
             if (!questStates.TryGetValue(quest.QuestId, out var state))
                 continue;
 
-            if (state.Status == QuestStatus.Locked && CanActivateQuest(quest))
+            // Desbloquear si tiene RequiredQuests completadas
+            if (state.Status == QuestStatus.Locked && HasRequiredQuestsCompleted(quest))
+            {
+                UnlockQuest(quest);
+            }
+
+            // Activar automáticamente solo si está Available, puede activarse y tiene el flag AutoActivateOnStart
+            if (
+                state.Status == QuestStatus.Available
+                && quest.AutoActivateOnStart
+                && CanActivateQuest(quest)
+            )
             {
                 ActivateQuest(quest);
             }

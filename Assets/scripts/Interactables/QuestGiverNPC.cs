@@ -1,5 +1,7 @@
+using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 {
@@ -51,6 +53,8 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
     [ShowInInspector, ReadOnly]
     private QuestStatus _currentQuestStatus = QuestStatus.Locked;
 
+    private Coroutine _dialogueSequenceCoroutine;
+
     // ══════════════════════════════════════════════════════════════
     // PROPIEDADES PÚBLICAS
     // ══════════════════════════════════════════════════════════════
@@ -91,23 +95,61 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 
         UpdateQuestStatus();
 
-        // Intentar activar la misión si es posible
-        if (_currentQuestStatus == QuestStatus.Locked && (!_oneTimeOnly || !_questActivated))
+        // Detener cualquier secuencia de diálogo anterior
+        if (_dialogueSequenceCoroutine != null)
         {
-            if (QuestManager.Instance != null)
+            StopCoroutine(_dialogueSequenceCoroutine);
+        }
+
+        // Iniciar la secuencia completa de diálogo
+        _dialogueSequenceCoroutine = StartCoroutine(HandleInteractionSequence());
+    }
+
+    private IEnumerator HandleInteractionSequence()
+    {
+        UpdateQuestStatus();
+
+        // Si la misión está Locked o Available, mostrar diálogos "before" primero
+        if (
+            _currentQuestStatus == QuestStatus.Locked
+            || _currentQuestStatus == QuestStatus.Available
+        )
+        {
+            // Mostrar diálogos "before quest"
+            yield return StartCoroutine(ShowDialogueSequence(_dialogueBeforeQuest));
+
+            // Actualizar estado después de mostrar los diálogos
+            UpdateQuestStatus();
+
+            // Intentar activar la misión después de mostrar los diálogos "before"
+            if (
+                _currentQuestStatus == QuestStatus.Locked
+                || _currentQuestStatus == QuestStatus.Available
+            )
             {
-                bool activated = QuestManager.Instance.TryActivateQuest(questToGive);
-                if (activated)
+                if (QuestManager.Instance != null && (!_oneTimeOnly || !_questActivated))
                 {
-                    _questActivated = true;
-                    UpdateQuestStatus();
-                    Debug.Log($"✅ Misión activada: {questToGive.QuestName}");
+                    bool activated = QuestManager.Instance.TryActivateQuest(questToGive);
+                    if (activated)
+                    {
+                        _questActivated = true;
+                        UpdateQuestStatus();
+                        Debug.Log($"✅ Misión activada: {questToGive.QuestName}");
+
+                        // Mostrar diálogos "after quest" si se activó correctamente
+                        yield return StartCoroutine(ShowDialogueSequence(_dialogueAfterQuest));
+                    }
                 }
             }
         }
+        else
+        {
+            // Para otros estados, mostrar el diálogo correspondiente
+            string[] dialogueToShow = GetDialogueLines();
+            yield return StartCoroutine(ShowDialogueSequence(dialogueToShow));
+        }
 
-        // Mostrar diálogo apropiado
-        StartDialogue();
+        _dialogueSequenceCoroutine = null;
     }
 
     public string GetInteractionText()
@@ -138,8 +180,54 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
             return;
         }
 
+        // Detener cualquier secuencia de diálogo anterior
+        if (_dialogueSequenceCoroutine != null)
+        {
+            StopCoroutine(_dialogueSequenceCoroutine);
+        }
+
         string[] dialogueToShow = GetDialogueLines();
-        DialogueSystem.Instance.SendText(dialogueToShow);
+        _dialogueSequenceCoroutine = StartCoroutine(ShowDialogueSequence(dialogueToShow));
+    }
+
+    private IEnumerator ShowDialogueSequence(string[] dialogueLines)
+    {
+        if (dialogueLines == null || dialogueLines.Length == 0)
+            yield break;
+
+        // Suscribirse al evento de fin de diálogo
+        bool dialogueFinished = false;
+        UnityAction onDialogueEnd = () =>
+        {
+            dialogueFinished = true;
+        };
+
+        foreach (string line in dialogueLines)
+        {
+            if (string.IsNullOrEmpty(line))
+                continue;
+
+            dialogueFinished = false;
+
+            // Suscribirse al evento
+            DialogueSystem.Instance.OnDialogueEnd.AddListener(onDialogueEnd);
+
+            // Enviar el mensaje actual
+            DialogueSystem.Instance.SendText(line);
+
+            // Esperar a que termine el diálogo (se cierre automáticamente o manualmente)
+            yield return new WaitUntil(() =>
+                !DialogueSystem.Instance.IsDialogueActive || dialogueFinished
+            );
+
+            // Desuscribirse del evento
+            DialogueSystem.Instance.OnDialogueEnd.RemoveListener(onDialogueEnd);
+
+            // Pequeña pausa entre mensajes
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        _dialogueSequenceCoroutine = null;
     }
 
     public string GetDialogueText()

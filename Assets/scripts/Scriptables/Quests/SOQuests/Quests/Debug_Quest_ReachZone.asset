@@ -26,6 +26,8 @@ MonoBehaviour:
     RequiredAmount: 0
     ItemToCraft: {fileID: 0}
     CraftRequiredAmount: 0
-  RequiredQuests: []
+  RequiredQuests:
+  - {fileID: 11400000, guid: c4aaa62330aaf4317aecdb7dcae64dd0, type: 2}
   UnlocksQuests: []
   BlocksQuests: []
+  AutoActivateOnStart: 0

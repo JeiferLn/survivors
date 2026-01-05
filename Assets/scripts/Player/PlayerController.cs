@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     private TextMeshPro keyUI;
 
     [SerializeField]
-    private string actionName = "Interaction";
+    private InputActionReference interactionActionRef;
 
     private PlayerInput playerInput;
 
@@ -239,7 +239,10 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateKeyDisplay()
     {
-        var action = playerInput.actions[actionName];
+        if(interactionActionRef.action==null)
+            return;
+
+        var action = interactionActionRef.action;
 
         // Obtener el índice correcto según el dispositivo actual
         int bindingIndex = GetCorrectBindingIndex(action);

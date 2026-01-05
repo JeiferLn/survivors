@@ -1177,7 +1177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keyUI: {fileID: 1213375355}
-  actionName: Pickup
+  interactionActionRef: {fileID: -2303620076154341897, guid: 1c22b4fd3ad7048bbbdda2cde844830b, type: 3}
   walkMovementSpeed: 6
   runMovementSpeed: 10
   aimingMoveSpeed: 3

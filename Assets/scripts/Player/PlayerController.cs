@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     private TextMeshPro keyUI;
 
     [SerializeField]
-    private string actionName = "Pickup";
+    private string actionName = "Interaction";
 
     private PlayerInput playerInput;
 

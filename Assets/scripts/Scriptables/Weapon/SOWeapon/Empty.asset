@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2fac3ddf31f5b43bd7fa52950328ac, type: 3}
   m_Name: Empty
   m_EditorClassIdentifier: 
+  weaponName: 
+  playerWeaponPrefab: {fileID: 0}
   damage: 0
   recoilAmount: 0
   recoilReturnSpeed: 0
@@ -22,3 +24,4 @@ MonoBehaviour:
   bulletLength: 0
   bulletMaxDistance: 0
   fireCooldown: 0
+  weaponType: 0

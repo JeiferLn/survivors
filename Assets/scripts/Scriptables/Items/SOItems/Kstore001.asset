@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemID: 001
   itemName: Llave del almacen
-  description: Es una llave vieja
+  itemDescription: Una llave vieja, parece que aun se usa.
   itemImage: {fileID: -2133931053, guid: 737e1c03e4591af4682fad75f76209c5, type: 3}
   item3d: {fileID: 919132149155446097, guid: 1ae6e17d43715d642965fe33e1015f9e, type: 3}
   itemType: 3

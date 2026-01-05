@@ -2,15 +2,16 @@ using UnityEngine;
 
 public class ItemInfo : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    private ItemData itemData;
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        Debug.Log(
+            $"Id: {itemData.itemID}\n" +
+            $"Name: {itemData.itemName}\n" +
+            $"Type: {itemData.itemType}\n" +
+            $"Description: {itemData.itemDescription}\n"
+        );
     }
 }

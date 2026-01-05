@@ -6,13 +6,12 @@ public class ItemData : ScriptableObject
     [Header("Basic Information")]
     public string itemID;
     public string itemName;
-    public string description;
+    [TextArea]
+    public string itemDescription;
     public Sprite itemImage;
-    public GameObject item3d;
 
     [Header("Classification")]
     public ItemType itemType;
-
     public ItemRarity itemRarity;
 
     [Header("Stack")]

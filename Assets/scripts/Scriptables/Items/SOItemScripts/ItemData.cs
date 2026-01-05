@@ -1,0 +1,38 @@
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
+public class ItemData : ScriptableObject
+{
+    [Header("Basic Information")]
+    public string itemID;
+    public string itemName;
+    public string description;
+    public Sprite itemImage;
+    public GameObject itemPrefab;
+
+    [Header("Classification")]
+    public ItemType itemType;
+
+    public ItemRarity itemRarity;
+
+    [Header("Stack")]
+    public int maxStack = 1;
+    public bool isStackable;
+
+    private void OnValidate()
+    {
+        if (itemType is ItemType.Equippable or ItemType.Collectable)
+        {
+            isStackable = false;
+            maxStack = 1;
+        }
+        else
+        {
+            isStackable = true;
+            if (maxStack < 1)
+            {
+                maxStack = 1;
+            }
+        }
+    }
+}

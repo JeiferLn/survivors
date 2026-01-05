@@ -1957,6 +1957,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoneId: {fileID: 11400000, guid: f8c96e51c958ee14388fb19ddccea712, type: 2}
+  triggerReachZone: 1
+  triggerCountdown: 1
 --- !u!65 &1279227684
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2415,6 +2417,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoneId: {fileID: 11400000, guid: a337e31f60dc94803afc701d1a8576e8, type: 2}
+  triggerReachZone: 1
+  triggerCountdown: 1
 --- !u!1 &1738467044
 GameObject:
   m_ObjectHideFlags: 0

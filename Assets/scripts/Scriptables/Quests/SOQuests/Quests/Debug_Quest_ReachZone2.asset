@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2014fac9987e45c397329ba077de58b, type: 3}
   m_Name: Debug_Quest_ReachZone2
   m_EditorClassIdentifier: 
-  QuestId: Debug_Quest_ReachZone
+  QuestId: Debug_Quest_ReachZone2
   QuestName: ReachZone
   Description: Debug_Quest_ReachZone
   Category: 1

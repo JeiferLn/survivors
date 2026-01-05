@@ -12,6 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eed24b2e67d340a46be0cd96c6ca29dc, type: 3}
   m_Name: QuestDatabase
   m_EditorClassIdentifier: 
-  quests:
+  mainCountdown:
   - {fileID: 11400000, guid: c4aaa62330aaf4317aecdb7dcae64dd0, type: 2}
+  mainReachZone:
+  - {fileID: 11400000, guid: 3a7474f2df888464bb171d0d2b0018d1, type: 2}
+  mainTalkToNPC: []
+  mainCollectItem: []
+  mainCraftItem: []
+  sideCountdown:
   - {fileID: 11400000, guid: 4727465c1784d0945b0f01bde72949f9, type: 2}
+  sideReachZone:
+  - {fileID: 11400000, guid: 139954cb3ff1fe04c8ac2ee308e8c077, type: 2}
+  sideTalkToNPC: []
+  sideCollectItem: []
+  sideCraftItem: []

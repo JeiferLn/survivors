@@ -290,6 +290,65 @@ public class QuestManager : MonoBehaviour
         return newState;
     }
 
+    public bool TryActivateQuest(string questId)
+    {
+        if (questDatabase == null)
+        {
+            Debug.LogError("[QuestManager] QuestDatabase no está asignado.");
+            return false;
+        }
+
+        var quest = questDatabase.GetQuestById(questId);
+        if (quest == null)
+        {
+            Debug.LogWarning($"[QuestManager] No se encontró la misión con QuestId: {questId}");
+            return false;
+        }
+
+        return TryActivateQuest(quest);
+    }
+
+    public bool TryActivateQuest(QuestDefinition quest)
+    {
+        if (quest == null || string.IsNullOrEmpty(quest.QuestId))
+        {
+            Debug.LogWarning("[QuestManager] La misión es null o no tiene QuestId.");
+            return false;
+        }
+
+        // Asegurar que el estado existe
+        if (!questStates.ContainsKey(quest.QuestId))
+        {
+            questStates[quest.QuestId] = new QuestState { Status = QuestStatus.Locked };
+        }
+
+        var state = questStates[quest.QuestId];
+
+        // Solo activar si está bloqueada y puede activarse
+        if (state.Status == QuestStatus.Locked && CanActivateQuest(quest))
+        {
+            ActivateQuest(quest);
+            return true;
+        }
+
+        if (state.Status == QuestStatus.Active)
+        {
+            Debug.Log($"[QuestManager] La misión '{quest.QuestName}' ya está activa.");
+            return false;
+        }
+
+        if (state.Status == QuestStatus.Completed)
+        {
+            Debug.Log($"[QuestManager] La misión '{quest.QuestName}' ya está completada.");
+            return false;
+        }
+
+        Debug.LogWarning(
+            $"[QuestManager] No se puede activar la misión '{quest.QuestName}'. Estado: {state.Status}"
+        );
+        return false;
+    }
+
     public void ResetCountdownProgressForZone(ZoneId zone)
     {
         if (zone == null)
@@ -310,7 +369,6 @@ public class QuestManager : MonoBehaviour
             for (int i = 0; i < quest.Objectives.Count; i++)
             {
                 var objective = quest.Objectives[i];
-                // SOLO resetea objetivos de tipo Countdown, otros tipos mantienen su progreso
                 if (objective.Type == QuestType.Countdown && objective.Zone == zone)
                 {
                     if (!state.IsObjectiveCompleted(i, objective))

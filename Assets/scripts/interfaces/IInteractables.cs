@@ -15,8 +15,8 @@ public interface ILockable
 
 public interface IKeyLockable : ILockable
 {
-    string RequiredKeyId { get; }  
-    bool TryUnlock(string keyId);     
+    string RequiredKeyId { get; }
+    bool TryUnlock(string keyId);
     bool HasValidKey(string keyId);
 }
 

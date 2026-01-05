@@ -1,10 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Dispara eventos de misiones cuando el jugador entra/sale de una zona.
-/// Configurable para disparar eventos de ReachZone y/o Countdown.
-/// </summary>
 public class ZoneTrigger : MonoBehaviour
 {
     [Header("Zone Configuration")]

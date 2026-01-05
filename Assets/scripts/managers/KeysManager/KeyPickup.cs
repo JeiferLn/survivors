@@ -1,14 +1,18 @@
-﻿using UnityEngine;
-using Sirenix.OdinInspector;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 public class KeyPickup : MonoBehaviour, IInteractable
 {
-    [Title("Configuración")] 
-    [SerializeField] private string _keyId = "key_01";
-    [SerializeField] private bool _destroyOnPickup = true;
+    [Title("Configuración")]
+    [SerializeField]
+    private string _keyId = "key_01";
+
+    [SerializeField]
+    private bool _destroyOnPickup = true;
 
     [Title("Outline Shader Referencia")]
-    [SerializeField] private Outline outline;
+    [SerializeField]
+    private Outline outline;
 
     public void Interact()
     {

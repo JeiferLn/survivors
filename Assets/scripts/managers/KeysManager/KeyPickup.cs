@@ -17,7 +17,7 @@ public class KeyPickup : MonoBehaviour, IInteractable
     public void Interact()
     {
         // Buscar al jugador
-        PlayerInteraction3D player = FindFirstObjectByType<PlayerInteraction3D>();
+        PlayerInteraction player = FindFirstObjectByType<PlayerInteraction>();
 
         if (player != null)
         {

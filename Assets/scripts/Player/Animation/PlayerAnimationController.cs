@@ -127,4 +127,18 @@ public class PlayerAnimationController : MonoBehaviour
             rigBuilder.Build();
         }
     }
+
+    // ---------------- RESET ANIMATION PARAMETERS ----------------
+    /// <summary>
+    /// Resetea los parámetros de locomoción a su estado base (Speed, Horizontal, Vertical = 0)
+    /// </summary>
+    public void ResetLocomotionParameters()
+    {
+        if (animator == null)
+            return;
+
+        animator.SetFloat("Speed", 0f);
+        animator.SetFloat("Horizontal", 0f);
+        animator.SetFloat("Vertical", 0f);
+    }
 }

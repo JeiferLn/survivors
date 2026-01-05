@@ -106,6 +106,10 @@ public class PlayerController : MonoBehaviour
         if (!canMove)
             return;
 
+        // No permitir movimiento si hay diálogo activo
+        if (DialogueSystem.Instance != null && DialogueSystem.Instance.IsDialogueActive)
+            return;
+
         MovePlayer();
         ApplyGravity();
         HandleRotation();
@@ -239,7 +243,7 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateKeyDisplay()
     {
-        if(interactionActionRef.action==null)
+        if (interactionActionRef.action == null)
             return;
 
         var action = interactionActionRef.action;

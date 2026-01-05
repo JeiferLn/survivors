@@ -22,6 +22,7 @@ public class PlayerInteraction : MonoBehaviour
 
     [Title("Equipamiento")]
     private PlayerEquipmentController _equipmentController;
+    private PlayerAnimationController _animationController;
 
     // ══════════════════════════════════════════════════════════════
     // INVENTARIO DE LLAVES
@@ -41,17 +42,25 @@ public class PlayerInteraction : MonoBehaviour
     private Outline _lastOutline;
 
     // ══════════════════════════════════════════════════════════════
+    // CONTROL DE DIÁLOGO
+    // ══════════════════════════════════════════════════════════════
+
+    private float _timeSinceTextFinished = 0f;
+
+    // ══════════════════════════════════════════════════════════════
     // UNITY LIFECYCLE
     // ══════════════════════════════════════════════════════════════
 
     private void Awake()
     {
         _equipmentController = GetComponent<PlayerEquipmentController>();
+        _animationController = GetComponent<PlayerAnimationController>();
     }
 
     private void Update()
     {
         UpdateCurrentTarget();
+        UpdateDialogueTimer();
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -186,6 +195,16 @@ public class PlayerInteraction : MonoBehaviour
 
     private void TryInteract()
     {
+        // Resetear parámetros de animación al interactuar
+        ResetAnimationParameters();
+
+        // Verificar primero si hay un diálogo activo
+        if (DialogueSystem.Instance != null && DialogueSystem.Instance.IsDialogueActive)
+        {
+            HandleDialogueInteraction();
+            return;
+        }
+
         // Prioridad: IInteractable sobre IEquipable
         if (_currentTarget != null)
         {
@@ -205,6 +224,58 @@ public class PlayerInteraction : MonoBehaviour
             // Equipar arma si no hay nada interactuable
             _currentEquipableTarget.Equip(_equipmentController);
             _currentEquipableTarget = null;
+        }
+    }
+
+    private void ResetAnimationParameters()
+    {
+        if (_animationController != null)
+        {
+            _animationController.ResetLocomotionParameters();
+        }
+    }
+
+    private void HandleDialogueInteraction()
+    {
+        DialogueSystem dialogueSystem = DialogueSystem.Instance;
+
+        if (dialogueSystem == null)
+            return;
+
+        // Si está escribiendo, completar el texto de una vez
+        if (dialogueSystem.IsTyping)
+        {
+            dialogueSystem.SkipCurrentPage();
+            _timeSinceTextFinished = 0f; // Resetear el timer
+        }
+        // Si el texto terminó (independientemente del tiempo), permitir cerrar el diálogo con la acción de interactuar
+        else if (!dialogueSystem.IsTyping)
+        {
+            dialogueSystem.ForceEndDialogue();
+            _timeSinceTextFinished = 0f;
+        }
+    }
+
+    private void UpdateDialogueTimer()
+    {
+        if (
+            DialogueSystem.Instance != null
+            && DialogueSystem.Instance.IsDialogueActive
+            && !DialogueSystem.Instance.IsTyping
+        )
+        {
+            _timeSinceTextFinished += Time.deltaTime;
+
+            // Cerrar automáticamente después de 1 segundo
+            if (_timeSinceTextFinished >= 1f)
+            {
+                DialogueSystem.Instance.ForceEndDialogue();
+                _timeSinceTextFinished = 0f;
+            }
+        }
+        else
+        {
+            _timeSinceTextFinished = 0f;
         }
     }
 

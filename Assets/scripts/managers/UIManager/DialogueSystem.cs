@@ -19,7 +19,8 @@ public class DialogueSystem : MonoBehaviour
     private TextMeshProUGUI _tmpText;
     private TextAnimatorPlayer _textAnimatorPlayer;
 
-    [SerializeField] private GameObject _dialoguePanel;
+    [SerializeField]
+    private GameObject _dialoguePanel;
 
     [SerializeField, Tooltip("Indicador visual de 'presiona para continuar'")]
     private GameObject _continueIndicator;
@@ -32,13 +33,16 @@ public class DialogueSystem : MonoBehaviour
     // ══════════════════════════════════════════════════════════════
 
     [Title("Configuración de Texto")]
-    [SerializeField, Range(1, 4)] private int _maxLinesPerPage = 2;
+    [SerializeField, Range(1, 4)]
+    private int _maxLinesPerPage = 2;
 
     [SerializeField, Range(10, 100), Tooltip("Caracteres máximos por línea (aproximado)")]
     private int _maxCharsPerLine = 50;
 
-    [Title("Controles")] 
-    [SerializeField] private KeyCode _continueKey = KeyCode.Space;
+    [Title("Controles")]
+    [SerializeField]
+    private KeyCode _continueKey = KeyCode.Space;
+
     [SerializeField, Tooltip("También permitir click para continuar")]
     private bool _allowMouseClick = true;
 
@@ -46,29 +50,37 @@ public class DialogueSystem : MonoBehaviour
     // EVENTOS DE UNITY
     // ══════════════════════════════════════════════════════════════
 
-    [Title("Eventos")] [FoldoutGroup("Unity Events")] [LabelText("Al Recibir Texto")]
+    [Title("Eventos")]
+    [FoldoutGroup("Unity Events")]
+    [LabelText("Al Recibir Texto")]
     public UnityEvent<string> OnReceiveText;
 
-    [FoldoutGroup("Unity Events")] [LabelText("Al Iniciar Diálogo")]
+    [FoldoutGroup("Unity Events")]
+    [LabelText("Al Iniciar Diálogo")]
     public UnityEvent OnDialogueStart;
 
-    [FoldoutGroup("Unity Events")] [LabelText("Al Terminar Diálogo")]
+    [FoldoutGroup("Unity Events")]
+    [LabelText("Al Terminar Diálogo")]
     public UnityEvent OnDialogueEnd;
 
-    [FoldoutGroup("Unity Events")] [LabelText("Al Completar Página")]
+    [FoldoutGroup("Unity Events")]
+    [LabelText("Al Completar Página")]
     public UnityEvent OnPageComplete;
 
-    [FoldoutGroup("Unity Events")] [LabelText("Al Cambiar Página")]
+    [FoldoutGroup("Unity Events")]
+    [LabelText("Al Cambiar Página")]
     public UnityEvent<int, int> OnPageChanged; // (currentPage, totalPages)
 
     // ══════════════════════════════════════════════════════════════
     // ESTADO INTERNO
     // ══════════════════════════════════════════════════════════════
 
-    [Title("Debug (Solo Lectura)")] [ShowInInspector, ReadOnly]
+    [Title("Debug (Solo Lectura)")]
+    [ShowInInspector, ReadOnly]
     private bool _isDialogueActive = false;
 
-    [ShowInInspector, ReadOnly] private bool _isTyping = false;
+    [ShowInInspector, ReadOnly]
+    private bool _isTyping = false;
 
     [ShowInInspector, ReadOnly, LabelText("Página Actual")]
     private int _currentPageIndex = 0;
@@ -122,7 +134,8 @@ public class DialogueSystem : MonoBehaviour
 
     private void Update()
     {
-        if (!_isDialogueActive) return;
+        if (!_isDialogueActive)
+            return;
 
         HandleInput();
     }
@@ -195,7 +208,8 @@ public class DialogueSystem : MonoBehaviour
     [Button("Enviar Texto", ButtonSizes.Large), GUIColor(0.4f, 0.8f, 0.4f)]
     public void SendText(string text)
     {
-        if (string.IsNullOrEmpty(text)) return;
+        if (string.IsNullOrEmpty(text))
+            return;
 
         OnReceiveText?.Invoke(text);
         StartDialogue(text);
@@ -206,7 +220,8 @@ public class DialogueSystem : MonoBehaviour
     /// </summary>
     public void SendText(string[] lines)
     {
-        if (lines == null || lines.Length == 0) return;
+        if (lines == null || lines.Length == 0)
+            return;
 
         string combined = string.Join("\n", lines);
         SendText(combined);
@@ -255,7 +270,8 @@ public class DialogueSystem : MonoBehaviour
     [Button("Siguiente Página")]
     public void NextPage()
     {
-        if (!_isDialogueActive || _isTyping) return;
+        if (!_isDialogueActive || _isTyping)
+            return;
 
         _currentPageIndex++;
 
@@ -346,9 +362,7 @@ public class DialogueSystem : MonoBehaviour
 
         foreach (string word in words)
         {
-            string testLine = string.IsNullOrEmpty(currentLine)
-                ? word
-                : currentLine + " " + word;
+            string testLine = string.IsNullOrEmpty(currentLine) ? word : currentLine + " " + word;
 
             if (testLine.Length > _maxCharsPerLine && !string.IsNullOrEmpty(currentLine))
             {
@@ -375,7 +389,8 @@ public class DialogueSystem : MonoBehaviour
 
     private void ShowCurrentPage()
     {
-        if (_currentPageIndex >= _pages.Count) return;
+        if (_currentPageIndex >= _pages.Count)
+            return;
 
         string pageText = _pages[_currentPageIndex];
 
@@ -439,16 +454,15 @@ public class DialogueSystem : MonoBehaviour
     {
         if (_dialoguePanel != null)
             _dialoguePanel.SetActive(active);
-        
+
         UpdateOpacityOfBackImage(active);
     }
-
 
     private void UpdateOpacityOfBackImage(bool active)
     {
         float defOpacity = active ? 0.5f : 0;
         float defDuration = active ? 0.8f : 0f;
-        
+
         Tween.Alpha(backImage, defOpacity, defDuration).SetEase(Ease.Linear);
     }
 
@@ -460,9 +474,7 @@ public class DialogueSystem : MonoBehaviour
 
     private void UpdateProgress()
     {
-        _progress = _totalPages > 0
-            ? (float)(_currentPageIndex + 1) / _totalPages
-            : 0f;
+        _progress = _totalPages > 0 ? (float)(_currentPageIndex + 1) / _totalPages : 0f;
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -470,7 +482,9 @@ public class DialogueSystem : MonoBehaviour
     // ══════════════════════════════════════════════════════════════
 
 #if UNITY_EDITOR
-    [Title("Testing")] [TextArea(3, 6)] [SerializeField]
+    [Title("Testing")]
+    [TextArea(3, 6)]
+    [SerializeField]
     private string _testText =
         "Bienvenido aventurero a nuestra humilde tienda.\nTenemos los mejores productos de toda la región.\n¿Qué te gustaría comprar hoy?\nTenemos espadas, escudos, pociones y mucho más.";
 

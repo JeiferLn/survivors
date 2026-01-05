@@ -223,6 +223,7 @@ public class PlayerInteraction : MonoBehaviour
             else
             {
                 // Aquí podrías mostrar UI, reproducir sonido, etc.
+                Debug.Log("Need Key");
             }
         }
         else

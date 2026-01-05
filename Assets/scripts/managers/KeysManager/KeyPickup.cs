@@ -4,15 +4,23 @@ using UnityEngine;
 public class KeyPickup : MonoBehaviour, IInteractable
 {
     [Title("Configuración")]
+    private string _keyId;
+    private string _description;
+    
     [SerializeField]
-    private string _keyId = "key_01";
-
+    private ItemInfo objectData;
     [SerializeField]
     private bool _destroyOnPickup = true;
 
     [Title("Outline Shader Referencia")]
     [SerializeField]
     private Outline outline;
+
+    private void Start()
+    {
+        objectData = GetComponent<ItemInfo>();
+        _keyId = objectData.itemData.itemID;
+    }
 
     public void Interact()
     {

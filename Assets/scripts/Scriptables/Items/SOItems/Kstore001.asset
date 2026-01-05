@@ -12,11 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1787b74462a7da449b0a711909cb242e, type: 3}
   m_Name: Kstore001
   m_EditorClassIdentifier: 
-  itemID: 001
-  itemName: Llave del almacen
+  itemID: key_01
+  itemName: Llave Oxidada
   itemDescription: Una llave vieja, parece que aun se usa.
   itemImage: {fileID: -2133931053, guid: 737e1c03e4591af4682fad75f76209c5, type: 3}
-  item3d: {fileID: 919132149155446097, guid: 1ae6e17d43715d642965fe33e1015f9e, type: 3}
   itemType: 3
   itemRarity: 0
   maxStack: 1

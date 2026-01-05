@@ -282,34 +282,31 @@ public class PlayerController : MonoBehaviour
 
     private int GetCorrectBindingIndex(InputAction action)
     {
-        // Iterar por todos los bindings
         for (int i = 0; i < action.bindings.Count; i++)
         {
             var binding = action.bindings[i];
 
+            // Ignorar composites (WASD, Stick, etc.)
+            if (binding.isComposite || binding.isPartOfComposite)
+                continue;
+
             if (currentInputDevice == InputDeviceType.Gamepad)
             {
-                // Buscar bindings de gamepad
-                if (
-                    binding.path.Contains("<Gamepad>")
-                    || binding.path.Contains("button")
-                    || binding.path.Contains("rightTrigger")
-                    || binding.path.Contains("leftTrigger")
-                )
-                {
+                // Gamepad bindings
+                if (binding.effectivePath.StartsWith("<Gamepad>"))
                     return i;
-                }
             }
             else if (currentInputDevice == InputDeviceType.MouseKeyboard)
             {
-                // Buscar bindings de teclado
-                if (binding.path.Contains("<Keyboard>"))
-                {
+                // Keyboard & Mouse bindings
+                if (
+                    binding.effectivePath.StartsWith("<Keyboard>")
+                    || binding.effectivePath.StartsWith("<Mouse>")
+                )
                     return i;
-                }
             }
         }
 
-        return -1; // No encontrado
+        return -1; // No se encontró un binding válido
     }
 }

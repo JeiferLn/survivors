@@ -168,7 +168,7 @@ public class PlayerController : MonoBehaviour
             verticalVelocity += gravity * Time.deltaTime;
         }
 
-        controller.Move(Vector3.up * verticalVelocity * Time.deltaTime);
+        controller.Move(Vector3.up * (verticalVelocity * Time.deltaTime));
     }
 
     // ---------------- ROTATION --------------------

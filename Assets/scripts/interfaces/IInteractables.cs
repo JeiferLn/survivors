@@ -23,5 +23,4 @@ public interface IKeyLockable : ILockable
 public interface IInteractable
 {
     void Interact();
-    string GetInteractionText();
 }

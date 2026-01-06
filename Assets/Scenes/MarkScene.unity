@@ -894,7 +894,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97fb3f0d1a0468fa4555090682e8572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectData: {fileID: 0}
   _destroyOnPickup: 1
   outline: {fileID: 0}
 --- !u!65 &515365001
@@ -1212,11 +1211,9 @@ MonoBehaviour:
   _doorType: 2
   _openAngle: -90
   _openSpeed: 1
-  _startsLocked: 1
-  _lockedMessage: "La puerta est\xE1 bloqueada"
   _requiredKeyId: key_01
+  _lockedMessage: "La puerta est\xE1 bloqueada"
   _noKeyMessage: Necesitas una llave
-  _wrongKeyMessage: Llave incorrecta
 --- !u!65 &839997554
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1603,7 +1600,7 @@ Transform:
   m_GameObject: {fileID: 1218887811}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 77.95, y: 28.92, z: -55.72}
+  m_LocalPosition: {x: 71.85, y: 28.92, z: -49.74}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2087,6 +2084,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a63c62980313786499199f9527637308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  textNormalColor: {r: 1, g: 1, b: 1, a: 1}
+  textImportantColor: {r: 1, g: 0.80716705, b: 0, a: 1}
+  textHealColor: {r: 0.14242072, g: 0.90943396, b: 0.45273355, a: 1}
+  textDamageColor: {r: 1, g: 0.33945617, b: 0.1462264, a: 1}
   _dialoguePanel: {fileID: 1275270422}
   _continueIndicator: {fileID: 1726997184}
   backImage: {fileID: 422495796}

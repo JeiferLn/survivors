@@ -18,7 +18,12 @@ public class DialogueSystem : MonoBehaviour
 
     private TextMeshProUGUI _tmpText;
     private TextAnimatorPlayer _textAnimatorPlayer;
-
+    
+    public Color textNormalColor;
+    public Color textImportantColor;
+    public Color textHealColor;
+    public Color textDamageColor;    
+    
     [SerializeField]
     private GameObject _dialoguePanel;
 

@@ -22,6 +22,7 @@ public class PlayerInteraction : MonoBehaviour
 
     [Title("Equipamiento")]
     private PlayerEquipmentController _equipmentController;
+
     private PlayerAnimationController _animationController;
 
     // ══════════════════════════════════════════════════════════════
@@ -33,10 +34,8 @@ public class PlayerInteraction : MonoBehaviour
     [ListDrawerSettings(ShowFoldout = true, DraggableItems = false)]
     private List<string> _keys = new List<string>();
 
-    [ShowInInspector, ReadOnly]
-    private int KeyCount => _keys.Count;
-
-    private string _lastInteractionText = "Ninguno";
+    [ShowInInspector, ReadOnly] private int KeyCount => _keys.Count;
+    
     private IInteractable _currentTarget;
     private IEquipable _currentEquipableTarget;
     private Outline _lastOutline;
@@ -93,7 +92,6 @@ public class PlayerInteraction : MonoBehaviour
             DisableLastTargetEffects();
             _currentTarget = null;
             _currentEquipableTarget = null;
-            _lastInteractionText = "Ninguno";
             return;
         }
 
@@ -144,20 +142,7 @@ public class PlayerInteraction : MonoBehaviour
         // Set targets actuales
         _currentTarget = bestInteractable;
         _currentEquipableTarget = bestEquipable;
-
-        // Actualizar texto de interacción
-        if (_currentTarget != null)
-        {
-            _lastInteractionText = _currentTarget.GetInteractionText();
-        }
-        else if (_currentEquipableTarget != null)
-        {
-            _lastInteractionText = "Equipar arma";
-        }
-        else
-        {
-            _lastInteractionText = "No interactuable";
-        }
+        
 
         // Primero desactivamos todos los outlines excepto el mejor
         foreach (var outline in outlinesInRange)
@@ -281,6 +266,18 @@ public class PlayerInteraction : MonoBehaviour
 
     private void InteractWithDoor(Door door)
     {
+        if (door is null) return;
+
+        // carga de mensajes
+        string msgDoorLocked = door._lockedMessage;
+        string msgDoorNeedKey = door._noKeyMessage;
+
+        if (door.CurrentDoorType == Door.DoorType.Locked)
+        {
+            Debug.Log(msgDoorLocked);
+            return;
+        }
+
         // Si la puerta requiere llave y está bloqueada
         if (door.CurrentDoorType == Door.DoorType.KeyRequired && door.IsLocked)
         {
@@ -294,7 +291,10 @@ public class PlayerInteraction : MonoBehaviour
             else
             {
                 // Aquí podrías mostrar UI, reproducir sonido, etc.
-                Debug.Log("Need Key");
+                if (door.IsLocked)
+                {
+                    Debug.Log(msgDoorNeedKey);
+                }
             }
         }
         else
@@ -318,7 +318,6 @@ public class PlayerInteraction : MonoBehaviour
         if (!HasKey(keyId))
         {
             _keys.Add(keyId);
-            DialogueSystem.Instance.SendText($"Has obtenido llaves {keyId}");
         }
     }
 
@@ -335,15 +334,7 @@ public class PlayerInteraction : MonoBehaviour
     // ══════════════════════════════════════════════════════════════
     // GETTERS PÚBLICOS
     // ══════════════════════════════════════════════════════════════
-
-    /// <summary>
-    /// Texto de interacción actual (útil para UI)
-    /// </summary>
-    public string GetCurrentInteractionText()
-    {
-        return _lastInteractionText;
-    }
-
+    
     /// <summary>
     /// ¿Hay un objetivo válido?
     /// </summary>

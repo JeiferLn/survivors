@@ -23,8 +23,6 @@ public class PlayerInteraction : MonoBehaviour
     [Title("Equipamiento")]
     private PlayerEquipmentController _equipmentController;
 
-    private PlayerAnimationController _animationController;
-
     // ══════════════════════════════════════════════════════════════
     // INVENTARIO DE LLAVES
     // ══════════════════════════════════════════════════════════════
@@ -34,8 +32,9 @@ public class PlayerInteraction : MonoBehaviour
     [ListDrawerSettings(ShowFoldout = true, DraggableItems = false)]
     private List<string> _keys = new List<string>();
 
-    [ShowInInspector, ReadOnly] private int KeyCount => _keys.Count;
-    
+    [ShowInInspector, ReadOnly]
+    private int KeyCount => _keys.Count;
+
     private IInteractable _currentTarget;
     private IEquipable _currentEquipableTarget;
     private Outline _lastOutline;
@@ -53,7 +52,6 @@ public class PlayerInteraction : MonoBehaviour
     private void Awake()
     {
         _equipmentController = GetComponent<PlayerEquipmentController>();
-        _animationController = GetComponent<PlayerAnimationController>();
     }
 
     private void Update()
@@ -86,7 +84,6 @@ public class PlayerInteraction : MonoBehaviour
             _interactableLayer
         );
 
-        // Si no hay nada → apagar outline previo
         if (hits.Length == 0)
         {
             DisableLastTargetEffects();
@@ -95,7 +92,6 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
-        // Guardamos todos los outlines dentro del rango
         List<Outline> outlinesInRange = new List<Outline>();
 
         float bestDist = float.MaxValue;
@@ -105,33 +101,28 @@ public class PlayerInteraction : MonoBehaviour
 
         foreach (var hit in hits)
         {
-            // Buscar componentes sin depender del Outline
             IInteractable interactable = hit.GetComponent<IInteractable>();
             IEquipable equipable = hit.GetComponent<IEquipable>();
             Outline outline = hit.GetComponent<Outline>();
 
-            // Si tiene outline, agregarlo a la lista
             if (outline != null)
                 outlinesInRange.Add(outline);
 
-            // Solo considerar objetos que tienen IInteractable o IEquipable
             if (interactable == null && equipable == null)
                 continue;
 
             float dist = Vector3.Distance(transform.position, hit.transform.position);
             if (dist < bestDist)
             {
-                // Prioridad: IInteractable sobre IEquipable
                 if (interactable != null)
                 {
                     bestDist = dist;
                     bestInteractable = interactable;
-                    bestEquipable = null; // Limpiar equipable si hay interactable
+                    bestEquipable = null;
                     bestOutline = outline;
                 }
                 else if (equipable != null && bestInteractable == null)
                 {
-                    // Solo considerar equipable si no hay interactable
                     bestDist = dist;
                     bestEquipable = equipable;
                     bestOutline = outline;
@@ -139,12 +130,9 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        // Set targets actuales
         _currentTarget = bestInteractable;
         _currentEquipableTarget = bestEquipable;
-        
 
-        // Primero desactivamos todos los outlines excepto el mejor
         foreach (var outline in outlinesInRange)
         {
             if (outline != bestOutline)
@@ -157,7 +145,6 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        // Solo activamos al más cercano
         if (bestOutline != null)
         {
             if (_lastOutline != null && _lastOutline != bestOutline)
@@ -180,43 +167,27 @@ public class PlayerInteraction : MonoBehaviour
 
     private void TryInteract()
     {
-        // Resetear parámetros de animación al interactuar
-        ResetAnimationParameters();
-
-        // Verificar primero si hay un diálogo activo
         if (DialogueSystem.Instance != null && DialogueSystem.Instance.IsDialogueActive)
         {
             HandleDialogueInteraction();
             return;
         }
 
-        // Prioridad: IInteractable sobre IEquipable
         if (_currentTarget != null)
         {
-            // Verificar si es una puerta con llave
             if (_currentTarget is Door door)
             {
                 InteractWithDoor(door);
             }
             else
             {
-                // Interacción normal para otros objetos
                 _currentTarget.Interact();
             }
         }
         else if (_currentEquipableTarget != null && _equipmentController != null)
         {
-            // Equipar arma si no hay nada interactuable
             _currentEquipableTarget.Equip(_equipmentController);
             _currentEquipableTarget = null;
-        }
-    }
-
-    private void ResetAnimationParameters()
-    {
-        if (_animationController != null)
-        {
-            _animationController.ResetLocomotionParameters();
         }
     }
 
@@ -227,13 +198,11 @@ public class PlayerInteraction : MonoBehaviour
         if (dialogueSystem == null)
             return;
 
-        // Si está escribiendo, completar el texto de una vez
         if (dialogueSystem.IsTyping)
         {
             dialogueSystem.SkipCurrentPage();
-            _timeSinceTextFinished = 0f; // Resetear el timer
+            _timeSinceTextFinished = 0f;
         }
-        // Si el texto terminó (independientemente del tiempo), permitir cerrar el diálogo con la acción de interactuar
         else if (!dialogueSystem.IsTyping)
         {
             dialogueSystem.ForceEndDialogue();
@@ -251,7 +220,6 @@ public class PlayerInteraction : MonoBehaviour
         {
             _timeSinceTextFinished += Time.deltaTime;
 
-            // Cerrar automáticamente después de 1 segundo
             if (_timeSinceTextFinished >= 1f)
             {
                 DialogueSystem.Instance.ForceEndDialogue();
@@ -266,9 +234,9 @@ public class PlayerInteraction : MonoBehaviour
 
     private void InteractWithDoor(Door door)
     {
-        if (door is null) return;
+        if (door is null)
+            return;
 
-        // carga de mensajes
         string msgDoorLocked = door._lockedMessage;
         string msgDoorNeedKey = door._noKeyMessage;
 
@@ -278,10 +246,8 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
-        // Si la puerta requiere llave y está bloqueada
         if (door.CurrentDoorType == Door.DoorType.KeyRequired && door.IsLocked)
         {
-            // Buscar si tenemos la llave correcta
             string requiredKey = door.RequiredKeyId;
 
             if (HasKey(requiredKey))
@@ -290,7 +256,6 @@ public class PlayerInteraction : MonoBehaviour
             }
             else
             {
-                // Aquí podrías mostrar UI, reproducir sonido, etc.
                 if (door.IsLocked)
                 {
                     Debug.Log(msgDoorNeedKey);
@@ -299,7 +264,6 @@ public class PlayerInteraction : MonoBehaviour
         }
         else
         {
-            // Puerta normal o ya desbloqueada
             door.Interact();
         }
     }
@@ -334,10 +298,7 @@ public class PlayerInteraction : MonoBehaviour
     // ══════════════════════════════════════════════════════════════
     // GETTERS PÚBLICOS
     // ══════════════════════════════════════════════════════════════
-    
-    /// <summary>
-    /// ¿Hay un objetivo válido?
-    /// </summary>
+
     public bool HasValidTarget()
     {
         return _currentTarget != null || _currentEquipableTarget != null;

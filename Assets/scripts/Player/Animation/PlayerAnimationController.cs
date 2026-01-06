@@ -52,6 +52,13 @@ public class PlayerAnimationController : MonoBehaviour
             : playerState.IsMoving ? 0.5f
             : 0f;
 
+        if (DialogueSystem.Instance != null && DialogueSystem.Instance.IsDialogueActive)
+        {
+            float reductionFactor = 0.05f;
+            speed *= reductionFactor;
+            localMoveDir *= reductionFactor;
+        }
+
         animator.SetFloat("Speed", speed, damping, Time.deltaTime);
         animator.SetFloat("Horizontal", localMoveDir.x, damping, Time.deltaTime);
         animator.SetFloat("Vertical", localMoveDir.z, damping, Time.deltaTime);
@@ -129,9 +136,6 @@ public class PlayerAnimationController : MonoBehaviour
     }
 
     // ---------------- RESET ANIMATION PARAMETERS ----------------
-    /// <summary>
-    /// Resetea los parámetros de locomoción a su estado base (Speed, Horizontal, Vertical = 0)
-    /// </summary>
     public void ResetLocomotionParameters()
     {
         if (animator == null)

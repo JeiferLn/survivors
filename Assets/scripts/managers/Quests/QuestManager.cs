@@ -159,7 +159,6 @@ public class QuestManager : MonoBehaviour
 
     internal void MarkObjectiveCompleted(QuestDefinition quest, QuestObjective objective)
     {
-        // Debug cuando se completa un objetivo de tipo TalkToNPC
         if (objective.Type == QuestType.TalkToNPC)
         {
             Debug.Log(

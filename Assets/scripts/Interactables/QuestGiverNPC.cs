@@ -6,10 +6,13 @@ using UnityEngine.Events;
 public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 {
     [Title("Misión")]
-    [SerializeField, Tooltip("La misión que este NPC puede dar al jugador")]
-    private QuestDefinition questToGive;
+    [SerializeField]
+    private NpcId npcID;
 
-    [SerializeField, Tooltip("Si es true, la misión solo se puede activar una vez")]
+    [SerializeField]
+    private QuestDefinition questID;
+
+    [SerializeField]
     private bool _oneTimeOnly = true;
 
     // ══════════════════════════════════════════════════════════════
@@ -17,42 +20,30 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
     // ══════════════════════════════════════════════════════════════
 
     [Title("Diálogo")]
-    [SerializeField, Tooltip("Nombre del NPC (se mostrará en el diálogo)")]
-    private string _npcName = "NPC";
+    [SerializeField]
+    private string _npcName;
 
-    [SerializeField, TextArea(3, 5), Tooltip("Texto de diálogo antes de activar la misión")]
-    private string[] _dialogueBeforeQuest = new string[] { "Hola, ¿puedes ayudarme?" };
+    [SerializeField, TextArea(3, 5)]
+    private string[] _dialogueBeforeQuest = new string[] { };
 
-    [SerializeField, TextArea(3, 5), Tooltip("Texto de diálogo después de activar la misión")]
-    private string[] _dialogueAfterQuest = new string[] { "¡Gracias! Buena suerte con la misión." };
+    [SerializeField, TextArea(3, 5)]
+    private string[] _dialogueAfterQuest = new string[] { };
 
-    [SerializeField, TextArea(3, 5), Tooltip("Texto si la misión ya está activa")]
-    private string[] _dialogueQuestActive = new string[]
-    {
-        "Ya te di esa misión. ¡Ve a completarla!",
-    };
+    [SerializeField, TextArea(3, 5)]
+    private string[] _dialogueQuestActive = new string[] { };
 
-    [SerializeField, TextArea(3, 5), Tooltip("Texto si la misión ya está completada")]
-    private string[] _dialogueQuestCompleted = new string[] { "¡Gracias por completar la misión!" };
+    [SerializeField, TextArea(3, 5)]
+    private string[] _dialogueQuestCompleted = new string[] { };
 
-    [
-        SerializeField,
-        TextArea(3, 5),
-        Tooltip("Texto si la misión no se puede activar (requisitos no cumplidos)")
-    ]
-    private string[] _dialogueQuestLocked = new string[] { "Aún no puedes recibir esta misión." };
+    [SerializeField, TextArea(3, 5)]
+    private string[] _dialogueQuestLocked = new string[] { };
 
     // ══════════════════════════════════════════════════════════════
     // ESTADO INTERNO
     // ══════════════════════════════════════════════════════════════
 
-    [Title("Debug (Solo Lectura)")]
-    [ShowInInspector, ReadOnly]
     private bool _questActivated = false;
-
-    [ShowInInspector, ReadOnly]
     private QuestStatus _currentQuestStatus = QuestStatus.Locked;
-
     private Coroutine _dialogueSequenceCoroutine;
 
     // ══════════════════════════════════════════════════════════════
@@ -73,10 +64,10 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 
     private void UpdateQuestStatus()
     {
-        if (questToGive == null || QuestManager.Instance == null)
+        if (questID == null || QuestManager.Instance == null)
             return;
 
-        var state = QuestManager.Instance.GetQuestState(questToGive.QuestId);
+        var state = QuestManager.Instance.GetQuestState(questID.QuestId);
         _currentQuestStatus = state.Status;
     }
 
@@ -86,7 +77,7 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 
     public void Interact()
     {
-        if (questToGive == null)
+        if (questID == null)
         {
             Debug.LogWarning($"[QuestGiverNPC] {_npcName} no tiene una misión asignada.");
             StartDialogue();
@@ -95,13 +86,11 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 
         UpdateQuestStatus();
 
-        // Detener cualquier secuencia de diálogo anterior
         if (_dialogueSequenceCoroutine != null)
         {
             StopCoroutine(_dialogueSequenceCoroutine);
         }
 
-        // Iniciar la secuencia completa de diálogo
         _dialogueSequenceCoroutine = StartCoroutine(HandleInteractionSequence());
     }
 
@@ -109,19 +98,14 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
     {
         UpdateQuestStatus();
 
-        // Si la misión está Locked o Available, mostrar diálogos "before" primero
         if (
             _currentQuestStatus == QuestStatus.Locked
             || _currentQuestStatus == QuestStatus.Available
         )
         {
-            // Mostrar diálogos "before quest"
             yield return StartCoroutine(ShowDialogueSequence(_dialogueBeforeQuest));
-
-            // Actualizar estado después de mostrar los diálogos
             UpdateQuestStatus();
 
-            // Intentar activar la misión después de mostrar los diálogos "before"
             if (
                 _currentQuestStatus == QuestStatus.Locked
                 || _currentQuestStatus == QuestStatus.Available
@@ -129,14 +113,13 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
             {
                 if (QuestManager.Instance != null && (!_oneTimeOnly || !_questActivated))
                 {
-                    bool activated = QuestManager.Instance.TryActivateQuest(questToGive);
+                    bool activated = QuestManager.Instance.TryActivateQuest(questID);
                     if (activated)
                     {
                         _questActivated = true;
                         UpdateQuestStatus();
-                        Debug.Log($"✅ Misión activada: {questToGive.QuestName}");
+                        Debug.Log($"✅ Misión activada: {questID.QuestName}");
 
-                        // Mostrar diálogos "after quest" si se activó correctamente
                         yield return StartCoroutine(ShowDialogueSequence(_dialogueAfterQuest));
                     }
                 }
@@ -144,7 +127,6 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
         }
         else
         {
-            // Para otros estados, mostrar el diálogo correspondiente
             string[] dialogueToShow = GetDialogueLines();
             yield return StartCoroutine(ShowDialogueSequence(dialogueToShow));
         }
@@ -154,7 +136,7 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 
     public string GetInteractionText()
     {
-        if (questToGive == null)
+        if (questID == null)
             return $"Hablar con {_npcName}";
 
         UpdateQuestStatus();
@@ -180,7 +162,6 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
             return;
         }
 
-        // Detener cualquier secuencia de diálogo anterior
         if (_dialogueSequenceCoroutine != null)
         {
             StopCoroutine(_dialogueSequenceCoroutine);
@@ -195,7 +176,6 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
         if (dialogueLines == null || dialogueLines.Length == 0)
             yield break;
 
-        // Suscribirse al evento de fin de diálogo
         bool dialogueFinished = false;
         UnityAction onDialogueEnd = () =>
         {
@@ -209,21 +189,16 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 
             dialogueFinished = false;
 
-            // Suscribirse al evento
             DialogueSystem.Instance.OnDialogueEnd.AddListener(onDialogueEnd);
 
-            // Enviar el mensaje actual
             DialogueSystem.Instance.SendText(line);
 
-            // Esperar a que termine el diálogo (se cierre automáticamente o manualmente)
             yield return new WaitUntil(() =>
                 !DialogueSystem.Instance.IsDialogueActive || dialogueFinished
             );
 
-            // Desuscribirse del evento
             DialogueSystem.Instance.OnDialogueEnd.RemoveListener(onDialogueEnd);
 
-            // Pequeña pausa entre mensajes
             yield return new WaitForSeconds(0.1f);
         }
 
@@ -238,7 +213,7 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 
     private string[] GetDialogueLines()
     {
-        if (questToGive == null)
+        if (questID == null)
             return _dialogueBeforeQuest;
 
         UpdateQuestStatus();
@@ -251,20 +226,4 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
             _ => _dialogueBeforeQuest,
         };
     }
-
-    // ══════════════════════════════════════════════════════════════
-    // BOTONES DE DEBUG (ODIN)
-    // ══════════════════════════════════════════════════════════════
-
-#if UNITY_EDITOR
-    [Title("Testing")]
-    [Button("Test Interact"), ShowIf("@UnityEngine.Application.isPlaying")]
-    private void TestInteract() => Interact();
-
-    [Button("Test Dialogue"), ShowIf("@UnityEngine.Application.isPlaying")]
-    private void TestDialogue() => StartDialogue();
-
-    [Button("Update Quest Status"), ShowIf("@UnityEngine.Application.isPlaying")]
-    private void TestUpdateStatus() => UpdateQuestStatus();
-#endif
 }

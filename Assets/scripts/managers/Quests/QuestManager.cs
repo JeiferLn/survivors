@@ -83,7 +83,6 @@ public class QuestManager : MonoBehaviour
 
             var state = questStates[quest.QuestId];
 
-            // Solo desbloquear (Available) si tiene RequiredQuests completadas
             if (state.Status == QuestStatus.Locked && HasRequiredQuestsCompleted(quest))
             {
                 UnlockQuest(quest);
@@ -120,9 +119,6 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Verifica si una misión tiene todas sus RequiredQuests completadas (para desbloquear)
-    /// </summary>
     private bool HasRequiredQuestsCompleted(QuestDefinition quest)
     {
         foreach (var required in quest.RequiredQuests)
@@ -137,25 +133,17 @@ public class QuestManager : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// Verifica si una misión puede activarse (debe estar Available y no estar bloqueada)
-    /// </summary>
     private bool CanActivateQuest(QuestDefinition quest)
     {
-        // Debe tener RequiredQuests completadas
         if (!HasRequiredQuestsCompleted(quest))
             return false;
 
-        // No debe estar bloqueada
         if (IsQuestBlocked(quest))
             return false;
 
         return true;
     }
 
-    /// <summary>
-    /// Desbloquea una misión (cambia de Locked a Available) sin activarla
-    /// </summary>
     private void UnlockQuest(QuestDefinition quest)
     {
         var state = questStates[quest.QuestId];
@@ -200,10 +188,8 @@ public class QuestManager : MonoBehaviour
 
     private void HandleQuestUnlocks(QuestDefinition quest)
     {
-        // UnlocksQuests: Desbloquear Y activar automáticamente
         foreach (var unlock in quest.UnlocksQuests)
         {
-            // Primero desbloquear si está Locked
             if (!questStates.ContainsKey(unlock.QuestId))
             {
                 questStates[unlock.QuestId] = new QuestState { Status = QuestStatus.Locked };
@@ -216,21 +202,17 @@ public class QuestManager : MonoBehaviour
                 UnlockQuest(unlock);
             }
 
-            // Luego activar si puede activarse
             if (CanActivateQuest(unlock))
             {
                 ActivateQuest(unlock);
             }
         }
 
-        // RequiredQuests: Solo desbloquear (Available), NO activar automáticamente
-        // Las misiones que tienen esta misión como RequiredQuest se desbloquearán
         foreach (var otherQuest in questDatabase.Quests)
         {
             if (string.IsNullOrEmpty(otherQuest.QuestId))
                 continue;
 
-            // Verificar si esta misión completada es requerida por otra
             if (otherQuest.RequiredQuests.Contains(quest))
             {
                 if (!questStates.ContainsKey(otherQuest.QuestId))
@@ -243,7 +225,6 @@ public class QuestManager : MonoBehaviour
 
                 var otherState = questStates[otherQuest.QuestId];
 
-                // Solo desbloquear si está Locked y ahora cumple los requisitos
                 if (
                     otherState.Status == QuestStatus.Locked
                     && HasRequiredQuestsCompleted(otherQuest)
@@ -387,7 +368,6 @@ public class QuestManager : MonoBehaviour
             return false;
         }
 
-        // Asegurar que el estado existe
         if (!questStates.ContainsKey(quest.QuestId))
         {
             questStates[quest.QuestId] = new QuestState { Status = QuestStatus.Locked };
@@ -395,14 +375,12 @@ public class QuestManager : MonoBehaviour
 
         var state = questStates[quest.QuestId];
 
-        // Solo activar si está Available o Locked (y puede activarse)
         if (state.Status == QuestStatus.Available && CanActivateQuest(quest))
         {
             ActivateQuest(quest);
             return true;
         }
 
-        // Si está Locked pero puede activarse, desbloquear primero y luego activar
         if (state.Status == QuestStatus.Locked && CanActivateQuest(quest))
         {
             UnlockQuest(quest);
@@ -540,10 +518,7 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    private void LogQuestStatusSummary()
-    {
-        // Método vacío - logs removidos
-    }
+    private void LogQuestStatusSummary() { }
 
     private void ReactivateUnlockedQuests()
     {
@@ -558,13 +533,11 @@ public class QuestManager : MonoBehaviour
             if (!questStates.TryGetValue(quest.QuestId, out var state))
                 continue;
 
-            // Desbloquear si tiene RequiredQuests completadas
             if (state.Status == QuestStatus.Locked && HasRequiredQuestsCompleted(quest))
             {
                 UnlockQuest(quest);
             }
 
-            // Activar automáticamente solo si está Available, puede activarse y tiene el flag AutoActivateOnStart
             if (
                 state.Status == QuestStatus.Available
                 && quest.AutoActivateOnStart

@@ -17,6 +17,8 @@ public class QuestDefinition : ScriptableObject
     public List<QuestDefinition> UnlocksQuests = new();
     public List<QuestDefinition> BlocksQuests = new();
 
-    [Tooltip("Si es true, la misión se activará automáticamente al iniciar el juego si está disponible")]
+    [Tooltip(
+        "Si es true, la misión se activará automáticamente al iniciar el juego si está disponible"
+    )]
     public bool AutoActivateOnStart = false;
 }

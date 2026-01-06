@@ -88,7 +88,6 @@ public class QuestManager : MonoBehaviour
                 UnlockQuest(quest);
             }
 
-            // Activar automáticamente solo si está Available, puede activarse y tiene el flag AutoActivateOnStart
             if (
                 state.Status == QuestStatus.Available
                 && quest.AutoActivateOnStart
@@ -160,6 +159,14 @@ public class QuestManager : MonoBehaviour
 
     internal void MarkObjectiveCompleted(QuestDefinition quest, QuestObjective objective)
     {
+        // Debug cuando se completa un objetivo de tipo TalkToNPC
+        if (objective.Type == QuestType.TalkToNPC)
+        {
+            Debug.Log(
+                $"Objetivo completado: Hablar con {objective.Npc.name} (Misión: {quest.QuestName})"
+            );
+        }
+
         CheckQuestCompletion(quest);
     }
 

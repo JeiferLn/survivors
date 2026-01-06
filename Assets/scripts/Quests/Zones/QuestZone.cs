@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class ZoneTrigger : MonoBehaviour
+public class QuestZone : MonoBehaviour
 {
     [Header("Zone Configuration")]
     [SerializeField]

@@ -77,9 +77,11 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
 
     public void Interact()
     {
-        if (questID == null)
+        if (questID == null && npcID == null)
         {
-            Debug.LogWarning($"[QuestGiverNPC] {_npcName} no tiene una misión asignada.");
+            Debug.LogWarning(
+                $"[QuestGiverNPC] {_npcName} no tiene una misión asignada ni un NPC asignado."
+            );
             StartDialogue();
             return;
         }
@@ -97,6 +99,11 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
     private IEnumerator HandleInteractionSequence()
     {
         UpdateQuestStatus();
+
+        if (npcID != null && QuestManager.Instance != null)
+        {
+            QuestManager.Instance.DispatchEvent(QuestType.TalkToNPC, npcID);
+        }
 
         if (
             _currentQuestStatus == QuestStatus.Locked
@@ -118,7 +125,6 @@ public class QuestGiverNPC : MonoBehaviour, IInteractable, IDialogueable
                     {
                         _questActivated = true;
                         UpdateQuestStatus();
-                        Debug.Log($"✅ Misión activada: {questID.QuestName}");
 
                         yield return StartCoroutine(ShowDialogueSequence(_dialogueAfterQuest));
                     }

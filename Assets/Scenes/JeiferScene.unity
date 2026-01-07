@@ -1030,6 +1030,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a63c62980313786499199f9527637308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  textNormalColor: {r: 0, g: 0, b: 0, a: 0}
+  textImportantColor: {r: 0, g: 0, b: 0, a: 0}
+  textHealColor: {r: 0, g: 0, b: 0, a: 0}
+  textDamageColor: {r: 0, g: 0, b: 0, a: 0}
   _dialoguePanel: {fileID: 608142564}
   _continueIndicator: {fileID: 1948914042}
   backImage: {fileID: 1982969675}
@@ -2241,7 +2245,7 @@ GameObject:
   - component: {fileID: 1279227686}
   - component: {fileID: 1279227685}
   - component: {fileID: 1279227684}
-  - component: {fileID: 1279227683}
+  - component: {fileID: 1279227688}
   m_Layer: 0
   m_Name: CountdownZone2
   m_TagString: Untagged
@@ -2249,21 +2253,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1279227683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1279227682}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de1dd11f09f254ece9af35c486aca318, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  zoneId: {fileID: 11400000, guid: f8c96e51c958ee14388fb19ddccea712, type: 2}
-  triggerReachZone: 1
-  triggerCountdown: 1
 --- !u!65 &1279227684
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2353,6 +2342,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1279227688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1279227682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 265989d5602e846548e3a7d25a089b7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  zoneId: {fileID: 11400000, guid: f8c96e51c958ee14388fb19ddccea712, type: 2}
+  triggerReachZone: 1
+  triggerCountdown: 1
 --- !u!1001 &1308772366
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2718,12 +2722,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1584840401}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de1dd11f09f254ece9af35c486aca318, type: 3}
+  m_Script: {fileID: 11500000, guid: 265989d5602e846548e3a7d25a089b7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   zoneId: {fileID: 11400000, guid: a337e31f60dc94803afc701d1a8576e8, type: 2}
-  triggerReachZone: 1
-  triggerCountdown: 1
+  triggerReachZone: 0
+  triggerCountdown: 0
 --- !u!1 &1738467044
 GameObject:
   m_ObjectHideFlags: 0
@@ -3698,24 +3702,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 2017244650}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d47669d675214b85894d993ee721ba5, type: 3}
+  m_Script: {fileID: 11500000, guid: 4b5ce595e4de94025b335b846d252b4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   npcID: {fileID: 11400000, guid: f9e26cbca49584fc4a734afd341f8ffa, type: 2}
-  questID: {fileID: 11400000, guid: 3a7474f2df888464bb171d0d2b0018d1, type: 2}
+  questID: {fileID: 0}
   _oneTimeOnly: 1
-  _npcName: NPC
+  _npcName: NPC Test
   _dialogueBeforeQuest:
-  - "Hola, \xBFpuedes ayudarme?"
-  - Ten esta mision.
-  _dialogueAfterQuest:
-  - "\xA1Gracias! Buena suerte con la misi\xF3n."
-  _dialogueQuestActive:
-  - "Ya te di esa misi\xF3n. \xA1Ve a completarla!"
-  _dialogueQuestCompleted:
-  - "\xA1Gracias por completar la misi\xF3n!"
-  _dialogueQuestLocked:
-  - "A\xFAn no puedes recibir esta misi\xF3n."
+  - hola
+  - 'no tengo mision
+
+'
+  _dialogueAfterQuest: []
+  _dialogueQuestActive: []
+  _dialogueQuestCompleted: []
+  _dialogueQuestLocked: []
 --- !u!136 &2017244652
 CapsuleCollider:
   m_ObjectHideFlags: 0

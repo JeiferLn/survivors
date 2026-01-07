@@ -1,4 +1,4 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Quest IDs/NPC")]
+[CreateAssetMenu(menuName = "IDs/NPC")]
 public class NpcId : ScriptableObject { }

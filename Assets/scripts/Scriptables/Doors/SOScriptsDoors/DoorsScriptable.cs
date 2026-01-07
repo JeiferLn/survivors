@@ -6,10 +6,10 @@ public class DoorData : ScriptableObject
 {
     public DoorType doorType;
     public string doorName;
-    
+
     [ShowIf("@doorType == DoorType.KeyRequired")]
-    public KeyIds doorId;
-    
+    public KeyId doorId;
+
     [ShowIf("@doorType == DoorType.Locked")]
     public string lockedMessage;
 

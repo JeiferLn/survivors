@@ -1,4 +1,4 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Quest IDs/Craft")]
+[CreateAssetMenu(menuName = "IDs/Craft")]
 public class CraftId : ScriptableObject { }

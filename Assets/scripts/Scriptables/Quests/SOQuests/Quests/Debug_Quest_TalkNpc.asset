@@ -12,12 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2014fac9987e45c397329ba077de58b, type: 3}
   m_Name: Debug_Quest_TalkNpc
   m_EditorClassIdentifier: 
-  QuestId: 
-  QuestName: 
-  Description: 
+  QuestId: Debug_Quest_TalkNpc
+  QuestName: TalkNpc
+  Description: Debug_Quest_TalkNpc
   Category: 0
-  Objectives: []
+  Objectives:
+  - Type: 2
+    Zone: {fileID: 0}
+    RequiredTime: 0
+    ReachZone: {fileID: 0}
+    Npc: {fileID: 11400000, guid: f9e26cbca49584fc4a734afd341f8ffa, type: 2}
+    Item: {fileID: 0}
+    RequiredAmount: 0
+    ItemToCraft: {fileID: 0}
+    CraftRequiredAmount: 0
   RequiredQuests: []
   UnlocksQuests: []
   BlocksQuests: []
-  AutoActivateOnStart: 0
+  AutoActivateOnStart: 1

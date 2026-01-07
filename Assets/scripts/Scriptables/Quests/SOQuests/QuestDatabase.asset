@@ -16,7 +16,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c4aaa62330aaf4317aecdb7dcae64dd0, type: 2}
   mainReachZone:
   - {fileID: 11400000, guid: 3a7474f2df888464bb171d0d2b0018d1, type: 2}
-  mainTalkToNPC: []
+  mainTalkToNPC:
+  - {fileID: 11400000, guid: 6122499074d344fd9ab5604717539e16, type: 2}
   mainCollectItem: []
   mainCraftItem: []
   sideCountdown:

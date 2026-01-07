@@ -29,4 +29,4 @@ MonoBehaviour:
   RequiredQuests: []
   UnlocksQuests: []
   BlocksQuests: []
-  AutoActivateOnStart: 1
+  AutoActivateOnStart: 0

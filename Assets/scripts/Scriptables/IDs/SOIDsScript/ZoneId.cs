@@ -1,4 +1,4 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Quest IDs/Zone")]
+[CreateAssetMenu(menuName = "IDs/Zone")]
 public class ZoneId : ScriptableObject { }

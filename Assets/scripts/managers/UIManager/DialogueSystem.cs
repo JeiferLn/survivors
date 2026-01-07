@@ -18,11 +18,12 @@ public class DialogueSystem : MonoBehaviour
 
     private TextMeshProUGUI _tmpText;
     private TextAnimatorPlayer _textAnimatorPlayer;
-    
-    public Color textNormalColor;
-    public Color textImportantColor;
-    public Color textHealColor;
-    public Color textDamageColor;    
+   
+    // Text Colors
+    [SerializeField]
+    private Color KeyTextColor;
+    [HideInInspector]
+    public string keyColor;
     
     [SerializeField]
     private GameObject _dialoguePanel;
@@ -127,6 +128,7 @@ public class DialogueSystem : MonoBehaviour
         _tmpText = GetComponent<TextMeshProUGUI>();
         _textAnimatorPlayer = GetComponent<TextAnimatorPlayer>();
 
+        SetTexColors();
         ValidateReferences();
         SetupTextAnimatorEvents();
         SetPanelActive(false);
@@ -136,6 +138,7 @@ public class DialogueSystem : MonoBehaviour
     {
         CleanupTextAnimatorEvents();
     }
+   
 
     private void Update()
     {
@@ -148,6 +151,11 @@ public class DialogueSystem : MonoBehaviour
     // ══════════════════════════════════════════════════════════════
     // SETUP
     // ══════════════════════════════════════════════════════════════
+    
+    private void SetTexColors()
+    {
+        keyColor = ColorUtility.ToHtmlStringRGBA(KeyTextColor);
+    }
 
     private void ValidateReferences()
     {

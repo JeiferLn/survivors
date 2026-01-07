@@ -1,39 +1,30 @@
-using PrimeTween;
 using UnityEngine;
+using PrimeTween;
 
 public class Door : MonoBehaviour, IInteractable
 {
-    public enum DoorType
-    {
-        Normal,
-        Locked,
-        KeyRequired
-    }
-
-    [SerializeField]
+    [Header("Door Data")]  
+    public DoorData doorData;
     private DoorType _doorType;
-
-    [SerializeField]
-    private float _openAngle = 90f;
-
-    [SerializeField]
-    private float _openSpeed = 0.5f;
-
-    public string _requiredKeyId = "key_01";
-    public string _lockedMessage = "La puerta está bloqueada";
-    public string _noKeyMessage = "Necesitas una llave";
-
+    private string _requiredKey;
+    
+    
+    // Estados
     private bool _isOpen;
     private bool _isLocked;
     private float _currentAngle;
     private Tween _currentTween;
 
+    [SerializeField] private float _openAngle = 90f; 
+    [SerializeField] private float _openSpeed = 0.5f;
+   
     public bool IsLocked => _isLocked;
-    public string RequiredKeyId => _requiredKeyId;
     public DoorType CurrentDoorType => _doorType;
 
     private void Awake()
     {
+        _requiredKey = doorData.openKey.ToString();
+        _doorType = doorData.doorType;
         _isLocked = _doorType != DoorType.Normal;
     }
 
@@ -53,14 +44,12 @@ public class Door : MonoBehaviour, IInteractable
             return;
         }
 
-        if (keyId != _requiredKeyId)
+        if (keyId != _requiredKey)
         {
-            Debug.Log(_noKeyMessage);
             return;
         }
 
         _isLocked = false;
-        Debug.Log($"Usaste la llave {_requiredKeyId}");
         ToggleDoor();
     }
 
@@ -85,15 +74,5 @@ public class Door : MonoBehaviour, IInteractable
                 transform.localRotation = Quaternion.Euler(0f, value, 0f);
             }
         );
-    }
-
-    public string GetInteractionText()
-    {
-        if (_isLocked)
-            return _doorType == DoorType.KeyRequired
-                ? $"{_noKeyMessage} [{_requiredKeyId}]"
-                : _lockedMessage;
-
-        return _isOpen ? "Cerrar puerta" : "Abrir puerta";
     }
 }

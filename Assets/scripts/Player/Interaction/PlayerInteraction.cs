@@ -237,29 +237,26 @@ public class PlayerInteraction : MonoBehaviour
         if (door is null)
             return;
 
-        string msgDoorLocked = door._lockedMessage;
-        string msgDoorNeedKey = door._noKeyMessage;
-
-        if (door.CurrentDoorType == Door.DoorType.Locked)
+         string msgDoorLocked = door.doorData.lockedMessage;
+         string msgDoorNeedKey = door.doorData.neededKeyMessage + $" {door.doorData.openKey.name}.";
+         
+        if (door.CurrentDoorType == DoorType.Locked)
         {
-            Debug.Log(msgDoorLocked);
+            Debug.Log(msgDoorLocked );
             return;
         }
 
-        if (door.CurrentDoorType == Door.DoorType.KeyRequired && door.IsLocked)
+        if (door.CurrentDoorType == DoorType.KeyRequired && door.IsLocked)
         {
-            string requiredKey = door.RequiredKeyId;
+            string requiredKey = door.doorData.openKey.ToString();
 
             if (HasKey(requiredKey))
             {
                 door.InteractWithKey(requiredKey);
             }
             else
-            {
-                if (door.IsLocked)
-                {
-                    Debug.Log(msgDoorNeedKey);
-                }
+            { 
+                DialogueSystem.Instance.SendText($"{msgDoorNeedKey} ");
             }
         }
         else

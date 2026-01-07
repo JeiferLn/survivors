@@ -9,8 +9,7 @@ public class KeyPickup : MonoBehaviour, IInteractable
     private string _keyId;
     private string _description;
     private string _ItemName;
-
-
+    
     [SerializeField]
     private bool _destroyOnPickup = true;
 
@@ -21,7 +20,7 @@ public class KeyPickup : MonoBehaviour, IInteractable
     private void Start()
     {
         objectData = GetComponent<ItemInfo>();
-        _keyId = objectData.itemData.itemID.ToString();
+        _keyId = objectData.itemData.keyId.ToString();
         _ItemName = objectData.itemData.itemName;   
         _description = objectData.itemData.itemDescription;
     }
@@ -31,12 +30,12 @@ public class KeyPickup : MonoBehaviour, IInteractable
         // Buscar al jugador
         PlayerInteraction player = FindFirstObjectByType<PlayerInteraction>();
         // Resaltar objeto de importancia
-        string importantColor = ColorUtility.ToHtmlStringRGBA(DialogueSystem.Instance.textImportantColor);
+        string kColor = DialogueSystem.Instance.keyColor;
         
         if (player != null)
         {
             player.AddKey(_keyId);
-            DialogueSystem.Instance.SendText($"Obtuviste <color=#{importantColor}>{_ItemName}</color>,\n" + _description);
+            DialogueSystem.Instance.SendText($"Obtuviste <color=#{kColor}>{_ItemName}</color>");
             if (_destroyOnPickup) Destroy(gameObject);
         }
     }

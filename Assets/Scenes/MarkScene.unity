@@ -1208,12 +1208,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1455dc08499a29b43a9089e1a56c8b2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _doorType: 2
+  doorData: {fileID: 11400000, guid: c5c7fa37fd28f0a43a548ea05b2a6ea5, type: 2}
   _openAngle: -90
   _openSpeed: 1
-  _requiredKeyId: key_01
-  _lockedMessage: "La puerta est\xE1 bloqueada"
-  _noKeyMessage: Necesitas una llave
 --- !u!65 &839997554
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1600,7 +1597,7 @@ Transform:
   m_GameObject: {fileID: 1218887811}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 71.85, y: 28.92, z: -49.74}
+  m_LocalPosition: {x: 70.2, y: 28.92, z: -50}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1848,8 +1845,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0.000030518, y: 0}
-  m_SizeDelta: {x: 1427.537, y: 74.571}
+  m_AnchoredPosition: {x: 0.000030518, y: 53}
+  m_SizeDelta: {x: 1427.537, y: 81.692}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1275270425
 MonoBehaviour:
@@ -2084,15 +2081,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a63c62980313786499199f9527637308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textNormalColor: {r: 1, g: 1, b: 1, a: 1}
-  textImportantColor: {r: 1, g: 0.80716705, b: 0, a: 1}
-  textHealColor: {r: 0.14242072, g: 0.90943396, b: 0.45273355, a: 1}
-  textDamageColor: {r: 1, g: 0.33945617, b: 0.1462264, a: 1}
+  KeyTextColor: {r: 0.96981126, g: 0.8160491, b: 0.107960045, a: 1}
+  keyColor: 
   _dialoguePanel: {fileID: 1275270422}
   _continueIndicator: {fileID: 1726997184}
   backImage: {fileID: 422495796}
   _maxLinesPerPage: 2
-  _maxCharsPerLine: 50
+  _maxCharsPerLine: 100
   _continueKey: 101
   _allowMouseClick: 0
   OnReceiveText:

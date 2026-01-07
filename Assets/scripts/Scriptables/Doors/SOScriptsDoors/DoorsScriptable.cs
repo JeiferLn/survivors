@@ -8,14 +8,14 @@ public class DoorData : ScriptableObject
     public string doorName;
 
     [ShowIf("@doorType == DoorType.KeyRequired")]
-    public KeyId doorId;
+    public KeyId openKey;
 
     [ShowIf("@doorType == DoorType.Locked")]
     public string lockedMessage;
 
     [ShowIf("@doorType == DoorType.KeyRequired")]
-    public string noKeyMessage;
+    public string neededKeyMessage;
 
     [ShowIf("@doorType == DoorType.KeyRequired")]
-    public string unlockedMessage;
+    public string usedKeyMessage;
 }

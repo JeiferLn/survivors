@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4105aaae6f9f4374ca3bef356b8d6188, type: 3}
-  m_Name: TestKey01
+  m_Name: Test-Door-01
   m_EditorClassIdentifier: 
-  doorId: 0
-  doorType: 0
-  doorName: 
-  lockedMessage: 
-  noKeyMessage: 
-  unlockedMessage: 
+  doorType: 2
+  doorName: Puerta del almacen
+  openKey: {fileID: 11400000, guid: 679f949efa4784dfa9a296cd841a4ec9, type: 2}
+  lockedMessage: No se puede abrir
+  neededKeyMessage: Necesitas las
+  usedKeyMessage: 'Usaste '

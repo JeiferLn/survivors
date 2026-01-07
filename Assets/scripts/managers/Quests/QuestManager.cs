@@ -165,6 +165,18 @@ public class QuestManager : MonoBehaviour
                 $"Objetivo completado: Hablar con {objective.Npc.name} (Misión: {quest.QuestName})"
             );
         }
+        else if (objective.Type == QuestType.CollectItem)
+        {
+            Debug.Log(
+                $"Objetivo completado: Recolectar {objective.RequiredAmount}x {objective.Item.name} (Misión: {quest.QuestName})"
+            );
+        }
+        else if (objective.Type == QuestType.CraftItem)
+        {
+            Debug.Log(
+                $"Objetivo completado: Craftear {objective.CraftRequiredAmount}x {objective.ItemToCraft.name} (Misión: {quest.QuestName})"
+            );
+        }
 
         CheckQuestCompletion(quest);
     }
@@ -187,6 +199,30 @@ public class QuestManager : MonoBehaviour
 
         state.Status = QuestStatus.Completed;
         UpdateActiveQuestCache(quest, false);
+
+        bool hasCollectItemObjective = false;
+        bool hasCraftItemObjective = false;
+        foreach (var obj in quest.Objectives)
+        {
+            if (obj.Type == QuestType.CollectItem)
+            {
+                hasCollectItemObjective = true;
+            }
+            if (obj.Type == QuestType.CraftItem)
+            {
+                hasCraftItemObjective = true;
+            }
+        }
+
+        if (hasCollectItemObjective)
+        {
+            Debug.Log($"🎯 Misión completada (CollectItem): {quest.QuestName}");
+        }
+
+        if (hasCraftItemObjective)
+        {
+            Debug.Log($"🎯 Misión completada (CraftItem): {quest.QuestName}");
+        }
 
         HandleQuestUnlocks(quest);
         HandleQuestBlocks(quest);

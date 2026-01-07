@@ -175,6 +175,7 @@ public class PlayerInteraction : MonoBehaviour
 
         if (_currentTarget != null)
         {
+            Debug.Log($"[PlayerInteraction] Interactuando con: {_currentTarget.GetType().Name}");
             if (_currentTarget is Door door)
             {
                 InteractWithDoor(door);
@@ -188,6 +189,10 @@ public class PlayerInteraction : MonoBehaviour
         {
             _currentEquipableTarget.Equip(_equipmentController);
             _currentEquipableTarget = null;
+        }
+        else
+        {
+            Debug.Log("[PlayerInteraction] No hay objetivo válido para interactuar.");
         }
     }
 

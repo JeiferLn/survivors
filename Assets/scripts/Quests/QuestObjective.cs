@@ -35,7 +35,7 @@ public class QuestObjective
 
     [ShowIf(nameof(IsCraftItem))]
     [BoxGroup("Craft Item")]
-    public ItemId ItemToCraft;
+    public CraftId ItemToCraft;
 
     [ShowIf(nameof(IsCraftItem))]
     [BoxGroup("Craft Item")]

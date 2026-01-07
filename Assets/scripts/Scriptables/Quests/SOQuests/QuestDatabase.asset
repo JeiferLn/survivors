@@ -18,8 +18,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3a7474f2df888464bb171d0d2b0018d1, type: 2}
   mainTalkToNPC:
   - {fileID: 11400000, guid: 6122499074d344fd9ab5604717539e16, type: 2}
-  mainCollectItem: []
-  mainCraftItem: []
+  mainCollectItem:
+  - {fileID: 11400000, guid: 68758cdf2620e4190a4ffd55069065e5, type: 2}
+  mainCraftItem:
+  - {fileID: 11400000, guid: 224a575731be44e4fb6ca41f1aac71f6, type: 2}
   sideCountdown:
   - {fileID: 11400000, guid: 4727465c1784d0945b0f01bde72949f9, type: 2}
   sideReachZone:

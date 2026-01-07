@@ -10,22 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2014fac9987e45c397329ba077de58b, type: 3}
-  m_Name: Debug_Quest_CollectItem
+  m_Name: Debug_Quest_Craft
   m_EditorClassIdentifier: 
-  QuestId: Debug_Quest_CollectItem
-  QuestName: CollectItem
-  Description: Debug_Quest_CollectItem
+  QuestId: Debug_Quest_Craft
+  QuestName: Craft
+  Description: Debug_Quest_Craft
   Category: 0
   Objectives:
-  - Type: 3
+  - Type: 4
     Zone: {fileID: 0}
     RequiredTime: 0
     ReachZone: {fileID: 0}
     Npc: {fileID: 0}
-    Item: {fileID: 11400000, guid: a2e1c0f13f22a490f95facd5be80243d, type: 2}
-    RequiredAmount: 3
-    ItemToCraft: {fileID: 0}
-    CraftRequiredAmount: 0
+    Item: {fileID: 0}
+    RequiredAmount: 0
+    ItemToCraft: {fileID: 11400000, guid: 608ce30e3b95b43bd8221ad480d62880, type: 2}
+    CraftRequiredAmount: 3
   RequiredQuests: []
   UnlocksQuests: []
   BlocksQuests: []

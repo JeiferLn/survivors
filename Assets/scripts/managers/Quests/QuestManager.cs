@@ -171,6 +171,12 @@ public class QuestManager : MonoBehaviour
                 $"Objetivo completado: Recolectar {objective.RequiredAmount}x {objective.Item.name} (Misión: {quest.QuestName})"
             );
         }
+        else if (objective.Type == QuestType.CraftItem)
+        {
+            Debug.Log(
+                $"Objetivo completado: Craftear {objective.CraftRequiredAmount}x {objective.ItemToCraft.name} (Misión: {quest.QuestName})"
+            );
+        }
 
         CheckQuestCompletion(quest);
     }
@@ -195,18 +201,27 @@ public class QuestManager : MonoBehaviour
         UpdateActiveQuestCache(quest, false);
 
         bool hasCollectItemObjective = false;
+        bool hasCraftItemObjective = false;
         foreach (var obj in quest.Objectives)
         {
             if (obj.Type == QuestType.CollectItem)
             {
                 hasCollectItemObjective = true;
-                break;
+            }
+            if (obj.Type == QuestType.CraftItem)
+            {
+                hasCraftItemObjective = true;
             }
         }
 
         if (hasCollectItemObjective)
         {
             Debug.Log($"🎯 Misión completada (CollectItem): {quest.QuestName}");
+        }
+
+        if (hasCraftItemObjective)
+        {
+            Debug.Log($"🎯 Misión completada (CraftItem): {quest.QuestName}");
         }
 
         HandleQuestUnlocks(quest);

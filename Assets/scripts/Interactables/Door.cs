@@ -49,6 +49,7 @@ public class Door : MonoBehaviour, IInteractable
             return;
         }
 
+        DialogueSystem.Instance.SendText($"{doorData.usedKeyMessage} {doorData.openKey.name}");
         _isLocked = false;
         ToggleDoor();
     }

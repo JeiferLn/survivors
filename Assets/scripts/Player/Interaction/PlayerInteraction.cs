@@ -175,7 +175,6 @@ public class PlayerInteraction : MonoBehaviour
 
         if (_currentTarget != null)
         {
-            Debug.Log($"[PlayerInteraction] Interactuando con: {_currentTarget.GetType().Name}");
             if (_currentTarget is Door door)
             {
                 InteractWithDoor(door);

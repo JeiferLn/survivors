@@ -8,7 +8,6 @@ public class Door : MonoBehaviour, IInteractable
     private DoorType _doorType;
     private string _requiredKey;
     
-    
     // Estados
     private bool _isOpen;
     private bool _isLocked;
@@ -49,7 +48,8 @@ public class Door : MonoBehaviour, IInteractable
             return;
         }
 
-        DialogueSystem.Instance.SendText($"{doorData.usedKeyMessage} {doorData.openKey.name}");
+        string kColor = DialogueSystem.Instance.keyColor;
+        DialogueSystem.Instance.SendText($"{doorData.usedKeyMessage} <color=#{kColor}>{doorData.openKey.name}</color>.");
         _isLocked = false;
         ToggleDoor();
     }

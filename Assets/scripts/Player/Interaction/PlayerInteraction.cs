@@ -32,8 +32,7 @@ public class PlayerInteraction : MonoBehaviour
     [ListDrawerSettings(ShowFoldout = true, DraggableItems = false)]
     private List<string> _keys = new List<string>();
 
-    [ShowInInspector, ReadOnly]
-    private int KeyCount => _keys.Count;
+    [ShowInInspector, ReadOnly] private int KeyCount => _keys.Count;
 
     private IInteractable _currentTarget;
     private IEquipable _currentEquipableTarget;
@@ -241,12 +240,13 @@ public class PlayerInteraction : MonoBehaviour
         if (door is null)
             return;
 
-         string msgDoorLocked = door.doorData.lockedMessage;
-         string msgDoorNeedKey = door.doorData.neededKeyMessage + $" {door.doorData.openKey.name}.";
-         
+        string kColor = DialogueSystem.Instance.keyColor;
+        string msgDoorLocked = door.doorData.lockedMessage;
+        string msgDoorNeedKey = door.doorData.neededKeyMessage + $" <color=#{kColor}>{door.doorData.openKey.name}</color>.";
+
         if (door.CurrentDoorType == DoorType.Locked)
         {
-            Debug.Log(msgDoorLocked );
+            Debug.Log(msgDoorLocked);
             return;
         }
 
@@ -259,7 +259,7 @@ public class PlayerInteraction : MonoBehaviour
                 door.InteractWithKey(requiredKey);
             }
             else
-            { 
+            {
                 DialogueSystem.Instance.SendText($"{msgDoorNeedKey} ");
             }
         }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   weaponName: Pistol
-  playerWeaponPrefab: {fileID: 0}
+  playerWeaponPrefab: {fileID: 4965438261709640327, guid: a35b8c32acba1334b9b31dfe8cdbc9be, type: 3}
   damage: 10
   recoilAmount: 0
   recoilReturnSpeed: 0

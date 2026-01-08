@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerEquipmentController : MonoBehaviour
 {
     private WeaponContext weaponContext;
+    private WeaponController weaponController;
 
     [Header("References")]
     [SerializeField]
@@ -12,10 +13,12 @@ public class PlayerEquipmentController : MonoBehaviour
     private PlayerAnimationController animationController;
 
     public WeaponData CurrentWeapon { get; private set; }
+    private GameObject currentWeaponPrefab;
 
     private void Awake()
     {
         weaponContext = GetComponent<WeaponContext>();
+        weaponController = GetComponent<WeaponController>();
         playerState = GetComponent<PlayerState>();
         animationController = GetComponentInChildren<PlayerAnimationController>();
     }
@@ -25,20 +28,37 @@ public class PlayerEquipmentController : MonoBehaviour
     {
         UnequipCurrentWeapon();
 
-        if (weaponData == null || weaponData.playerWeaponPrefab == null)
+        if (weaponData == null || weaponData.weaponId == null)
+        {
+            Debug.Log($"WeaponData or WeaponId is null");
             return;
+        }
 
-        weaponData.playerWeaponPrefab.SetActive(true);
+        GameObject weaponPrefab = FindWeaponPrefabByID(weaponData.weaponId);
 
+        if (weaponPrefab == null)
+        {
+            Debug.LogWarning(
+                $"No se encontró el prefab para el WeaponId: {weaponData.weaponId.name}"
+            );
+            return;
+        }
+
+        weaponPrefab.SetActive(true);
+        currentWeaponPrefab = weaponPrefab;
         CurrentWeapon = weaponData;
 
         playerState.SetCombatState(PlayerCombatState.Armed);
 
-        if (weaponData.playerWeaponPrefab.TryGetComponent(out WeaponModel weaponModel))
+        if (weaponPrefab.TryGetComponent(out WeaponModel weaponModel))
         {
             animationController.SetLeftHandIKTarget(weaponModel.leftHandGrip);
 
             weaponContext.SetWeapon(weaponData, weaponModel);
+        }
+        else
+        {
+            Debug.LogWarning($"El prefab {weaponPrefab.name} no tiene el componente WeaponModel");
         }
     }
 
@@ -47,11 +67,42 @@ public class PlayerEquipmentController : MonoBehaviour
         if (CurrentWeapon == null)
             return;
 
-        CurrentWeapon.playerWeaponPrefab.SetActive(false);
+        if (currentWeaponPrefab != null)
+        {
+            currentWeaponPrefab.SetActive(false);
+            currentWeaponPrefab = null;
+        }
+
         CurrentWeapon = null;
 
         weaponContext.ClearWeapon();
         playerState.SetCombatState(PlayerCombatState.None);
         animationController.SetLeftHandIKTarget(null);
+    }
+
+    // -------- HELPER METHODS --------
+    private GameObject FindWeaponPrefabByID(WeaponId weaponId)
+    {
+        if (weaponController == null || weaponController.weaponPrefabs == null)
+        {
+            Debug.LogWarning("WeaponController o weaponPrefabs no están asignados");
+            return null;
+        }
+
+        foreach (GameObject prefab in weaponController.weaponPrefabs)
+        {
+            if (prefab == null)
+                continue;
+
+            if (prefab.TryGetComponent(out WeaponModel weaponModel))
+            {
+                if (weaponModel.weaponId == weaponId)
+                {
+                    return prefab;
+                }
+            }
+        }
+
+        return null;
     }
 }

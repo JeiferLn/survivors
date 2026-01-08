@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2fac3ddf31f5b43bd7fa52950328ac, type: 3}
   m_Name: Pistol
   m_EditorClassIdentifier: 
+  weaponId: {fileID: 11400000, guid: 979e14439a2c2452b9a1b4992548d202, type: 2}
   weaponName: Pistol
-  playerWeaponPrefab: {fileID: 4965438261709640327, guid: a35b8c32acba1334b9b31dfe8cdbc9be, type: 3}
   damage: 10
   recoilAmount: 0
   recoilReturnSpeed: 0

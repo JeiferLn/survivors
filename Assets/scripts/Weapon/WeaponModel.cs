@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class WeaponModel : MonoBehaviour
 {
+    [Header("Weapon ID")]
+    public WeaponId weaponId;
+
     [Header("References")]
     public Transform leftHandGrip;
     public Transform muzzle;

@@ -10,11 +10,11 @@ public enum WeaponType
 [CreateAssetMenu(fileName = "WeaponData", menuName = "Weapons/WeaponData")]
 public class WeaponData : ScriptableObject
 {
+    [Header("Weapon ID")]
+    public WeaponId weaponId;
+
     [Header("Weapon Name")]
     public string weaponName;
-
-    [Header("Player Weapon Model")]
-    public GameObject playerWeaponPrefab;
 
     [Header("Damage")]
     public float damage;

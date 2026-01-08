@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WeaponController : MonoBehaviour
 {
+    [Header("Weapon Prefabs")]
+    public List<GameObject> weaponPrefabs;
     private WeaponContext weaponContext;
 
     private void Awake()

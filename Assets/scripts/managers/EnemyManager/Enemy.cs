@@ -251,10 +251,12 @@ public class Enemy : MonoBehaviour, IDamageable
                 break;
 
             case EnemyState.TakingDamage:
+                ForceStop();
                 enemyAnimator.ForceAnimation(Animations.Damage, 0.05f);
                 break;
 
             case EnemyState.Dead:
+                ForceStop();
                 enemyAnimator.SetAnimation(Animations.Die, 0.1f);
                 break;
         }
@@ -306,6 +308,8 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (agent == null || target == null || IsDead) return;
         if (!agent.isOnNavMesh) return;
+        
+        if (CurrentState == EnemyState.TakingDamage) return;
 
         mainTarget = target;
 
@@ -459,7 +463,7 @@ public class Enemy : MonoBehaviour, IDamageable
             }
         }
     }
-
+    
     private void Die()
     {
         CurrentState = EnemyState.Dead;
@@ -467,7 +471,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
         Debug.Log($"[Enemy] {name}: Died!");
     }
-
+    
     private void DeactivateEnemy()
     {
         gameObject.SetActive(false);

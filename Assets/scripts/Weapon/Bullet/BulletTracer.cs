@@ -42,7 +42,9 @@ public class BulletTracer : MonoBehaviour
 
             damageable = hit.collider.GetComponent<IDamageable>();
             if (damageable == null)
+            {
                 return;
+            }
 
             damageable.TakeDamage(bulletDamage);
             Destroy(gameObject);

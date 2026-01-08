@@ -29,20 +29,12 @@ public class PlayerEquipmentController : MonoBehaviour
         UnequipCurrentWeapon();
 
         if (weaponData == null || weaponData.weaponId == null)
-        {
-            Debug.Log($"WeaponData or WeaponId is null");
             return;
-        }
 
         GameObject weaponPrefab = FindWeaponPrefabByID(weaponData.weaponId);
 
         if (weaponPrefab == null)
-        {
-            Debug.LogWarning(
-                $"No se encontró el prefab para el WeaponId: {weaponData.weaponId.name}"
-            );
             return;
-        }
 
         weaponPrefab.SetActive(true);
         currentWeaponPrefab = weaponPrefab;

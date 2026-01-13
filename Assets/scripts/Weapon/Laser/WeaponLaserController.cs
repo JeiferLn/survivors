@@ -14,6 +14,11 @@ public class WeaponLaserController : MonoBehaviour
     private float laserExtendSpeed = 30f;
 
     [SerializeField]
+    private GameObject hitPointPrefab;
+
+    private GameObject hitPointInstance;
+
+    [SerializeField]
     private float laserWidth = 0.05f;
 
     private float laserLength01;
@@ -29,6 +34,9 @@ public class WeaponLaserController : MonoBehaviour
 
         laserRenderer.enabled = false;
         laserRenderer.positionCount = 2;
+
+        hitPointInstance = Instantiate(hitPointPrefab);
+        hitPointInstance.SetActive(false);
     }
 
     private void Update()
@@ -52,10 +60,15 @@ public class WeaponLaserController : MonoBehaviour
 
     private void UpdateLaser()
     {
+        // Condiciones para desactivar el láser
         if (!weaponContext.HasWeapon || !playerState.IsAiming || currentLaserDelay > 0f)
         {
             laserRenderer.enabled = false;
             laserLength01 = 0f;
+
+            if (hitPointInstance != null)
+                hitPointInstance.SetActive(false);
+
             return;
         }
 
@@ -64,17 +77,27 @@ public class WeaponLaserController : MonoBehaviour
         Vector3 origin = weaponContext.MuzzlePosition;
         Vector3 direction = weaponContext.FireDirection;
 
-        Vector3 targetEnd = Physics.Raycast(
+        // Raycast para detectar impacto
+        RaycastHit hit;
+        bool hasHit = Physics.Raycast(
             origin,
             direction,
-            out RaycastHit hit,
+            out hit,
             weaponContext.LaserDistance
-        )
+        );
+
+        Vector3 targetEnd = hasHit
             ? hit.point
             : origin + direction * weaponContext.LaserDistance;
 
-        laserLength01 = Mathf.MoveTowards(laserLength01, 1f, Time.deltaTime * laserExtendSpeed);
+        // Animación de extensión del láser
+        laserLength01 = Mathf.MoveTowards(
+            laserLength01,
+            1f,
+            Time.deltaTime * laserExtendSpeed
+        );
 
+        // Animación del grosor
         currentWidth = Mathf.MoveTowards(
             currentWidth,
             laserWidth,
@@ -84,7 +107,23 @@ public class WeaponLaserController : MonoBehaviour
         laserRenderer.startWidth = currentWidth;
         laserRenderer.endWidth = currentWidth;
 
+        // Posiciones del LineRenderer
         laserRenderer.SetPosition(0, origin);
         laserRenderer.SetPosition(1, Vector3.Lerp(origin, targetEnd, laserLength01));
+
+        // Punto de impacto (billboard)
+        if (hitPointInstance != null)
+        {
+            if (hasHit)
+            {
+                hitPointInstance.SetActive(true);
+                hitPointInstance.transform.position = hit.point;
+            }
+            else
+            {
+                hitPointInstance.SetActive(false);
+            }
+        }
     }
 }
+

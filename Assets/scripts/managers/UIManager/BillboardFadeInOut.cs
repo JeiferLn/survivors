@@ -4,19 +4,27 @@ using PrimeTween;
 
 public class BillboardFadeInOut : MonoBehaviour
 {
-    private Material parentMaterial;
-
+    
+    [SerializeField] private bool isCrosshair;
     [SerializeField] private float fadeDuration = 1f;
     [SerializeField] private float fadeAmount = 0.5f;
-
+    
+    private Material parentMaterial;
+    
     private void Awake()
     {
         parentMaterial = GetComponent<MeshRenderer>().material;
+        if (isCrosshair) BillboardManager.Instance.Register(gameObject.transform);
     }
     
     private void OnEnable()
     {
         OnFadeIn();
+    }
+
+    private void OnDisable()
+    {
+        if (isCrosshair) BillboardManager.Instance.Unregister(gameObject.transform);
     }
 
     private void OnFadeIn()

@@ -10,6 +10,9 @@ TagManager:
   - Weapon
   - Limit
   - Indicator
+  - Pistol
+  - Rifle
+  - Crosshair
   layers:
   - Default
   - TransparentFX
